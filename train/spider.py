@@ -1,30 +1,15 @@
 import argparse
 import datetime
 import json
+import os
+
 import requests
 import sys
 import time
-
 import tqdm
-
-import marcov19.settings
-from django.conf import settings
 from utils.log import create_logger
-
-
-settings.configure(DEBUG=True, default_settings=marcov19.settings)
-import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
-import django
-django.setup()
-
-
-from country.models import Country, City
-from train.models import Train, Station, MidStation
-
 # 暂时不管Gxxx/Gxxx格式的版本
 from requests.exceptions import Timeout
-from utils.cast import address_to_jingwei
 
 URL = 'http://train.qunar.com/qunar/checiInfo.jsp'
 DEFAULT_DATE = datetime.datetime.now()
@@ -71,69 +56,22 @@ def main(path, index=0, st=1):
 
     logger = create_logger(logger_name='spider', log_path=os.path.join(path, 'spider.log'), to_stdout=False)
 
-    country, flag = Country.objects.get_or_create(name_ch='中国', defaults={'name_en': 'Chinese'})
     for a in range(index, len(mingming)):
         bar = tqdm.tqdm(range(st, mingming[a][1]))
         for i in bar:
             bar.set_description(f'[prefix={a}]')
             if 0 <= datetime.datetime.now().hour <= 6:
-                time.sleep(1)
+                time.sleep(0.5)
             else:
-                time.sleep(3)
+                time.sleep(1)
             name = mingming[a][0] + str(i)
             result = getinfo(logger=logger, train_number=name)  # result是json
-            if result and not Train.objects.filter(name=name).exists():
-                dept_city_name = result.get('trainInfo').get(name).get('deptCity')
-                dept_sta_name = result.get('trainInfo').get(name).get('deptStation')
-                dept_time = result.get('trainInfo').get(name).get('deptTime')
-                dept_date = result.get('trainInfo').get(name).get('deptTime')
-                arri_city_name = result.get('trainInfo').get(name).get('deptCity')
-                arri_sta_name = result.get('trainInfo').get(name).get('deptStation')
-                arri_time = result.get('trainInfo').get(name).get('deptTime')
-                arri_date = result.get('trainInfo').get(name).get('deptTime')
-
-                dept_city, flag = City.objects.get_or_create(name_ch=dept_city_name)
-                if flag:  # 数据库没有的新的国家，存名字
-                    dept_city.country = country
-                    dept_city.save()
-                dept_sta, flag = Station.objects.get_or_create(name_cn=dept_sta_name)
-                if flag:  # 数据库没有的新的火车站，存经纬度
-                    dept_sta.jingdu, dept_sta.weidu = address_to_jingwei(dept_sta_name + '站')
-                    dept_sta.city = dept_city
-                    dept_sta.save()
-
-                arri_city, flag = City.objects.get_or_create(name_ch=arri_city_name)
-                if flag:  # 数据库没有的新的国家，存名字
-                    arri_city.country = country
-                    arri_city.save()
-                arri_sta, flag = Station.objects.get_or_create(name_cn=arri_sta_name)
-                if flag:  # 数据库没有的新的火车站，存经纬度
-                    arri_sta.jingdu, arri_sta.weidu = address_to_jingwei(arri_sta_name + '站')
-                    arri_sta.city = arri_city
-                    arri_sta.save()
-                train, flag = Train.objects.get_or_create(name=name, defaults={'dept_date': dept_date,
-                                                                         'dept_time': dept_time,
-                                                                         'arri_date': arri_date,
-                                                                         'arri_time': arri_time})
-                if flag:
-                    mid_list = result.get('trainScheduleBody')
-                    for c in mid_list:
-                        content = c.get('content')
-                        sta, flag = Station.objects.get_or_create(name_cn=content[1])
-                        if flag:  # 是新建，存经纬度
-                            sta.jingdu, sta.weidu = address_to_jingwei(arri_sta_name + '站')
-                            sta.city = arri_city
-                            sta.save()
-                        MidStation.objects.create(index=mid_list.index(c) + 1, arri_date=content[2],
-                                                  arri_time=content[3], station=sta, train=train)
-                train.interval = result.get('extInfo').get('allTime')
-                train.kilometer = result.get('extInfo').get('allMileage')
-                train.save()
+            print(result)
+            if result:
                 with open(os.path.join(path, '火车班次json数据.json'), 'a', encoding='utf-8') as fp:
-                    fp.write(str(result) + '\n')
+                    fp.write(json.dumps(result) + '\n')
                 with open(os.path.join(path, '火车班次列表.json'), 'a', encoding='utf-8') as fp:
                     fp.write(name + '\n')
-
 
 
 if __name__ == '__main__':
@@ -147,7 +85,6 @@ if __name__ == '__main__':
     print(f'[{start}] 开始爬取，path={args.path}, index={args.index}, st={args.st}...')
     main(args.path, args.index, args.st)
     end = str(datetime.datetime.now())
-    print(f'抓取完毕，请进入{args.path}文件夹查看数据，进入spider.log文件夹查看日志；开始时间为' + start + '结束时间为' + end)
 
     # res = getinfo('G1317')
     # print(res)
