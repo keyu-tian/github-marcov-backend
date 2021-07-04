@@ -1,5 +1,6 @@
 # gitee-marcov-backend
 
+## 开发前首先将该分支merge进自己的分支，请保证代码稳定再推到该分支，优先推共用代码
 
 #### 介绍
 the backend of MarCov
