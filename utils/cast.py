@@ -6,18 +6,18 @@ import urllib
 
 import requests
 
-
-def encode(s):
-    return urllib.parse.quote(base64.b64encode(str(s).encode()).decode(encoding="utf-8"))
-    # return str(s)
-
-
-def decode(s):
-    if isinstance(s, bytes):
-        s = s.decode()
-    s = urllib.parse.unquote(s)
-    return base64.b64decode(s).decode(encoding="utf-8")
-    # return s
+#
+# def encode(s):
+#     return urllib.parse.quote(base64.b64encode(str(s).encode()).decode(encoding="utf-8"))
+#     # return str(s)
+#
+#
+# def decode(s):
+#     if isinstance(s, bytes):
+#         s = s.decode()
+#     s = urllib.parse.unquote(s)
+#     return base64.b64decode(s).decode(encoding="utf-8")
+#     # return s
 
 
 def data_to_str(data: object):
