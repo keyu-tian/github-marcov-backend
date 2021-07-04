@@ -1,19 +1,9 @@
 from django.db import models
 
-from utils.cast import decode, encode
-
 DT_LENGTH = 64
 
+
 class Station(models.Model):
-    @staticmethod
-    def get_via_encoded_id(encoded_id):
-        u = Station.objects.filter(id=int(decode(encoded_id)))
-        return u.get() if u.exists() else None
-
-    @property
-    def encoded_id(self):
-        return encode(self.id)
-
     name_cn = models.CharField(max_length=512, null=False)
     jingdu = models.FloatField(blank=True, null=True)
     weidu = models.FloatField(blank=True, null=True)
@@ -21,15 +11,6 @@ class Station(models.Model):
 
 
 class Train(models.Model):
-    @staticmethod
-    def get_via_encoded_id(encoded_id):
-        u = Train.objects.filter(id=int(decode(encoded_id)))
-        return u.get() if u.exists() else None
-
-    @property
-    def encoded_id(self):
-        return encode(self.id)
-
     name = models.CharField(max_length=64, null=False)  # 火车号
     dept_date = models.CharField(max_length=DT_LENGTH, null=True, blank=True)
     dept_time = models.CharField(max_length=DT_LENGTH, null=True, blank=True)
