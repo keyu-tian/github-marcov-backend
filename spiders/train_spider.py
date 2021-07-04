@@ -124,7 +124,7 @@ def distributed_main():
     except:
         with open(os.path.join(path, '火车班次爬到哪了.txt'), 'r', encoding='utf-8') as fp:
             s = fp.read()
-        print(f'[rk{dist.rank}] 爬失败了，请你下次从 {s} 再开始爬！')
+        print(f'[rk{dist.rank}] 爬失败了，请你下次从 {s.strip()} 再开始爬！')
     else:
         print(f'[rk{dist.rank}] 爬完了！')
 
