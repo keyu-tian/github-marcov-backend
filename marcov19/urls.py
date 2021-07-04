@@ -15,7 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from risk.views import *
 
 urlpatterns = [
     path('/', admin.site.urls),
+
+    path('travel/risk_area', RiskAreaList.as_view(), name='risk_area')
 ]
