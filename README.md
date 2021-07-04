@@ -1,37 +1,59 @@
 # gitee-marcov-backend
 
+
 #### 介绍
 the backend of MarCov
 
-#### 软件架构
-软件架构说明
+
+#### 提交信息（Commit Message）编写规范
+
+1.  格式为：`[tag] comments`
+2.  `[tag]` 只能是其中之一：
+    - `[new]`：新功能开发。
+    - `[upd]`：正常更新现有功能（**注意**：debug 过程中的更新不是正常更新，所以不是 [upd]，而是下面的 [dbg]）。
+    - `[del]`：删除某个代码功能（**注意**：debug 后的删除无用代码不是 [del]，而是下面的 [fix]）。
+    - `[dbg]`：debug 过程中的提交，比如暂时修改一些代码，或者添加 debug 代码。
+    - `[fix]`：debug 结束，是 fix 一个 bug 的提交，包括删除无用的、用来 debug 的代码。
+    - `[ref]`：重构，不改变功能。
+    - `[merge]`：仅仅只是 merge 分支。**只有这个 [tag] 不是三个字母，便于记忆。**
+3.  `comments` 可以使用中文，简要描述一下这次提交是做了什么。如果只修改了一两个文件，请详细指出是哪个文件；如果修改了多个文件，请简要描述本次修改的大概目的。
+4.  请不要在短时间内连续提交；多个提交可以在本地积累之后一次性提交（如果是使用 PyCharm，可以把本地的多个 commit 合并之后，得到一个总的 commit，再一次性提交。这个合并的教程请见最下方）。
 
 
-#### 安装教程
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+#### 风格规范
+1.  务必确保代码的可读性，命名不要过短。
+2.  使用 4 空格而不是 `\t`（PyCharm 的右下角选择 `4 spaces` 即可）。
+3.  如无特别要求，所有的**函数**使用下划线命名法，而不是驼峰（比如 `foo_bar` 而不是 `fooBar`）。
+4.  如无特别要求，所有的**类名**使用驼峰命名法，而不是下划线（比如 `fooBar` 而不是 `foo_bar`）。
+5.  其他的比较自由。请注意可读性。
+6.  后续可能会使用自动检查或者格式化插件。
 
 
-#### 特技
+#### 开发规范
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+1.  每个开发者独立分支开发
+2.  开发完毕、**本地**简单测试完毕后，可以 push 到自己分支。
+3.  代码自动审查完毕后可以 merge 到 dev 分支，待在**服务器上**测试。
+4.  测试完毕的 dev 分支可以被管理员 merge 到 main 分支。
+5.  重大版本发布后，在 main 分支上会打上被保护的 tag，并发布 release 版本。
+
+
+#### 注意事项
+
+1.  杂七杂八的文件（不想同步到 git 上）请列在 .gitignore 里，比如 .idea 这个文件夹。
+
+
+
+
+#### 如何通过 PyCharm 合并多个本地的未 push 上去的 commits：
+
+1.  点击左下角的 git.
+2.  点击 `log` 选项卡。
+3.  可以在中间看见多个本地的未 push 上去的 commits.
+4.  找到这些 commits 里面最早的一个。
+5.  右键这一个 commit，点 Interactively Rebase from Here...
+6.  `ctrl+a` 全选，点上面的 Squash，在弹出的框里写 Commit Message（最终的一个 message）。
+7.  写完之后点一下下面的空白区域，然后可以看到上面所有的 commits 都指向了一个最终的 commit。
+8.  点 start rebasing，然后结束。
+9.  这个时候再提交，就只有一个 commit 了。
+
