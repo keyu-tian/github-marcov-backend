@@ -6,7 +6,7 @@ from colorama import Fore
 
 def walk_check(key):
     lines = 0
-    for path, dirs, files in os.walk(''):
+    for path, dirs, files in os.walk('.'):
         if any(s in path for s in ['__pycache__', 'migrations', 'frontend']):
             continue
         for f_name in files:

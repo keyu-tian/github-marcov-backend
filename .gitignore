@@ -13,7 +13,7 @@ store
 *.log
 *.out
 
-logging/**
 store/**
 
 upload/
+logging/
