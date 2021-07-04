@@ -63,6 +63,9 @@ def getinfo(logger, train_number='G99', date=DEFAULT_DATE_STR):
 
 
 def main(path, index=0, st=1):
+    if not os.path.exists(path):
+        os.makedirs(path)
+        
     logger = create_logger(logger_name='spider', log_path=os.path.join(path, 'spider.log'), to_stdout=False)
     
     country, flag = Country.objects.get_or_create(name_ch='中国', defaults={'name_en': 'Chinese'})
@@ -133,9 +136,9 @@ def main(path, index=0, st=1):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train-Spider')
-    parser.add_argument('path', default='train_crawler', type=str)
-    parser.add_argument('index', default=0, type=int)
-    parser.add_argument('st', default=1, type=int)
+    parser.add_argument('path', required=False, default='train_crawler', type=str)
+    parser.add_argument('index', required=False, default=0, type=int)
+    parser.add_argument('st', required=False, default=1, type=int)
     args = parser.parse_args()
     
     start = str(datetime.datetime.now())
