@@ -4,6 +4,9 @@ import json
 import requests
 import sys
 import time
+
+import tqdm
+
 import marcov19.settings
 from django.conf import settings
 from utils.log import create_logger
@@ -70,7 +73,9 @@ def main(path, index=0, st=1):
 
     country, flag = Country.objects.get_or_create(name_ch='中国', defaults={'name_en': 'Chinese'})
     for a in range(index, len(mingming)):
-        for i in range(st, mingming[a][1]):
+        bar = tqdm.tqdm(range(st, mingming[a][1]))
+        for i in bar:
+            bar.set_description(f'[prefix={a}]')
             if 0 <= datetime.datetime.now().hour <= 6:
                 time.sleep(1)
             else:
