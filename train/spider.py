@@ -134,8 +134,8 @@ def main(path, index=0, st=1):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train-Spider')
     parser.add_argument('path', default='train_crawler', type=str)
-    parser.add_argument('index', default=0, type=str, required=True)
-    parser.add_argument('st', default=1, type=str, required=True)
+    parser.add_argument('index', default=0, type=str)
+    parser.add_argument('st', default=1, type=str)
     args = parser.parse_args()
     
     start = str(datetime.datetime.now())
