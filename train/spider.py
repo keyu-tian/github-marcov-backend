@@ -75,7 +75,7 @@ def main(index=0, st=1):
             if 0 <= datetime.datetime.now().hour <= 6:
                 time.sleep(1)
             else:
-                time.sleep(5)
+                time.sleep(3)
             name = mingming[a][0] + str(i)
             result = getinfo(train_number=name)    # result是json
             if result and not Train.objects.filter(name=name).exists():
