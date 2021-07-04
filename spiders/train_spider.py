@@ -8,10 +8,7 @@ import requests
 from requests.exceptions import Timeout
 from tqdm import tqdm
 
-try:
-    from ..utils.log import create_logger
-except ImportError:
-    from utils.log import create_logger
+from utils.log import create_logger
 
 URL = 'http://train.qunar.com/qunar/checiInfo.jsp'
 DEFAULT_DATE = datetime.datetime.now()
