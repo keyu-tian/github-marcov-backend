@@ -8,6 +8,9 @@ class TNode(object):
         self.is_root = is_root
         self.fail, self.fa = None, None
         self._next = {}
+        1
+        2
+        3
 
     def __call__(self):
         yield self._next
