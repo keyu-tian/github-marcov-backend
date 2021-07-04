@@ -3,19 +3,10 @@ from django.db import models
 from django.db.models import Q
 
 from meta_config import TIME_FMT
-from utils.cast import encode, decode
 from user.hypers import *
 
+
 class User(models.Model):
-    @staticmethod
-    def get_via_encoded_id(encoded_id):
-        u = User.objects.filter(id=int(decode(encoded_id)))
-        return u.get() if u.exists() else None
-
-    @property
-    def encoded_id(self):
-        return encode(self.id)
-
     @property
     def ver_code(self):
         q = VerifyCode.objects.filter(account=self.account)
@@ -39,15 +30,6 @@ class User(models.Model):
 
 
 class VerifyCode(models.Model):
-    @staticmethod
-    def get_via_encoded_id(encoded_id):
-        q = VerifyCode.objects.filter(id=int(decode(encoded_id)))
-        return q.get() if q.exists() else None
-
-    @property
-    def encoded_id(self):
-        return encode(self.id)
-
     code = models.CharField(max_length=20, verbose_name='验证码')
     account = models.EmailField(max_length=50, verbose_name='用户邮箱', null=True, default='')
     expire_time = models.DateTimeField(null=True, verbose_name='过期时间')
