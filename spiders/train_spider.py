@@ -2,13 +2,16 @@ import argparse
 import datetime
 import json
 import os
+import time
 
 import requests
-from tqdm import tqdm
-import time
-from utils.log import create_logger
-# 暂时不管Gxxx/Gxxx格式的版本
 from requests.exceptions import Timeout
+from tqdm import tqdm
+
+try:
+    from ..utils.log import create_logger
+except ImportError:
+    from utils.log import create_logger
 
 URL = 'http://train.qunar.com/qunar/checiInfo.jsp'
 DEFAULT_DATE = datetime.datetime.now()
