@@ -8,6 +8,7 @@ import requests
 from requests.exceptions import Timeout
 from tqdm import tqdm
 
+from meta_config import SPIDER_DATA_DIRNAME
 from utils.log import create_logger
 
 URL = 'http://train.qunar.com/qunar/checiInfo.jsp'
@@ -74,7 +75,7 @@ def main(verbose, path, index=0, st=1):
                     bar.set_description(f'[{name}]')
                     bar.set_postfix_str(f'{data["deptCity"]} => {data["arriCity"]}')
                 with open(os.path.join(path, '火车班次爬到哪了.txt'), 'w', encoding='utf-8') as fp:
-                    fp.write(f'index={current_index}, st={current_st+1}')
+                    fp.write(f'index={current_index}, st={current_st+1}\n')
                 with open(os.path.join(path, '火车班次json数据.json'), 'a', encoding='utf-8') as fp:
                     fp.write(json.dumps(result) + '\n')
                 with open(os.path.join(path, '火车班次列表.json'), 'a', encoding='utf-8') as fp:
@@ -88,7 +89,7 @@ def main(verbose, path, index=0, st=1):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train-Spider')
     parser.add_argument('--verbose', required=False, default=True, type=bool)
-    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'train_spider'), type=str)
+    parser.add_argument('--path', required=False, default=os.path.join(SPIDER_DATA_DIRNAME, 'train_spider'), type=str)
     parser.add_argument('--index', required=False, default=0, type=int)
     parser.add_argument('--st', required=False, default=1, type=int)
     args = parser.parse_args()
@@ -104,7 +105,8 @@ if __name__ == '__main__':
         with open(os.path.join(args.path, '火车班次爬到哪了.txt'), 'r', encoding='utf-8') as fp:
             s = fp.read()
             print(f'爬失败了，请你下次从 {s} 再开始爬！')
-    print(f'爬完了！')
+    else:
+        print(f'爬完了！')
 
     # res = getinfo('G1317')
     # print(res)
