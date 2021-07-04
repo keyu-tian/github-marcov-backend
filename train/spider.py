@@ -26,7 +26,7 @@ URL = 'http://train.qunar.com/qunar/checiInfo.jsp'
 DEFAULT_DATE = datetime.datetime.now()
 DEFAULT_DATE_STR = DEFAULT_DATE.strftime('%Y-%m-%d')  # 默认查询当天的
 
-logger = create_logger(logger_name='crawler', log_path='../logging/crawler.log', to_stdout=False)
+logger = create_logger(logger_name='crawler', log_path='logging/crawler.log', to_stdout=False)
 
 mingming = [('G', 9999),
             ('C', 9999),
