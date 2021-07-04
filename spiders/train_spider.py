@@ -9,7 +9,8 @@ from requests.exceptions import Timeout
 from tqdm import tqdm
 
 from meta_config import SPIDER_DATA_DIRNAME
-from utils.log import create_logger
+from utils.cast import cur_time
+from utils.logger import create_logger
 
 URL = 'http://train.qunar.com/qunar/checiInfo.jsp'
 DEFAULT_DATE = datetime.datetime.now()
@@ -86,16 +87,17 @@ def main(verbose, path, index=0, st=1):
                     bar.set_postfix_str('failed')
 
 
-if __name__ == '__main__':
+def local_main():
+    """
+    在单机上爬取
+    """
     parser = argparse.ArgumentParser(description='Train-Spider')
     parser.add_argument('--verbose', required=False, default=True, type=bool)
     parser.add_argument('--path', required=False, default=os.path.join(SPIDER_DATA_DIRNAME, 'train_spider'), type=str)
     parser.add_argument('--index', required=False, default=0, type=int)
     parser.add_argument('--st', required=False, default=1, type=int)
     args = parser.parse_args()
-
-    # [todo]@tky: 分布式爬取在这里写分布式的初始化，记得 verbose 设为 is_master
-
+    
     start = datetime.datetime.now().strftime('[%m-%d %H:%M:%S]')
     args.path += f'_index{args.index}_st{args.st}'
     print(f'{start} 开始爬！path={args.path}, index={args.index}, st={args.st}...')
@@ -107,6 +109,28 @@ if __name__ == '__main__':
             print(f'爬失败了，请你下次从 {s} 再开始爬！')
     else:
         print(f'爬完了！')
+
+
+def distributed_main():
+    """
+    分布式爬取
+    """
+    input('请确保是tky在跑，否则请跑 local_main 而不是 distributed_main')
+    from utils.pytorch_dist import TorchDistManager
+    dist = TorchDistManager(cur_time(), 'auto', 'auto')
+    path = os.path.join(SPIDER_DATA_DIRNAME, f'train_spider_distributed{dist.rank}')
+    try:
+        main(dist.is_master(), path, dist.rank, 1)
+    except:
+        with open(os.path.join(path, '火车班次爬到哪了.txt'), 'r', encoding='utf-8') as fp:
+            s = fp.read()
+        print(f'[rk{dist.rank}] 爬失败了，请你下次从 {s} 再开始爬！')
+    else:
+        print(f'[rk{dist.rank}] 爬完了！')
+
+
+if __name__ == '__main__':
+    distributed_main()
 
     # res = getinfo('G1317')
     # print(res)
