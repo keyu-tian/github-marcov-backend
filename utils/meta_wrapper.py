@@ -1,21 +1,13 @@
+import functools
 import json
 import time
-import functools
-import traceback
 from datetime import datetime
-import random
-from string import ascii_uppercase
+from pprint import pformat
 
+from colorama import Fore
 from django.http import JsonResponse, HttpResponseForbidden
-from django.contrib.sessions.backends.db import SessionStore
-from colorama import Fore, Back
 
 import meta_config
-from pprint import pprint, pformat
-from typing import List
-from collections import OrderedDict
-
-from utils.cast import cur_time
 
 
 def JSR(*keys): # 这里的 keys 是 @JSR(...) 里面填的 keys
