@@ -12,8 +12,8 @@ then
   source activate "${dj_name}"
 fi
 
-lg_info " install dependencies... (listed in \`req.txt\`)"
-pip install -r req.txt
+lg_info " install dependencies... (listed in \`requirements.txt\`)"
+pip install -r requirements.txt
 
 
 #lg_info "dependencies installed, rebuild database..."
