@@ -3,19 +3,10 @@ from django.db import models
 from django.db.models import Q
 
 from meta_config import TIME_FMT
-from utils.cast import encode, decode
 from user.hypers import *
 
+
 class User(models.Model):
-    @staticmethod
-    def get_via_encoded_id(encoded_id):
-        u = User.objects.filter(id=int(decode(encoded_id)))
-        return u.get() if u.exists() else None
-
-    @property
-    def encoded_id(self):
-        return encode(self.id)
-
     @property
     def ver_code(self):
         q = VerifyCode.objects.filter(account=self.account)
