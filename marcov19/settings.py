@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'user',
     'country',
     'train',
+    'flight'
 ]
 
 MIDDLEWARE = [
