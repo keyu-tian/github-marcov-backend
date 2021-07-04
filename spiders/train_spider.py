@@ -115,7 +115,7 @@ def distributed_main():
     """
     分布式爬取
     """
-    input('请确保是tky在跑，否则请跑 local_main 而不是 distributed_main')
+    print('请确保是tky在跑，否则请跑 local_main 而不是 distributed_main')
     from utils.pytorch_dist import TorchDistManager
     dist = TorchDistManager(cur_time(), 'auto', 'auto')
     path = os.path.join(SPIDER_DATA_DIRNAME, f'train_spider_distributed{dist.rank}')
@@ -130,7 +130,7 @@ def distributed_main():
 
 
 if __name__ == '__main__':
-    distributed_main()
+    local_main()
 
     # res = getinfo('G1317')
     # print(res)
