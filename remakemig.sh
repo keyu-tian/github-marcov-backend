@@ -66,4 +66,4 @@ fi
 #python manage.py "${mode}"
 #
 #
-#lg_info "[finished]"
+lg_info "[finished]"

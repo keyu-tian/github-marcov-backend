@@ -18,61 +18,66 @@ from collections import OrderedDict
 from utils.cast import cur_time
 
 
-def JSR(*keys):
+def JSR(*keys): # 这里的 keys 是 @JSR(...) 里面填的 keys
+    
     def decorator(req_func):
+        
         @functools.wraps(req_func)
         def wrapper(*args, **kw):
-            req_type, func_name = '', ''
-            debug = meta_config.DEBUG and len(args) == 2
-            # user.UnreadCount.GET
+            # args 是被 JSR 装饰的成员函数，所以理论上是有两个参数，第一个是 this 指针（self），第二个是函数唯一的显式参数 request；理论上 kw 是空的
             self, request = args
             req_type = req_func.__name__.upper()
-            # req_type = 'POST' if hasattr(request, 'body') and len(request.body) > 0 else 'GET'
             func_name: str = meta_config.CLS_PARSE_REG.findall(str(type(self)))[0].replace(".views.", ".")
             func_name = '' if len(func_name) < 2 else func_name
             func_name += f'.{req_type}'
-            # func_name += f'.{req_type} ({random.choice(ascii_uppercase) + random.choice(ascii_uppercase)})'
-            # func_name += '.' + req_type.lower()
 
-            # print(Fore.BLUE + f'[{req_type}] called: {func_name}')
-            if req_type == 'POST':
+            if req_type == 'POST':  # 如果是 POST 请求，输入是从 request.body 来的；这里解析一下 inputs，后面打印用。
                 try:
                     inputs = pformat(json.loads(request.body))
                 except:
                     inputs = '[cannot preview body]'
-            else:  # req_type == 'GET':
+            else:   # 如果是 GET 请求，输入是从 request.session 来的；这里解析一下 inputs，后面打印用。
                 inputs = f'session: {pformat(dict(request.session))}'
-                if len(dict(request.GET).keys()):
-                    inputs += f', GET: {pformat(dict(request.GET))}'
+                d_get = dict(request.GET)
+                if len(d_get.keys()):
+                    inputs += f', GET: {pformat(d_get)}'
 
-            prev_time = time.time()
+            prev_time = time.time() # 这个变量是计算后端实际耗时用的
             try:
+                # 【关键】实际就是在这里调用了某个 View 的成员函数
                 values = req_func(*args, **kw)
             except Exception as e:
                 time_cost = time.time() - prev_time
-                time.sleep(0.2)
+                time.sleep(0.1)
+                # 【关键】这个请求出错了，打印
                 print(Fore.MAGENTA + f'[{func_name}] ====! FATAL ERR !==== : {e}, {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
-                                     f'\n input: {inputs}, time: {time_cost:.2f}s')
-                time.sleep(0.2)
+                                     f'\n input: {inputs}, time: {time_cost:.2f}s', flush=True)
+                time.sleep(0.1)
                 # traceback.print_exc()
                 raise e
             else:
                 time_cost = time.time() - prev_time
-                values = list(values) if isinstance(values, (tuple, list)) else [values]
-                # values = list(map(lambda x: x.strftime('%Y-%m-%d %H:%M:%S') if isinstance(x, datetime) else x, values))
-                [values.append('') for _ in range(len(keys) - len(values))]
-                ret_dict = dict(zip(keys, values))
-                if debug and func_name not in ['user.UnreadCount.GET', 'chat.ChatCount.GET', 'entity.DocumentOnline.GET']:
+                values = list(values) if isinstance(values, (tuple, list)) else [values]    # 这个是为了判断，如果只有一个返回值，那么就把它转成一个单元素列表
+                [values.append('') for _ in range(len(keys) - len(values))]                 # 这个是在给没填的返回值位置自动填充空字符串作为返回值
+                ret_dict = dict(zip(keys, values))      # 打包成返回值
+                
+                if meta_config.DEBUG and func_name not in ['user.UnreadCount.GET', 'chat.ChatCount.GET', 'entity.DocumentOnline.GET']:
                     c = Fore.RED if ret_dict.get('status', 0) else Fore.GREEN
                     cur_dt = datetime.now()
                     dt_str = cur_dt.strftime("%H:%M:%S.") + f'{float(cur_dt.strftime("0.%f")):.2f}'[-2:]
-                    print(c + f'[{func_name}] input: {inputs}\n ret: {pformat(ret_dict)}, time: {time_cost:.2f}s, at [{dt_str}]')
+                    # 【关键】给正常返回的请求打印一下
+                    print(c + f'[{func_name}] input: {inputs}\n ret: {pformat(ret_dict)}, time: {time_cost:.2f}s, at [{dt_str}]', flush=True)
                 if ret_dict.get('status', 0) == 403:
                     return HttpResponseForbidden()
-                session_id = request.COOKIES.get('sessionid') if request.COOKIES.get('sessionid', None) else request.session.session_key
+                
+                # 设置 session_id。这个部分不是 tky 写的。
+                session_id = request.COOKIES.get('sessionid', None)
+                if session_id is None:
+                    session_id = request.session.session_key
                 ret_dict['sessionid'] = session_id
                 response = JsonResponse(ret_dict)
                 response.set_cookie(key="sessionid", value=session_id, httponly=False, domain="buaasoft.icu")
+                
                 return response
 
         return wrapper
