@@ -24,7 +24,7 @@ from utils.cast import address_to_jingwei
 
 URL = 'http://train.qunar.com/qunar/checiInfo.jsp'
 DEFAULT_DATE = datetime.datetime.now()
-DEFAULT_DATE_STR = DEFAULT_DATE.strftime('%Y-%m-%d') # 默认查询30天后的时刻表
+DEFAULT_DATE_STR = DEFAULT_DATE.strftime('%Y-%m-%d')    # 默认查询当天的
 
 logging.basicConfig(level=logging.WARN,
                 format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
