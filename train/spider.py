@@ -122,7 +122,7 @@ def main(index=0, st=1):
                             sta.save()
                         MidStation.objects.create(index=mid_list.index(c) + 1, arri_date=content[2],
                                                                arri_time=content[3], station=sta, train=train)
-
+                train.save()
                 gotfile = open('../data/火车班次json数据.json', 'a', encoding='utf-8')
                 gotfile.write(str(result) + '\n')
                 gotfile.close()

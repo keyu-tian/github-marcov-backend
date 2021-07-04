@@ -32,3 +32,6 @@ class MidStation(models.Model):
     arri_time = models.CharField(max_length=DT_LENGTH, blank=True)
     station = models.ForeignKey(Station, related_name='pass_by_train', on_delete=models.CASCADE)
     train = models.ForeignKey(Train, related_name='mid_station', on_delete=models.CASCADE)
+
+    class Meta:
+        ordering = ('index',)
