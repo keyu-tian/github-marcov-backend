@@ -110,8 +110,6 @@ def main(index=0, st=1):
                                                                          'arri_date': arri_date,
                                                                          'arri_time': arri_time})
                 if flag:
-                    train.interval = result.get('extInfo').get('allTime')
-                    train.kilometer = result.get('extInfo').get('allMileage')
                     mid_list = result.get('trainScheduleBody')
                     for c in mid_list:
                         content = c.get('content')
@@ -122,6 +120,8 @@ def main(index=0, st=1):
                             sta.save()
                         MidStation.objects.create(index=mid_list.index(c) + 1, arri_date=content[2],
                                                                arri_time=content[3], station=sta, train=train)
+                train.interval = result.get('extInfo').get('allTime')
+                train.kilometer = result.get('extInfo').get('allMileage')
                 train.save()
                 gotfile = open('../data/火车班次json数据.json', 'a', encoding='utf-8')
                 gotfile.write(str(result) + '\n')
