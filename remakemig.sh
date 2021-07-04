@@ -66,4 +66,4 @@ fi
 #python manage.py "${mode}"
 #
 #
-#lg_info "server exited"
+#lg_info "[finished]"
