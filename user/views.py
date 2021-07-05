@@ -11,7 +11,7 @@ from django.db.utils import IntegrityError, DataError
 from marcov19.settings import SERVER_HOST
 from user.models import User, VerifyCode
 from user.hypers import *
-from utils.network import send_code
+from utils.email_sender import send_code
 from utils.meta_wrapper import JSR
 
 
@@ -47,7 +47,7 @@ class Register(View):
                 u = User.objects.create(**kwargs)
             except IntegrityError:
                 return 101,  # 字段unique未满足
-            except DataError as e:
+            except DataError:
                 return -1,  # 诸如某个CharField超过了max_len的错误
             except:
                 return -1,
@@ -61,7 +61,7 @@ class Register(View):
             return 102,
 
 
-class Send_ver(View):
+class SendVer(View):
     @JSR('status')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
@@ -189,7 +189,7 @@ class ChangeInfo(View):
         u = u.get()
 
         kwargs: dict = json.loads(request.body)
-        if kwargs.keys() != {'name', 'avatar', 'birth'}:
+        if kwargs.keys() != {'name', 'avatar'}:
             return 1,
         if kwargs['name'] is not None and not CHECK_NAME(kwargs['name']):
             return 4,
@@ -197,16 +197,6 @@ class ChangeInfo(View):
         if kwargs['avatar'] is not None and not CHECK_AVATAR(kwargs['avatar']):
             return 102,
         u.avatar = kwargs['avatar']
-        if kwargs['birth'] is not None:
-            try:
-                birth = datetime.strptime(kwargs['birth'][:10], '%Y-%m-%d').date()
-            except ValueError:
-                return 104
-            if birth.year > datetime.today().year or (
-                    birth.year == datetime.today().year and birth.month > datetime.today().month) or (
-                    birth.year == datetime.today().year and birth.month == datetime.today().month and birth.day > datetime.today().day):
-                return 103
-            u.birthday = birth
 
         try:
             u.save()
@@ -216,29 +206,19 @@ class ChangeInfo(View):
 
 
 class UserInfo(View):
-    @JSR('status', 'name', 'avatar', 'identity', 'uid', 'sid', 'birth')
+    @JSR('status', 'name', 'avatar', 'identity', 'uid')
     def get(self, request):
         if not request.session.get('is_login', None):
-            return 0, '', '', 1, '', '', ''
+            return 0, '', '', 1, '',
         try:
             uid = int(request.session.get('uid', None))
         except:
-            return 1, '', '', 1, '', '', ''
+            return 1, '', '', 1, '',
         u = User.objects.filter(id=uid)
         if not u.exists():
-            return -1, '', '', 1, '', '', ''
+            return -1, '', '', 1, '',
         u = u.get()
-        try:
-            scholar = u.scholar_set.get()
-        except:
-            scholar = None
-        sid = ''
-        is_scholar = False
-        if scholar:
-            sid = scholar.id
-            is_scholar = True
-        identity = 2 if (is_scholar and u.identity == 1) else u.identity
-        return 0, u.name, u.avatar, identity, u.id, sid, u.birthday_str
+        return 0, u.name, u.avatar, u.identity, u.id,
 
 
 class Identity(View):
@@ -256,7 +236,7 @@ class Identity(View):
 
 
 class UploadPic(View):
-    @JSR('status', 'url')
+    @JSR('status', 'avatar')
     def post(self, request):
         try:
             file = request.FILES.get('file')
