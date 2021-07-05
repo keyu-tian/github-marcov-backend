@@ -1,6 +1,8 @@
 import argparse
 import datetime
 import json
+import re
+
 import marcov19.settings
 from django.conf import settings
 
@@ -74,7 +76,16 @@ def parse_train_json(path):
                     if flag:  # 是新建，存经纬度
                         sta.jingdu, sta.weidu = address_to_jingwei(arri_sta_name + '站')
                         js = jingwei_to_address(sta.jingdu, sta.weidu)
-                        sta.city = js['result']['addressComponent']['city'][0: -1]
+                        city_name = re.findall(r'(.*)市', js['result']['addressComponent']['city'])
+                        if len(city_name):
+                            city_name = city_name[0]
+                        else:
+                            city_name = js['result']['addressComponent']['city']
+                        mid_city, flag = City.objects.get_or_create(name_ch=city_name)
+                        if flag:  # 数据库没有的新的国家，存名字
+                            mid_city.country = country
+                            mid_city.save()
+                        sta.city = mid_city
                         sta.save()
                     MidStation.objects.create(index=mid_list.index(c) + 1, arri_date=content[2],
                                               arri_time=content[3], station=sta, train=train)
