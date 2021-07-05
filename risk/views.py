@@ -10,5 +10,5 @@ class RiskAreaList(View):
         area_list = RiskArea.objects.all()
         areas = []
         for area in area_list:
-            areas.append({'province': area.province, 'city': area.city, 'detail': area.address, 'risk': area.level})
+            areas.append({'province': area.province, 'city': area.city if area.city is not None else '', 'detail': area.address, 'risk': area.level})
         return areas
