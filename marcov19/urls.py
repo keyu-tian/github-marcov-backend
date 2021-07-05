@@ -15,10 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from train.views import *
 from risk.views import *
 
 urlpatterns = [
     path('/', admin.site.urls),
 
-    path('travel/risk_area', RiskAreaList.as_view(), name='risk_area')
+    path('travel/risk_area', RiskAreaList.as_view(), name='risk_area'),
+    path('travel/train', TravelTrain.as_view()),
 ]
