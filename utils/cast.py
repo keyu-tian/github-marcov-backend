@@ -5,6 +5,7 @@ import base64
 import urllib
 
 import requests
+from risk.models import RiskArea
 
 #
 # def encode(s):
@@ -49,3 +50,57 @@ def address_to_jingwei(address) -> (float, float):
     jingdu = float(js['result']['location']['lng'])
     weidu = float(js['result']['location']['lat'])
     return jingdu, weidu
+
+
+def jingwei_to_address(jingdu, weidu):
+    '''
+    返回的是json：
+{
+  "status": 0,
+  "result": {
+    "location": {
+      "lng": 121.50989077799084,    # 经度
+      "lat": 31.22932842411674
+    },
+    "formatted_address": "上海市黄浦区中山南路187",
+    "business": "外滩,陆家嘴,董家渡",
+    "addressComponent": {
+      "country": "中国",
+      "country_code": 0,
+      "country_code_iso": "CHN",
+      "country_code_iso2": "CN",
+      "province": "上海市",
+      "city": "上海市",
+      "city_level": 2,
+      "district": "黄浦区",
+      "town": "",
+      "town_code": "",
+      "adcode": "310101",
+      "street": "中山南路",
+      "street_number": "187",
+      "direction": "东北",
+      "distance": "91"
+    },
+    "pois": [],
+    "roads": [],
+    "poiRegions": [],
+    "sematic_description": "",
+    "cityCode": 289
+  }
+}
+    '''
+    ak = "vnRXRCTGp9RMnO6xbuGU497wta2P1FFj"
+    url = "http://api.map.baidu.com/reverse_geocoding/v3/?ak=" + ak \
+        +'&output=json&coordtype=wgs84ll&language=zh-CN&location=' + str(weidu) + ',' + str(jingdu)
+    try:
+        res = requests.get(url=url)
+    except:
+        return None, None
+    js = json.loads(res.text)
+    return js
+
+
+# 根据城市名字获取该城市风险等级
+def get_city_risk_level(name) -> int:
+    count = RiskArea.objects.filter(city=name).count()
+    return (count+1)//2

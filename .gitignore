@@ -17,3 +17,9 @@ store/**
 
 upload/
 logging/
+
+spiders_data/
+news/news.json
+flight/flights_data.json
+flight/chromedriver.exe
+risk/risk_areas.json

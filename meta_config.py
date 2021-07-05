@@ -2,6 +2,8 @@ import re
 
 DEBUG = True
 
+SPIDER_DATA_DIRNAME = 'spiders_data'
+
 HOST_IP = 'localhost'
 
 CLS_PARSE_REG = re.compile(r"['](.*?)[']", re.S)
