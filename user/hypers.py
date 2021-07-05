@@ -31,6 +31,7 @@ VERCODE_CHS = (
 # )
 IDENTITY_DICT = {e[0]: e[1] for e in IDENTITY_CHS}
 DEFAULT_AVATAR_ROOT = os.path.join(MEDIA_ROOT, 'avatar')          # 头像路径
+MAX_UPLOADED_FSIZE = 10 * 1024 * 1024
 FNAME_DEFAULT_LEN = 20
 
 # constants
