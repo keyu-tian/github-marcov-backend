@@ -1,12 +1,15 @@
 import datetime
 import json
+import re
 import time
+import math
 
 import requests
 from django.db.models import Q
 from django.views import View
 
 from country.models import *
+from risk.views import get_city_risk_level
 from train.models import *
 from requests import Timeout
 
@@ -41,17 +44,19 @@ def search_train_by_number(train_number='G99', date=DEFAULT_DATE_STR):
 
 def get_train_info_res(train):
     res = {'stations': []}
-    total_risk_level = 0  # todo：等wz or tky写完risk_level
+    total_risk_level = 0
+    count = train.schedule_station.count()
     for a in train.schedule_station.all():
-        risk_level = 0  # todo
+        risk_level = get_city_risk_level(a.city.name_ch)
         res['stations'].append({
             'station_name': a.name_cn,
             'city_name': a.city.name_ch,
             'risk_level': risk_level,
             'pos': [a.jingdu, a.weidu],
         })
+        total_risk_level += float(risk_level) / count
     res['info'] = {
-        'level': total_risk_level,
+        'level': math.ceil(total_risk_level) if math.ceil(total_risk_level) <= 5 else 5,
         'msg': '贴心话贴心话',  # todo：贴心话
     }
     return res
@@ -114,21 +119,25 @@ def query_train_info(train_number):
     return None
 
 
-def query_train_info_by_city(city):
+def query_train_info_by_city(city_name):
     # return: query_set(Train)
-    city = City.objects.filter(name_ch=city)
+    city = City.objects.filter(name_ch=city_name)
     if city.exists():
         city = city.get()
     else:
         jingdu, weidu = address_to_jingwei(city)
-        jsr = jingwei_to_address(jingdu, weidu)
-        city_name = jsr['result']['addressComponent']['city'][0: -1]
+        js = jingwei_to_address(jingdu, weidu)
+        city_name = re.findall(r'(.*)市', js['result']['addressComponent']['city'])
+        if len(city_name):
+            city_name = city_name[0]
+        else:
+            city_name = js['result']['addressComponent']['city']
         city = City.objects.filter(name_ch=city_name)
         if not city.exists():
             return None
         city = city.get()
     station_set = Station.objects.filter(city=city)
-    train_set = Train.objects.filter(Q(schedule_station__city=city) | Q(dept_city=city) | Q(arri_city=city))
+    train_set = Train.objects.filter(Q(schedule_station__city=city) | Q(dept_city=city) | Q(arri_city=city)).distinct()
     for a in station_set:
         query2 = a.start_train.all()
         query2 = (query2 | a.end_train.all()).distinct()
