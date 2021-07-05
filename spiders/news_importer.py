@@ -1,15 +1,19 @@
 import json
+import marcov19.settings
+from django.conf import settings
+
+settings.configure(DEBUG=True, default_settings=marcov19.settings)
 import os
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
 import django
-import sys
-sys.path.extend(['C:\\Users\\wangzhen\\gitee-marcov-backend', 'D:\\Program Files\\JetBrains\\PyCharm 2020.2.3\\plugins\\python\\helpers\\pycharm', 'D:\\Program Files\\JetBrains\\PyCharm 2020.2.3\\plugins\\python\\helpers\\pydev'])
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "marcov19.settings")
+
 django.setup()
 from news.models import *
 
 
 def news_storage():
-    with open('./news.json', 'r+', encoding='utf-8') as f:
+    with open('../spiders_data/news.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
 
     # 如果想要在存新的新闻之前删去旧的，可以去掉下面三行的注释
@@ -28,4 +32,5 @@ def main():
     news_storage()
 
 
-main()
+if __name__ == '__main__':
+    main()

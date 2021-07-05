@@ -1,15 +1,19 @@
 import json
+import marcov19.settings
+from django.conf import settings
+
+settings.configure(DEBUG=True, default_settings=marcov19.settings)
 import os
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
 import django
-import sys
-sys.path.extend(['C:\\Users\\wangzhen\\gitee-marcov-backend', 'D:\\Program Files\\JetBrains\\PyCharm 2020.2.3\\plugins\\python\\helpers\\pycharm', 'D:\\Program Files\\JetBrains\\PyCharm 2020.2.3\\plugins\\python\\helpers\\pydev'])
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "marcov19.settings")
+
 django.setup()
 from flight.models import *
 from country.models import City
 
 
-def news_storage():
+def flights_storage():
     with open('./flights_data.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
 
@@ -17,12 +21,7 @@ def news_storage():
     # old_news = News.objects.all()
     # while old_news.count():
     #     old_news.delete()
-    total_code = []
     for line in data:
-        # try:
-        if line['code'] in total_code:
-            continue
-        total_code.append(line['code'])
         dept_city = line['dept_city']
         if City.objects.filter(code=dept_city).count() == 0:
             dept_city = None
@@ -40,7 +39,8 @@ def news_storage():
 
 
 def main():
-    news_storage()
+    flights_storage()
 
 
-main()
+if __name__ == '__main__':
+    main()

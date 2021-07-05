@@ -37,8 +37,9 @@ def main():
             continue
         results.append(result)
 
-    with open('./news.json', 'w+', encoding='utf-8') as f:
+    with open('../spiders_data/news_data.json', 'w+', encoding='utf-8') as f:
         f.write(json.dumps(results, ensure_ascii=False))
 
 
-main()
+if __name__ == '__main__':
+    main()
