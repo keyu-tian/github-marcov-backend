@@ -2,10 +2,12 @@ import re
 import json
 import os
 import django
+import sys
+sys.path.extend(['C:\\Users\\wangzhen\\gitee-marcov-backend', 'D:\\Program Files\\JetBrains\\PyCharm 2020.2.3\\plugins\\python\\helpers\\pycharm', 'D:\\Program Files\\JetBrains\\PyCharm 2020.2.3\\plugins\\python\\helpers\\pydev'])
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "marcov19.settings")
 django.setup()
 from risk.models import *
-from country.models import City
+from utils.cast import address_to_jingwei
 
 
 def risk_area_storage():
@@ -19,18 +21,16 @@ def risk_area_storage():
         section = re.split('[省市区]', area)
         province = section[0]
         city = section[1]
-        res = City.objects.filter(name_ch=city)
-        city = None if res is None else res.get()
         address = area
+        jingdu, weidu = address_to_jingwei(address)
+        print(jingdu, weidu)
         level = 1
-        kwargs = {'province': province, 'city': city, 'address': address, 'level': level}
+        kwargs = {'province': province, 'city': city, 'address': address, 'level': level, 'jingdu': jingdu, 'weidu': weidu}
         RiskArea.objects.create(**kwargs)
     for area in data['高风险地区']:
         section = re.split('[省市区]', area)
         province = section[0]
         city = section[1]
-        res = City.objects.filter(name_ch=city)
-        city = None if res is None else res.get()
         address = area
         level = 2
         kwargs = {'province': province, 'city': city, 'address': address, 'level': level}
