@@ -14,7 +14,7 @@ django.setup()
 
 from country.models import Country, City
 from train.models import Train, Station, MidStation
-from utils.cast import address_to_jingwei
+from utils.cast import address_to_jingwei, jingwei_to_address
 
 
 def parse_train_json(path):
@@ -73,7 +73,8 @@ def parse_train_json(path):
                     sta, flag = Station.objects.get_or_create(name_cn=content[1])
                     if flag:  # 是新建，存经纬度
                         sta.jingdu, sta.weidu = address_to_jingwei(arri_sta_name + '站')
-                        sta.city = arri_city
+                        js = jingwei_to_address(sta.jingdu, sta.weidu)
+                        sta.city = js['result']['addressComponent']['city'][0: -1]
                         sta.save()
                     MidStation.objects.create(index=mid_list.index(c) + 1, arri_date=content[2],
                                               arri_time=content[3], station=sta, train=train)
