@@ -1,5 +1,4 @@
 from django.db import models
-from utils.cast import encode, decode
 
 
 # Create your models here.
