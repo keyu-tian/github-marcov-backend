@@ -5,6 +5,16 @@
 #### 介绍
 the backend of MarCov
 
+#### 脚本使用
+
+- 下面三个脚本在 gitbash 中使用 `sh ./xxxx.sh` 运行
+    1.  `drop.sh`：进行三个操作：修改时区为 utc+8、删库、新建库。
+    2.  `install.sh`：安装 `requirements.txt` 里的 python 库。
+    3.  `make_migs.sh`：修改 django 的模型定义后，自动迁移更新数据库
+
+- 下面这个脚本可以 `sh ./search` 运行，也可以直接 `search` 运行
+    4.  `search`：搜索某个
+
 
 #### 提交信息（Commit Message）编写规范
 
