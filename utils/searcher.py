@@ -4,7 +4,8 @@ import os
 from colorama import Fore
 
 
-def walk_check(key):
+def walk_check(dirname, key):
+    os.chdir(dirname)
     lines = 0
     for path, dirs, files in os.walk('.'):
         if any(s in path for s in ['__pycache__', 'migrations', 'frontend']):
@@ -26,13 +27,15 @@ def walk_check(key):
                 #       + Fore.GREEN + f'`{key}`' + Fore.RESET + ' found in '
                 #       + Fore.CYAN + f' {f_name:20s}' + Fore.RESET + ': '
                 #       + Fore.BLUE + f'[line {str(lines).strip("[]")}]' + Fore.RESET)
-    print(f'\n[total lines of DiaDoc backend: {lines}]')
+    if dirname in ['.', './']:
+        print(f'\n[total lines of MarCov-19 backend: {lines}]')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
+    parser.add_argument('dir', type=str, default='.')
     parser.add_argument('key', type=str, default=None)
     args = parser.parse_args()
     # if args.key is None:
     #     args.key = input('please input the key: ')
-    walk_check(args.key)
+    walk_check(args.dir, args.key)
