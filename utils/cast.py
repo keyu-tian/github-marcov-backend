@@ -5,6 +5,7 @@ import base64
 import urllib
 
 import requests
+from risk.models import RiskArea
 
 #
 # def encode(s):
@@ -49,3 +50,9 @@ def address_to_jingwei(address) -> (float, float):
     jingdu = float(js['result']['location']['lng'])
     weidu = float(js['result']['location']['lat'])
     return jingdu, weidu
+
+
+# 根据城市名字获取该城市风险等级
+def get_city_risk_level(name) -> int:
+    count = RiskArea.objects.filter(city=name).count()
+    return (count+1)//2
