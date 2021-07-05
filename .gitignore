@@ -17,3 +17,6 @@ store/**
 
 upload/
 logging/
+
+spiders_data/
+

@@ -1,6 +1,6 @@
 # gitee-marcov-backend
 
-## 开发前首先将该分支merge进自己的分支，请保证代码稳定再推到该分支，优先推共用代码
+[![Keyu Tian/gitee-marcov-backend](https://gitee.com/keyu_tian/gitee-marcov-backend/widgets/widget_card.svg?colors=ffffff,1e252b,323d47,455059,d7deea,99a0ae)](https://gitee.com/keyu_tian/gitee-marcov-backend)
 
 #### 介绍
 the backend of MarCov
@@ -34,7 +34,7 @@ the backend of MarCov
 
 1.  每个开发者独立分支开发
 2.  开发完毕、**本地**简单测试完毕后，可以 push 到自己分支。
-3.  代码自动审查完毕后可以 merge 到 dev 分支，待在**服务器上**测试。
+3.  代码自动审查完毕后可以 merge 到 test 分支，待在**服务器上**测试。
 4.  测试完毕的 dev 分支可以被管理员 merge 到 main 分支。
 5.  重大版本发布后，在 main 分支上会打上被保护的 tag，并发布 release 版本。
 
