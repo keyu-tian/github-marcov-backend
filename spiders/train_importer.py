@@ -74,7 +74,7 @@ def parse_train_json(path):
                     content = c.get('content')
                     sta, flag = Station.objects.get_or_create(name_cn=content[1])
                     if flag:  # 是新建，存经纬度
-                        sta.jingdu, sta.weidu = address_to_jingwei(arri_sta_name + '站')
+                        sta.jingdu, sta.weidu = address_to_jingwei(content[1] + '站')
                         js = jingwei_to_address(sta.jingdu, sta.weidu)
                         city_name = re.findall(r'(.*)市', js['result']['addressComponent']['city'])
                         if len(city_name):

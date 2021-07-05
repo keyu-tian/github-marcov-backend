@@ -6,7 +6,7 @@ from risk.models import RiskArea
 # 根据城市名字获取该城市风险等级
 def get_city_risk_level(name) -> int:
     count = RiskArea.objects.filter(city=name).count()
-    return (count+1)//2
+    return (count+1)//2 if (count+1)//2 <= 5 else 5
 
 
 # Create your views here.
