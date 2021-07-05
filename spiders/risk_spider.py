@@ -1,6 +1,5 @@
 import requests
 import json
-import os
 from bs4 import BeautifulSoup
 
 result = {'中风险地区': [], '高风险地区': []}
@@ -43,7 +42,7 @@ def risk_area_spider():
     text = get_content(url)
     generate_result(text)
 
-    with open('./risk_areas.json', 'w+', encoding='utf-8') as f:
+    with open('../spiders_data/risk_areas.json', 'w+', encoding='utf-8') as f:
         f.write(json.dumps(result, ensure_ascii=False))
 
 
@@ -51,4 +50,5 @@ def main():
     risk_area_spider()
 
 
-main()
+if __name__ == '__main__':
+    main()

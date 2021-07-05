@@ -2,6 +2,7 @@ import argparse
 import datetime
 import json
 import re
+from tqdm import tqdm
 
 import marcov19.settings
 from django.conf import settings
@@ -20,20 +21,17 @@ from utils.cast import address_to_jingwei, jingwei_to_address
 
 
 def parse_train_json(path):
-    if not os.path.exists(path):
-        os.makedirs(path)
-    file = open(os.path.join(path, '火车班次json数据.json'), encoding='utf-8')
-    while 1:
-        result = file.readline()[: -1]
-        if not result:
-            break
-        print(result)
-        result = json.loads(result)
-        print(result)
-        country, flag = Country.objects.get_or_create(name_ch='中国', defaults={'name_en': 'Chinese'})
-        name = list(result.get('trainInfo').keys())[0]
+    with open(os.path.join(path, '火车班次json数据.json'), 'r', encoding='utf-8') as file:
+        bar = tqdm(enumerate(file.readlines()), dynamic_ncols=True)
+    for line, result in bar:
+        bar.set_description(f'[line{line}]')
+        try:
+            result = json.loads(result)
+        except:
+            result = None
         if result:
-            print('yes')
+            country, flag = Country.objects.get_or_create(name_ch='中国', defaults={'name_en': 'Chinese'})
+            name = list(result.get('trainInfo').keys())[0]
             dept_city_name = result.get('trainInfo').get(name).get('deptCity')
             dept_sta_name = result.get('trainInfo').get(name).get('deptStation')
             dept_time = result.get('trainInfo').get(name).get('deptTime')
@@ -43,6 +41,8 @@ def parse_train_json(path):
             arri_time = result.get('trainInfo').get(name).get('deptTime')
             arri_date = result.get('trainInfo').get(name).get('deptTime')
 
+            bar.set_postfix_str(f'{dept_city_name} => {arri_city_name}')
+            
             dept_city, flag = City.objects.get_or_create(name_ch=dept_city_name)
             if flag:  # 数据库没有的新的国家，存名字
                 dept_city.country = country
@@ -90,11 +90,14 @@ def parse_train_json(path):
                     MidStation.objects.create(index=mid_list.index(c) + 1, arri_date=content[2],
                                               arri_time=content[3], station=sta, train=train)
             train.save()
+        
+        else:
+            bar.set_postfix_str(f'failed!')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train-Spider')
-    parser.add_argument('--path', required=False, default='train_crawler', type=str)
+    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'train_spider_all'), type=str)
     args = parser.parse_args()
 
     start = str(datetime.datetime.now())

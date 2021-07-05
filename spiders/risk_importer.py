@@ -1,17 +1,21 @@
 import re
 import json
+import marcov19.settings
+from django.conf import settings
+
+settings.configure(DEBUG=True, default_settings=marcov19.settings)
 import os
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
 import django
-import sys
-sys.path.extend(['C:\\Users\\wangzhen\\gitee-marcov-backend', 'D:\\Program Files\\JetBrains\\PyCharm 2020.2.3\\plugins\\python\\helpers\\pycharm', 'D:\\Program Files\\JetBrains\\PyCharm 2020.2.3\\plugins\\python\\helpers\\pydev'])
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "marcov19.settings")
+
 django.setup()
-from risk.models import *
+from risk.models import RiskArea
 from utils.cast import address_to_jingwei
 
 
 def risk_area_storage():
-    with open('./risk_areas.json', 'r+', encoding='utf-8') as f:
+    with open('../spiders_data/risk_areas.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
 
     old_area = RiskArea.objects.all()
@@ -41,4 +45,5 @@ def main():
     risk_area_storage()
 
 
-main()
+if __name__ == '__main__':
+    main()
