@@ -5,6 +5,7 @@ import base64
 import urllib
 
 import requests
+from risk.models import RiskArea
 
 #
 # def encode(s):
@@ -97,3 +98,9 @@ def jingwei_to_address(jingdu, weidu):
         return None, None
     js = json.loads(res.text)
     return js
+
+
+# 根据城市名字获取该城市风险等级
+def get_city_risk_level(name) -> int:
+    count = RiskArea.objects.filter(city=name).count()
+    return (count+1)//2
