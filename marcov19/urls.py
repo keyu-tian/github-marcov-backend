@@ -27,8 +27,16 @@ urlpatterns = [
 
     path('map/province', MapProvince.as_view()),
     path('map/province_dt', MapProvinceDt.as_view()),
-
-
+    # path('map/oversea', ),
+    # path('map/oversea_dt', ),
+    #
+    # # todo
+    # path('data/country_list', ),
+    # path('data/province_list', ),
+    # path('data/international_analyze', ),
+    # path('data/domestic_analyze', ),
+    # path('data/search', ),
+    # path('data/country_analyze', ),
 
     path('travel/risk_area', RiskAreaList.as_view(), name='risk_area'),
     path('travel/train', TravelTrain.as_view()),
@@ -37,15 +45,15 @@ urlpatterns = [
 
 
 
-    path('account/login', Login.as_view()),
-    path('account/register', Register.as_view()),
-    path('account/forget_pwd_send', ForgetPwdSend.as_view()),
-    path('account/forget_pwd_change', ForgetPwdChange.as_view()),
-    path('account/logout', Logout.as_view()),
-    path('account/send_ver', SendVer.as_view()),
-    path('account/change_pwd', ChangePwd.as_view()),
-    path('account/change_info', ChangeInfo.as_view()),
-    path('user_info', UserInfo.as_view()),
-    path('identity', Identity.as_view()),
-    path('upload_pic', UploadPic.as_view()),
+    # path('account/login', Login.as_view()),
+    # path('account/register', Register.as_view()),
+    # path('account/forget_pwd_send', ForgetPwdSend.as_view()),
+    # path('account/forget_pwd_change', ForgetPwdChange.as_view()),
+    # path('account/logout', Logout.as_view()),
+    # path('account/send_ver', SendVer.as_view()),
+    # path('account/change_pwd', ChangePwd.as_view()),
+    # path('account/change_info', ChangeInfo.as_view()),
+    # path('user_info', UserInfo.as_view()),
+    # path('identity', Identity.as_view()),
+    # path('upload_pic', UploadPic.as_view()),
 ]
