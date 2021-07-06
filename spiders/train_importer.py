@@ -20,12 +20,14 @@ from train.models import Train, Station, MidStation
 from utils.cast import address_to_jingwei, jingwei_to_address
 
 
-def parse_train_json(path):
+def parse_train_json(path, line_start):
     # with open('../train/train_crawler/火车班次json数据.json', 'r', encoding='utf-8') as file:
     with open(os.path.join(path, '火车班次json数据.json'), 'r', encoding='utf-8') as file:
-        bar = tqdm(enumerate(file.readlines()), dynamic_ncols=True)
+        bar = tqdm(list(enumerate(file.readlines())), dynamic_ncols=True)
     for line, result in bar:
         bar.set_description(f'[line{line}]')
+        if line < line_start:
+            continue
         try:
             result = json.loads(result)
         except:
@@ -100,10 +102,11 @@ def parse_train_json(path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train-Spider')
     parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'train_spider_all'), type=str)
+    parser.add_argument('--line', required=False, default=0, type=int)
     args = parser.parse_args()
 
     start = str(datetime.datetime.now())
     print(f'[{start}] 开始parse...')
-    parse_train_json(args.path)
+    parse_train_json(args.path, args.line)
     end = str(datetime.datetime.now())
     print('over')
