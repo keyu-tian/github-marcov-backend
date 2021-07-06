@@ -60,7 +60,7 @@ def main(path, res):
             response = requests.get(get_url, headers={'Content-Type': 'application/json'}, timeout=10)
             js = json.loads(response.text)
             if js['success']:
-                with open(os.path.join(path, 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
+                with open(os.path.join(path, 'policy_by_city.json'), 'w', encoding='utf-8') as fp:
                     fp.write(json.dumps({
                         'province': js['data']['province'],
                         'city': js['data']['city'],
