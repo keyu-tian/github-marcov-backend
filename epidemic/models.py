@@ -6,6 +6,7 @@ class HistoryEpidemicData(models.Model):
     date = models.CharField(verbose_name='日期', max_length=255)
     country_ch = models.CharField(max_length=512, blank=True)
     province_ch = models.CharField(max_length=512, blank=True)
+    state_en = models.CharField(max_length=512, blank=True)
     city_ch = models.CharField(max_length=512, blank=True)
     province_total_died = models.IntegerField(blank=True, null=True)
     province_total_cured = models.IntegerField(blank=True, null=True)
