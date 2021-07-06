@@ -19,9 +19,16 @@ from train.views import *
 from flight.views import *
 from risk.views import *
 from user.views import *
+from epidemic.views import *
 
 urlpatterns = [
     path('/', admin.site.urls),
+
+
+    path('map/province', MapProvince.as_view()),
+    path('map/province_dt', MapProvinceDt.as_view()),
+
+
 
     path('travel/risk_area', RiskAreaList.as_view(), name='risk_area'),
     path('travel/train', TravelTrain.as_view()),
