@@ -611,6 +611,7 @@ INSTALLED_APPS = [
     'flight',
     'news',
     'risk',
+    'epidemic',
 ]
 
 MIDDLEWARE = [
