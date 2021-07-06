@@ -48,7 +48,7 @@ def news_spider():
             continue
         results.append(result)
 
-    with open('./spiders_data/news_data.json', 'w+', encoding='utf-8') as f:
+    with open('../spiders_data/news_data.json', 'w+', encoding='utf-8') as f:
         f.write(json.dumps(results, ensure_ascii=False))
     return results
 
