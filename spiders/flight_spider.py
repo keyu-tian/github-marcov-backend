@@ -35,7 +35,7 @@ def get_flight_info(begin_pos):
     driver = webdriver.Chrome(executable_path='./chromedriver.exe', options=options)
     now = datetime.now().strftime("%Y-%m-%d")
     for src in code[begin_pos[0]: len(city_list)]:
-        print(src)
+        print(code.index(src))
         for dst in code[begin_pos[1]: len(city_list)]:
             if src == dst:
                 continue
@@ -75,7 +75,6 @@ def get_flight_info(begin_pos):
                         context_now = json.loads(context_now)
                 with open(f'../spiders_data/flights_data/flights_data{now}.json', 'w+', encoding='utf-8') as fp:
                     context_now.extend(results)
-                    print(context_now)
                     fp.write(json.dumps(context_now, ensure_ascii=False))
             else:
                 with open(f'../spiders_data/flights_data/flights_data{args.date}.json', 'r+', encoding='utf-8') as fp:
@@ -86,7 +85,6 @@ def get_flight_info(begin_pos):
                         context_now = json.loads(context_now)
                 with open(f'../spiders_data/flights_data/flights_data{args.date}.json', 'w+', encoding='utf-8') as fp:
                     context_now.extend(results)
-                    print(context_now)
                     fp.write(json.dumps(context_now, ensure_ascii=False))
     driver.quit()
 
@@ -101,7 +99,16 @@ def main():
                 begin_pos[0] = code.index(context['dept_city'])
                 begin_pos[1] = code.index(context['arri_city'])
         except:
+            print('您选择的日期错误（日期格式：y-m-d，例如：2020-07-02')
+    else:
+        try:
+            with open(f'../spiders_data/flights_data/flights_data{datetime.now().strftime("%Y-%m-%d")}.json', 'r+', encoding='utf-8') as f:
+                context = json.loads(f.read())[-1]
+                begin_pos[0] = code.index(context['dept_city'])
+                begin_pos[1] = code.index(context['arri_city'])
+        except:
             pass
+    print('begin_pos:', begin_pos[0], begin_pos[1])
     get_flight_info(begin_pos)
     end = time.time()
     print(f'cost time: {end - start}s')

@@ -13,7 +13,7 @@ from news.models import *
 
 
 def news_storage():
-    with open('../spiders_data/news.json', 'r+', encoding='utf-8') as f:
+    with open('../spiders_data/news_data.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
 
     # 如果想要在存新的新闻之前删去旧的，可以去掉下面三行的注释
