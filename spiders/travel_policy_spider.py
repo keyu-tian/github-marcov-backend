@@ -29,7 +29,7 @@ def get_input_options_by_xml(path):
 
 def get_input_options_by_json(path):
     res = {}
-    with open('./City.json', 'r', encoding='utf-8') as jsonfile:
+    with open(os.path.join(path, 'City.json'), 'r', encoding='utf-8') as jsonfile:
         js = json.load(jsonfile)
     for i in range(len(js['data'])):
         if js['data'][i]['province'] not in res.keys():
