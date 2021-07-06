@@ -26,6 +26,7 @@ urlpatterns = [
     path('travel/risk_area', RiskAreaList.as_view(), name='risk_area'),
     path('travel/train', TravelTrain.as_view()),
     path('travel/country', CountryFlightInfo.as_view()),
+    path('travel/search', TravelSearch.as_view()),
 
 
 

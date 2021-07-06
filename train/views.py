@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.views import View
 
 from country.models import *
+from flight.views import query_flight_info, get_flight_dept_and_arri_info_res
 from risk.views import get_city_risk_level
 from train.models import *
 from requests import Timeout
@@ -19,6 +20,7 @@ from utils.meta_wrapper import JSR
 DEFAULT_DATE = datetime.datetime.now()
 DEFAULT_DATE_STR = DEFAULT_DATE.strftime('%Y-%m-%d')
 
+# 以get开头的返回json，以query开头的返回queryset或对象
 
 def search_train_by_number(train_number='G99', date=DEFAULT_DATE_STR):
     # 返回值None为查询错误或不是列车号，不支持模糊匹配
@@ -45,7 +47,14 @@ def search_train_by_number(train_number='G99', date=DEFAULT_DATE_STR):
 def get_train_info_res(train):
     res = {'stations': []}
     total_risk_level = 0
-    count = train.schedule_station.count()
+    count = train.schedule_station.count() + 2
+    res['stations'].append({
+        'station_name': train.dept_station,
+        'city_name': train.dept_city,
+        'risk_level': get_city_risk_level(train.dept_city),
+        'pos': [train.dept_station.jingdu, train.dept_station.weidu],
+    })
+    total_risk_level += float(get_city_risk_level(train.dept_city)) / count
     for a in train.schedule_station.all():
         risk_level = get_city_risk_level(a.city.name_ch)
         res['stations'].append({
@@ -55,6 +64,13 @@ def get_train_info_res(train):
             'pos': [a.jingdu, a.weidu],
         })
         total_risk_level += float(risk_level) / count
+    res['stations'].append({
+        'station_name': train.arri_station,
+        'city_name': train.arri_city,
+        'risk_level': get_city_risk_level(train.arri_city),
+        'pos': [train.arri_station.jingdu, train.arri_station.weidu],
+    })
+    total_risk_level += float(get_city_risk_level(train.dept_city)) / count
     res['info'] = {
         'level': math.ceil(total_risk_level) if math.ceil(total_risk_level) <= 5 else 5,
         'msg': '贴心话贴心话',  # todo：贴心话
@@ -62,11 +78,30 @@ def get_train_info_res(train):
     return res
 
 
+def get_train_dept_and_arri_info_res(train):
+    res = {
+    'start': {
+        'city_name': train.dept_city,
+        'country_name': train.dept_city.country,
+        'risk': get_city_risk_level(train.dept_city),
+        'datetime': datetime.date.today().strftime("%Y-%m-%d ") + train.dept_time,
+    },
+    'end': {
+        'city_name': train.arri_city,
+        'country_name': train.arri_city.country,
+        'risk': get_city_risk_level(train.arri_city),
+        'datetime': datetime.date.today().strftime("%Y-%m-%d ") + train.arri_time,
+    },
+    'key': train.name,
+    'is_train': 0,
+    }
+    return res
+
+
 def query_train_info(train_number):
-    train = Train.objects.filter(name=train_number)
+    train = Train.objects.filter(name__icontains=train_number)
     if train.exists():
-        train = train.get()
-        return get_train_info_res(train)
+        return train.get()
     else:
         result = search_train_by_number(train_number)
         country, flag = Country.objects.get_or_create(name_ch='中国', defaults={'name_en': 'Chinese'})
@@ -115,7 +150,7 @@ def query_train_info(train_number):
                     MidStation.objects.create(index=mid_list.index(c) + 1, arri_date=content[2],
                                               arri_time=content[3], station=sta, train=train)
             train.save()
-            return get_train_info_res(train)
+            return train
     return None
 
 
@@ -176,8 +211,31 @@ class TravelTrain(View):
         except:
             return -1,
 
-        res = query_train_info(key)
+        res = get_train_info_res(query_train_info(key))
         if res:
             return 0, res['stations'], res['info']
         else:
             return 7,
+
+
+class TravelSearch(View):
+    @JSR('status', 'results')
+    def post(self, request):
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'key'}:
+            return 1,
+        try:
+            key = kwargs['key']
+        except:
+            return -1,
+
+        res = {'results': []}
+        key_list = key.split(' ')
+        for key in key_list:
+            train_query = query_train_info(key)
+            if train_query:
+                res['results'].append(get_train_dept_and_arri_info_res(train_query))
+            flight_query = query_flight_info(key)
+            if flight_query:
+                res['results'].append(get_flight_dept_and_arri_info_res(flight_query))
+        return 0, res
