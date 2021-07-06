@@ -35,14 +35,14 @@ class MapProvince(View):
         if msg.count() == 0:
             msg = '未知'
         else:
-            msg = msg.first().enter_policy+'\n'+msg.first().outer_policy
+            msg = msg.first().enter_policy+'\n'+msg.first().out_policy
         infos = []
         for city_data in data:
             msg = Policy.objects.filter(city_name=city_data.city_ch)
             if msg.count() == 0:
                 msg = '未知'
             else:
-                msg = msg.first().enter_policy + '\n' + msg.first().outer_policy
+                msg = msg.first().enter_policy + '\n' + msg.first().out_policy
             info = {'level': get_city_risk_level(city_data.city_ch), 'msg': msg}
             city = {'name': city_data.city_ch}
             city['new'] = {
@@ -119,7 +119,7 @@ class MapOversea(View):
             # if msg.count() == 0:
             #     msg = '未知'
             # else:
-            #     msg = msg.first().enter_policy+'\n'+msg.first().outer_policy
+            #     msg = msg.first().enter_policy+'\n'+msg.first().out_policy
             info = {'level': get_city_risk_level(state_data.city_ch), 'msg': '未知'}
             state = {'name': state_data.state_en}
             state['new'] = {
