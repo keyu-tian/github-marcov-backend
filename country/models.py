@@ -21,3 +21,12 @@ class City(models.Model):
     province = models.ForeignKey(to=Province, on_delete=models.CASCADE, related_name='province_city_set', blank=True, null=True)
     jingdu = models.FloatField(blank=True, null=True)
     weidu = models.FloatField(blank=True, null=True)
+
+
+class Policy(models.Model):
+    city = models.ForeignKey(to=City, on_delete=models.DO_NOTHING, related_name='policy_set', blank=True, null=True)
+    province = models.ForeignKey(to=Province, on_delete=models.DO_NOTHING, related_name='policy_set', blank=True, null=True)
+    city_name = models.CharField(max_length=128, blank=True, null=True)
+    province_name = models.CharField(max_length=128, blank=True, null=True)
+    enter_policy = models.TextField(blank=True, null=True)
+    out_policy = models.TextField(blank=True, null=True)
