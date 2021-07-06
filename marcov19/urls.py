@@ -27,16 +27,16 @@ urlpatterns = [
 
     path('map/province', MapProvince.as_view()),
     path('map/province_dt', MapProvinceDt.as_view()),
-    path('map/oversea', ),
-    path('map/oversea_dt', ),
-
-    # todo
-    path('data/country_list', ),
-    path('data/province_list', ),
-    path('data/international_analyze', ),
-    path('data/domestic_analyze', ),
-    path('data/search', ),
-    path('data/country_analyze', ),
+    # path('map/oversea', ),
+    # path('map/oversea_dt', ),
+    #
+    # # todo
+    # path('data/country_list', ),
+    # path('data/province_list', ),
+    # path('data/international_analyze', ),
+    # path('data/domestic_analyze', ),
+    # path('data/search', ),
+    # path('data/country_analyze', ),
 
     path('travel/risk_area', RiskAreaList.as_view(), name='risk_area'),
     path('travel/train', TravelTrain.as_view()),
