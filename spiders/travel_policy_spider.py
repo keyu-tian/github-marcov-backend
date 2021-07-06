@@ -3,6 +3,7 @@ import os
 
 from selenium import webdriver
 import argparse
+import xml
 from xml.dom.minidom import parse
 import xml.dom.minidom
 import requests
