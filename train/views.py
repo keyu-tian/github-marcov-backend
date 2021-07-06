@@ -101,7 +101,7 @@ def get_train_dept_and_arri_info_res(train):
 def query_train_info(train_number):
     train = Train.objects.filter(name__icontains=train_number)
     if train.exists():
-        return train.get()
+        return train
     else:
         result = search_train_by_number(train_number)
         country, flag = Country.objects.get_or_create(name_ch='中国', defaults={'name_en': 'Chinese'})
@@ -150,7 +150,7 @@ def query_train_info(train_number):
                     MidStation.objects.create(index=mid_list.index(c) + 1, arri_date=content[2],
                                               arri_time=content[3], station=sta, train=train)
             train.save()
-            return train
+            return [train]
     return None
 
 
@@ -234,8 +234,10 @@ class TravelSearch(View):
         for key in key_list:
             train_query = query_train_info(key)
             if train_query:
-                res['results'].append(get_train_dept_and_arri_info_res(train_query))
+                for a in train_query:
+                    res['results'].append(get_train_dept_and_arri_info_res(a))
             flight_query = query_flight_info(key)
             if flight_query:
-                res['results'].append(get_flight_dept_and_arri_info_res(flight_query))
+                for a in flight_query:
+                    res['results'].append(get_flight_dept_and_arri_info_res(a))
         return 0, res
