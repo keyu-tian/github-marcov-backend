@@ -70,7 +70,7 @@ def main(path, res):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train-Spider')
-    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'train_spider_all'), type=str)
+    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'travel_policy_spider_all'), type=str)
     args = parser.parse_args()
 
     res = get_input_options_by_json(args.path)

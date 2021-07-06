@@ -54,7 +54,7 @@ def main(path, line_start):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train-Spider')
-    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'train_spider_all'), type=str)
+    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'travel_policy_spider_all'), type=str)
     parser.add_argument('--line', required=False, default=0, type=int)
     args = parser.parse_args()
 

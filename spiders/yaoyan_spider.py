@@ -43,7 +43,7 @@ def main(path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train-Spider')
-    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'train_spider_all'), type=str)
+    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'yaoyan_spider_all'), type=str)
     args = parser.parse_args()
 
     main(args.path)
