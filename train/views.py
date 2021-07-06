@@ -74,11 +74,11 @@ def query_train_info(train_number):
             dept_city_name = result.get('trainInfo').get(train_number).get('deptCity')
             dept_sta_name = result.get('trainInfo').get(train_number).get('deptStation')
             dept_time = result.get('trainInfo').get(train_number).get('deptTime')
-            dept_date = result.get('trainInfo').get(train_number).get('deptTime')
-            arri_city_name = result.get('trainInfo').get(train_number).get('deptCity')
-            arri_sta_name = result.get('trainInfo').get(train_number).get('deptStation')
-            arri_time = result.get('trainInfo').get(train_number).get('deptTime')
-            arri_date = result.get('trainInfo').get(train_number).get('deptTime')
+            dept_date = result.get('trainInfo').get(train_number).get('dptDate')
+            arri_city_name = result.get('trainInfo').get(train_number).get('arriCity')
+            arri_sta_name = result.get('trainInfo').get(train_number).get('arriStation')
+            arri_time = result.get('trainInfo').get(train_number).get('arriTime')
+            arri_date = result.get('trainInfo').get(train_number).get('arrDate')
             dept_city, flag = City.objects.get_or_create(name_ch=dept_city_name)
             if flag:
                 dept_city.country = country

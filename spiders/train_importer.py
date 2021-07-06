@@ -38,11 +38,11 @@ def parse_train_json(path, line_start):
             dept_city_name = result.get('trainInfo').get(name).get('deptCity')
             dept_sta_name = result.get('trainInfo').get(name).get('deptStation')
             dept_time = result.get('trainInfo').get(name).get('deptTime')
-            dept_date = result.get('trainInfo').get(name).get('deptTime')
-            arri_city_name = result.get('trainInfo').get(name).get('deptCity')
-            arri_sta_name = result.get('trainInfo').get(name).get('deptStation')
-            arri_time = result.get('trainInfo').get(name).get('deptTime')
-            arri_date = result.get('trainInfo').get(name).get('deptTime')
+            dept_date = result.get('trainInfo').get(name).get('dptDate')
+            arri_city_name = result.get('trainInfo').get(name).get('arriCity')
+            arri_sta_name = result.get('trainInfo').get(name).get('arriStation')
+            arri_time = result.get('trainInfo').get(name).get('arriTime')
+            arri_date = result.get('trainInfo').get(name).get('arrDate')
 
             bar.set_postfix_str(f'{dept_city_name} => {arri_city_name}')
             
