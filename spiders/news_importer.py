@@ -13,13 +13,13 @@ from news.models import *
 
 
 def news_importer():
-    with open('./spiders_data/news_data.json', 'r+', encoding='utf-8') as f:
+    with open('../spiders_data/news_data.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
 
     # 如果想要在存新的新闻之前删去旧的，可以去掉下面三行的注释
-    old_news = News.objects.all()
-    while old_news.count():
-        old_news.delete()
+    # old_news = News.objects.all()
+    # while old_news.count():
+    #     old_news.delete()
     for line in data:
         # try:
         News.objects.get_or_create(title=line['title'], defaults={
