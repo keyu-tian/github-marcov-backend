@@ -61,7 +61,7 @@ def query_flight_info(flight_num):
     # 查询航班号，如果查询到，就直接返回Flight对象，如果没查到，就返回none
     flights = Flight.objects.filter(code__icontains=flight_num)
     if flights.count() == 0:
-        return []
+        return [None]
     result = []
     for flight in flights:
         result.append(flight)
