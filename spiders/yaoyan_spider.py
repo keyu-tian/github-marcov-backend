@@ -32,6 +32,8 @@ def main(path):
     js = json.loads(response.text)
     if js['code'] == 'success':
         # with open('./spiders_data/rumor.json', 'a', encoding='utf-8') as fp:
+        if not os.path.exists(path):
+            os.makedirs(path)
         with open(os.path.join(path, 'rumor.json'), 'a', encoding='utf-8') as fp:
             for a in js['data']:
                 fp.write(json.dumps({

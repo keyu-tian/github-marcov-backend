@@ -36,6 +36,8 @@ def get_input_options_by_json(path):
             res[js['data'][i]['province']] = []
         res[js['data'][i]['province']].append([js['data'][i]['city']])
     # with open('./option_result.json', 'w+', encoding='utf-8') as jsonfile:
+    if not os.path.exists(path):
+        os.makedirs(path)
     with open(os.path.join(path, 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
         fp.write(json.dumps(res) + '\n')
     return res
