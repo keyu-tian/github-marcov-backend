@@ -21,7 +21,7 @@ def is_Chinese(ch):
     return False
 
 
-def main():
+def news_spider():
     for news in news_list:
         result = {'title': news['title'],
                   'img': news['img'],
@@ -48,9 +48,10 @@ def main():
             continue
         results.append(result)
 
-    with open('./spiders_data/news_data.json', 'a', encoding='utf-8') as f:
+    with open('./spiders_data/news_data.json', 'w+', encoding='utf-8') as f:
         f.write(json.dumps(results, ensure_ascii=False))
+    return results
 
 
 if __name__ == '__main__':
-    main()
+    news_spider()

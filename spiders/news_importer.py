@@ -12,7 +12,7 @@ django.setup()
 from news.models import *
 
 
-def news_storage():
+def news_importer():
     with open('./spiders_data/news_data.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
 
@@ -22,23 +22,18 @@ def news_storage():
         old_news.delete()
     for line in data:
         # try:
-        kwargs = {'title': line['title'],
-                  'img': line['img'],
-                  'url': line['url'],
-                  'media': line['media_name'],
-                  'publish_time': line['publish_time'],
-                  'context': line['context'],
-                  'category_cn': line['category_cn'],
-                  'sub_category_cn': line['sub_category_cn'],
-                  }
-        News.objects.create(**kwargs)
+        News.objects.get_or_create(title=line['title'], defaults={
+            'img': line['img'],
+            'url': line['url'],
+            'media': line['media_name'],
+            'publish_time': line['publish_time'],
+            'context': line['context'],
+            'category_cn': line['category_cn'],
+            'sub_category_cn': line['sub_category_cn'],
+        })
         # except:
         #     print('插入新闻数据错误')
 
 
-def main():
-    news_storage()
-
-
 if __name__ == '__main__':
-    main()
+    news_importer()
