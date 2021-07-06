@@ -9,17 +9,23 @@ from utils.news_importer import news_spider, news_importer
 
 
 class WeeklyNews(View):
-    @JSR('status', 'china', 'global')
+    @JSR('status', 'date', 'china', 'global')
     def post(self, request):
         # new_news = news_spider()
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'date'}:
-            return 1, []
+            return 1, '', [], []
         res_china = []
         res_global = []
         # if News.objects.first().publish_time != new_news[0]['publish_time']:
         #     news_importer()
-        end_date = datetime.strptime(kwargs['date'], '%Y-%m-%d')
+        if kwargs['date'] == '':
+            end_date = datetime.now()
+        else:
+            try:
+               end_date = datetime.strptime(kwargs['date'], '%Y-%m-%d')
+            except:
+                return 7, '', [], []
         for dis in range(7):
             now = end_date - timedelta(days=dis)
             now = now.strftime('%Y-%m-%d')
@@ -64,5 +70,5 @@ class WeeklyNews(View):
                     'media_name': a.media,
                     'img_url': '',
                 })
-        return 0, res_china, res_global
+        return 0, end_date.strftime('%Y-%m-%d'), res_china, res_global
 
