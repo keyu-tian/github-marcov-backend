@@ -29,8 +29,8 @@ urlpatterns = [
 
     path('map/province', MapProvince.as_view()),
     path('map/province_dt', MapProvinceDt.as_view()),
-    # path('map/oversea', ),
-    # path('map/oversea_dt', ),
+    path('map/oversea', MapOversea.as_view()),
+    path('map/oversea_dt', MapOverseaDt.as_view()),
     #
     # # todo
     # path('data/country_list', ),
