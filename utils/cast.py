@@ -46,8 +46,12 @@ def address_to_jingwei(address) -> (float, float):
     except:
         return None, None
     js = json.loads(re.findall(r'showLocation&&showLocation\((.+)\)', res.text)[0])
-    jingdu = float(js['result']['location']['lng'])
-    weidu = float(js['result']['location']['lat'])
+    if int(js['status']) == 0:
+        jingdu = float(js['result']['location']['lng'])
+        weidu = float(js['result']['location']['lat'])
+    else:
+        print(js['msg'], '地址：' + address)
+        return 0, 0
     return jingdu, weidu
 
 

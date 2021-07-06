@@ -20,11 +20,14 @@ from train.models import Train, Station, MidStation
 from utils.cast import address_to_jingwei, jingwei_to_address
 
 
-def parse_train_json(path):
+def parse_train_json(path, line_start):
+    # with open('../train/train_crawler/火车班次json数据.json', 'r', encoding='utf-8') as file:
     with open(os.path.join(path, '火车班次json数据.json'), 'r', encoding='utf-8') as file:
-        bar = tqdm(enumerate(file.readlines()), dynamic_ncols=True)
+        bar = tqdm(list(enumerate(file.readlines())), dynamic_ncols=True)
     for line, result in bar:
         bar.set_description(f'[line{line}]')
+        if line < line_start:
+            continue
         try:
             result = json.loads(result)
         except:
@@ -35,11 +38,11 @@ def parse_train_json(path):
             dept_city_name = result.get('trainInfo').get(name).get('deptCity')
             dept_sta_name = result.get('trainInfo').get(name).get('deptStation')
             dept_time = result.get('trainInfo').get(name).get('deptTime')
-            dept_date = result.get('trainInfo').get(name).get('deptTime')
-            arri_city_name = result.get('trainInfo').get(name).get('deptCity')
-            arri_sta_name = result.get('trainInfo').get(name).get('deptStation')
-            arri_time = result.get('trainInfo').get(name).get('deptTime')
-            arri_date = result.get('trainInfo').get(name).get('deptTime')
+            dept_date = result.get('trainInfo').get(name).get('dptDate')
+            arri_city_name = result.get('trainInfo').get(name).get('arriCity')
+            arri_sta_name = result.get('trainInfo').get(name).get('arriStation')
+            arri_time = result.get('trainInfo').get(name).get('arriTime')
+            arri_date = result.get('trainInfo').get(name).get('arrDate')
 
             bar.set_postfix_str(f'{dept_city_name} => {arri_city_name}')
             
@@ -87,6 +90,7 @@ def parse_train_json(path):
                             mid_city.save()
                         sta.city = mid_city
                         sta.save()
+
                     MidStation.objects.create(index=mid_list.index(c) + 1, arri_date=content[2],
                                               arri_time=content[3], station=sta, train=train)
             train.save()
@@ -98,10 +102,11 @@ def parse_train_json(path):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train-Spider')
     parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'train_spider_all'), type=str)
+    parser.add_argument('--line', required=False, default=0, type=int)
     args = parser.parse_args()
 
     start = str(datetime.datetime.now())
     print(f'[{start}] 开始parse...')
-    parse_train_json(args.path)
+    parse_train_json(args.path, args.line)
     end = str(datetime.datetime.now())
     print('over')
