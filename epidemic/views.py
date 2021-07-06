@@ -1,5 +1,6 @@
 from django.views import View
 from utils.meta_wrapper import JSR
+from utils.dict_ch import city_dict_ch
 from risk.views import get_city_risk_level
 from epidemic.models import HistoryEpidemicData
 from country.models import Policy
@@ -12,6 +13,7 @@ class MapProvince(View):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name', 'date'}:
             return 1, []
+        kwargs['name'] = city_dict_ch[kwargs['name']]
         province = {}
         data = HistoryEpidemicData.objects.filter(date=kwargs['date'], province_ch=kwargs['name'])
         if data.count() == 0:
@@ -60,6 +62,7 @@ class MapProvinceDt(View):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name'}:
             return 1, []
+        kwargs['name'] = city_dict_ch[kwargs['name']]
         total_data = HistoryEpidemicData.objects.filter(province_ch=kwargs['name'])
         res = []
         date = []
