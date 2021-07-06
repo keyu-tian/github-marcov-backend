@@ -1,14 +1,3 @@
-
-import marcov19.settings
-from django.conf import settings
-
-settings.configure(DEBUG=True, default_settings=marcov19.settings)
-import os
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
-import django
-
-django.setup()
 from django.views import View
 from utils.meta_wrapper import JSR
 import json
@@ -19,31 +8,6 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from django.db.models import Q
 from country.models import Country, City
-
-
-def get_flight_info_by_code(code):
-    results = []
-    flights = Flight.objects.filter(code__icontains=code)
-    print(flights.count())
-    if flights.count() == 0:
-        return results
-    for flight in flights:
-        result = {'key': flight.code, 'is_train': 1}
-        start = {}
-        end = {}
-        start_city = flight.dept_city
-        end_city = flight.arri_city
-        start['city_name'] = start_city.name_ch if start_city else '未知'
-        start['country_name'] = start_city.country.name_ch if start_city and start_city.country else '未知'
-        start['risk'] = address_to_jingwei(start['city_name']) if start_city else 0
-        start['datetime'] = flight.dept_time
-        end['city_name'] = end_city.name_ch if end_city else '未知'
-        end['country_name'] = end_city.country.name_ch if end_city and end_city.country else '未知'
-        end['risk'] = address_to_jingwei(end_city['city_name']) if end_city else 0
-        end['datetime'] = flight.arri_time
-        result['start'] = start
-        result['end'] = end
-    return results
 
 
 def get_flight_info_by_city(name, date):
@@ -95,12 +59,33 @@ def get_flight_info_by_city(name, date):
 
 def query_flight_info(flight_num):
     # 查询航班号，如果查询到，就直接返回Flight对象，如果没查到，就返回none
-    return None
+    flights = Flight.objects.filter(code__icontains=flight_num)
+    if flights.count() == 0:
+        return []
+    result = []
+    for flight in flights:
+        result.append(flight)
+    return result
 
 
 def get_flight_dept_and_arri_info_res(flight):
     # 传入flight对象，按交互文档travel/search格式返回dict
-    return {}
+    result = {'key': flight.code, 'is_train': 1}
+    start = {}
+    end = {}
+    start_city = flight.dept_city
+    end_city = flight.arri_city
+    start['city_name'] = start_city.name_ch if start_city else '未知'
+    start['country_name'] = start_city.country.name_ch if start_city and start_city.country else '未知'
+    start['risk'] = address_to_jingwei(start['city_name']) if start_city else 0
+    start['datetime'] = flight.dept_time
+    end['city_name'] = end_city.name_ch if end_city else '未知'
+    end['country_name'] = end_city.country.name_ch if end_city and end_city.country else '未知'
+    end['risk'] = address_to_jingwei(end_city['city_name']) if end_city else 0
+    end['datetime'] = flight.arri_time
+    result['start'] = start
+    result['end'] = end
+    return result
 
 
 class CountryFlightInfo(View):
