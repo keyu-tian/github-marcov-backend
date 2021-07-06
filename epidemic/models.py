@@ -2,7 +2,7 @@ from django.db import models
 
 
 # Create your models here.
-class HistoryEpidemicDate(models.Model):
+class HistoryEpidemicData(models.Model):
     date = models.CharField(verbose_name='日期', max_length=255)
     country_ch = models.CharField(max_length=512, blank=True)
     province_ch = models.CharField(max_length=512, blank=True)
