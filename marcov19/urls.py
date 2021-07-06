@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from train.views import *
+from flight.views import *
 from risk.views import *
 from user.views import *
 
@@ -24,6 +25,8 @@ urlpatterns = [
 
     path('travel/risk_area', RiskAreaList.as_view(), name='risk_area'),
     path('travel/train', TravelTrain.as_view()),
+    path('travel/country', CountryFlightInfo.as_view()),
+
 
 
     path('account/login', Login.as_view()),

@@ -1,6 +1,7 @@
 import time
 import re
 import json
+import os
 import argparse
 
 from bs4 import BeautifulSoup
@@ -12,7 +13,7 @@ parser.add_argument('--date', required=False, type=str)
 args = parser.parse_args()
 
 options = webdriver.ChromeOptions()
-# options.add_argument('--headless')
+options.add_argument('--headless')
 options.add_argument(
     f'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36')
 
@@ -59,7 +60,7 @@ def get_flight_info(begin_pos):
                 for flight in flights:
                     context = flight.get_text().strip().split()
                     # print(context)
-                    results.append({'code': context[0][:-4], 'dept_time': now + ' ' + (context[1] if context[2] == "--" else context[2]) + ':00', 'arri_time': now + ' ' + (context[4] if context[5] == "--" else context[5]) + ':00', 'condition': context[6], 'dept_city': src, 'arri_city': dst})
+                    results.append({'code': ''.join(re.findall(r'[A-Za-z0-9]', context[0])), 'dept_time': now + ' ' + (context[1] if context[2] == "--" else context[2]) + ':00', 'arri_time': now + ' ' + (context[4] if context[5] == "--" else context[5]) + ':00', 'condition': context[6], 'dept_city': src, 'arri_city': dst})
                 try:
                     next_page = driver.find_element_by_css_selector('#p_next')
                     next_page.click()
@@ -67,15 +68,15 @@ def get_flight_info(begin_pos):
                     break
             # print(results)
             if begin_pos[0] == 0 and begin_pos[1] == 0:
-                with open(f'../spiders_data/flights_data/flights_data{now}.json', 'r+', encoding='utf-8') as fp:
-                    context_now = fp.read()
-                    if context_now == '':
-                        context_now = []
-                    else:
-                        context_now = json.loads(context_now)
+                # with open(f'../spiders_data/flights_data/flights_data{now}.json', 'r+', encoding='utf-8') as fp:
+                #     context_now = fp.read()
+                #     if context_now == '':
+                #         context_now = []
+                #     else:
+                #         context_now = json.loads(context_now)
                 with open(f'../spiders_data/flights_data/flights_data{now}.json', 'w+', encoding='utf-8') as fp:
-                    context_now.extend(results)
-                    fp.write(json.dumps(context_now, ensure_ascii=False))
+                    # context_now.extend(results)
+                    fp.write(json.dumps(results, ensure_ascii=False))
             else:
                 with open(f'../spiders_data/flights_data/flights_data{args.date}.json', 'r+', encoding='utf-8') as fp:
                     context_now = fp.read()
@@ -106,7 +107,7 @@ def main():
                 context = json.loads(f.read())[-1]
                 begin_pos[0] = code.index(context['dept_city'])
                 begin_pos[1] = code.index(context['arri_city'])
-        except:
+        except FileNotFoundError:
             pass
     print('begin_pos:', begin_pos[0], begin_pos[1])
     get_flight_info(begin_pos)
