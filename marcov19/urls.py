@@ -61,4 +61,6 @@ urlpatterns = [
     path('upload_pic', UploadPic.as_view()),
 
     path('data/domestic_analyze', DomesticAnalyze.as_view()),
+    path('data/search', SearchAnalyse.as_view()),
+    path('data/country_analyze', CountryAnalyze.as_view()),
 ]
