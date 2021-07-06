@@ -1,3 +1,14 @@
+
+import marcov19.settings
+from django.conf import settings
+
+settings.configure(DEBUG=True, default_settings=marcov19.settings)
+import os
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
+import django
+
+django.setup()
 from django.views import View
 from utils.meta_wrapper import JSR
 import json
@@ -13,6 +24,7 @@ from country.models import Country, City
 def get_flight_info_by_code(code):
     results = []
     flights = Flight.objects.filter(code__icontains=code)
+    print(flights.count())
     if flights.count() == 0:
         return results
     for flight in flights:
@@ -167,3 +179,8 @@ class CountryFlightInfo(View):
                        'pos': list(address_to_jingwei(end_city.name_ch))}
             planes.append({'number': flight.code, 'stations': [start, end]})
         return 0, planes
+
+
+if __name__ == '__main__':
+    ret = get_flight_info_by_code('N')
+    print(ret)
