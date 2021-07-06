@@ -11,7 +11,7 @@ import requests
 # 城市的出行政策爬取
 
 def get_input_options_by_xml(path):
-    DOMTree = xml.dom.minidom.parse("./CountryProvinceCityLocListCH_and_Code.xml")
+    DOMTree = xml.dom.minidom.parse(os.path.join(os.path.split(path)[0], 'CountryProvinceCityLocListCH_and_Code.xml'))
     china = DOMTree.documentElement.getElementsByTagName('CountryRegion').item(0).getElementsByTagName('State')
     res = {}
     for i in range(len(china)):
@@ -29,15 +29,15 @@ def get_input_options_by_xml(path):
 
 def get_input_options_by_json(path):
     res = {}
-    with open(os.path.join(path, 'City.json'), 'r', encoding='utf-8') as jsonfile:
+    if not os.path.exists(path):
+        os.makedirs(path)
+    with open(os.path.join(os.path.split(path)[0], 'City.json'), 'r', encoding='utf-8') as jsonfile:
         js = json.load(jsonfile)
     for i in range(len(js['data'])):
         if js['data'][i]['province'] not in res.keys():
             res[js['data'][i]['province']] = []
         res[js['data'][i]['province']].append([js['data'][i]['city']])
     # with open('./option_result.json', 'w+', encoding='utf-8') as jsonfile:
-    if not os.path.exists(path):
-        os.makedirs(path)
     with open(os.path.join(path, 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
         fp.write(json.dumps(res) + '\n')
     return res
