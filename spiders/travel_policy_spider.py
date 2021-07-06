@@ -1,4 +1,5 @@
 import json
+import os
 
 from selenium import webdriver
 import argparse
@@ -8,7 +9,7 @@ import requests
 
 # 城市的出行政策爬取
 
-def get_input_options_by_xml():
+def get_input_options_by_xml(path):
     DOMTree = xml.dom.minidom.parse("./CountryProvinceCityLocListCH_and_Code.xml")
     china = DOMTree.documentElement.getElementsByTagName('CountryRegion').item(0).getElementsByTagName('State')
     res = {}
@@ -20,10 +21,12 @@ def get_input_options_by_xml():
         for j in range(len(city_list)):
             city_name = city_list[j].getAttribute('Name')
             res[state_name].append(city_name)
+    with open(os.path.join(path, 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
+        fp.write(json.dumps(res) + '\n')
     return res
 
 
-def get_input_options_by_json():
+def get_input_options_by_json(path):
     res = {}
     with open('./City.json', 'r', encoding='utf-8') as jsonfile:
         js = json.load(jsonfile)
@@ -31,12 +34,13 @@ def get_input_options_by_json():
         if js['data'][i]['province'] not in res.keys():
             res[js['data'][i]['province']] = []
         res[js['data'][i]['province']].append([js['data'][i]['city']])
-    with open('./option_result.json', 'w+', encoding='utf-8') as jsonfile:
-        jsonfile.write(json.dumps(res) + '\n')
+    # with open('./option_result.json', 'w+', encoding='utf-8') as jsonfile:
+    with open(os.path.join(path, 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
+        fp.write(json.dumps(res) + '\n')
     return res
 
 
-def main(res):
+def main(path, res):
     '''
     {"success":true,
     "code":0,
@@ -47,7 +51,6 @@ def main(res):
     "city":"朝阳","param1":    {"success":false,"code":2,"msg":"没有查询的城市","data":null}
     '''
     url = 'http://wx.wind.com.cn/alert/traffic/getPolicy?city='
-    json_file = open('./policy_by_city.json', 'a', encoding='utf-8')
     for i in range(len(list(res.keys()))):
         city_list = res.get(list(res.keys())[i])
         for j in range(len(city_list)):
@@ -55,15 +58,21 @@ def main(res):
             response = requests.get(get_url, headers={'Content-Type': 'application/json'}, timeout=10)
             js = json.loads(response.text)
             if js['success']:
-                json_file.write(json.dumps({
-                    'province': js['data']['province'],
-                    'city': js['data']['city'],
-                    'enter_policy': js['data']['enterPolicy'],
-                    'out_policy': js['data']['outPolicy'],
-                }) + '\n')
+                with open(os.path.join(path, 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
+                    fp.write(json.dumps({
+                        'province': js['data']['province'],
+                        'city': js['data']['city'],
+                        'enter_policy': js['data']['enterPolicy'],
+                        'out_policy': js['data']['outPolicy'],
+                    }) + '\n')
 
 
 if __name__ == '__main__':
-    res = get_input_options_by_json()
+    parser = argparse.ArgumentParser(description='Train-Spider')
+    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'train_spider_all'), type=str)
+    args = parser.parse_args()
+
+    res = get_input_options_by_json(args.path)
     print(res)
-    main(res)
+
+    main(args.path, res)
