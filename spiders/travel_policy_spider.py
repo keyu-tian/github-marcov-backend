@@ -22,8 +22,8 @@ def get_input_options_by_xml(path):
         for j in range(len(city_list)):
             city_name = city_list[j].getAttribute('Name')
             res[state_name].append(city_name)
-    with open(os.path.join(path, 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
-        fp.write(json.dumps(res) + '\n')
+    # with open(os.path.join(path, 'city.json'), 'a', encoding='utf-8') as fp:
+    #     fp.write(json.dumps(res) + '\n')
     return res
 
 
