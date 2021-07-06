@@ -20,6 +20,7 @@ from flight.views import *
 from risk.views import *
 from user.views import *
 from epidemic.views import *
+from analysis.views import *
 
 urlpatterns = [
     path('/', admin.site.urls),
@@ -48,4 +49,6 @@ urlpatterns = [
     path('user_info', UserInfo.as_view()),
     path('identity', Identity.as_view()),
     path('upload_pic', UploadPic.as_view()),
+
+    path('data/domestic_analyze', DomesticAnalyze.as_view()),
 ]
