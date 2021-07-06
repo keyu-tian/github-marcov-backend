@@ -19,6 +19,7 @@ from train.views import *
 from flight.views import *
 from risk.views import *
 from user.views import *
+from news.views import *
 from epidemic.views import *
 
 urlpatterns = [
@@ -42,6 +43,8 @@ urlpatterns = [
     path('travel/train', TravelTrain.as_view()),
     path('travel/country', CountryFlightInfo.as_view()),
     path('travel/search', TravelSearch.as_view()),
+
+    path('news/weekly', WeeklyNews.as_view()),
 
 
 
