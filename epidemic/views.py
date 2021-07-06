@@ -2,6 +2,7 @@ from django.views import View
 from utils.meta_wrapper import JSR
 from risk.views import get_city_risk_level
 from epidemic.models import HistoryEpidemicData
+from country.models import Policy
 import json
 
 
@@ -29,7 +30,12 @@ class MapProvince(View):
         cities = []
         infos = []
         for city_data in data:
-            info = {'level': get_city_risk_level(city_data.city_ch), 'msg': '未知'}
+            msg = Policy.objects.filter(city_name=city_data.city_ch)
+            if msg.count() == 0:
+                msg = '未知'
+            else:
+                msg = msg.first().enter_policy+'\n'+msg.first().outer_policy
+            info = {'level': get_city_risk_level(city_data.city_ch), 'msg': msg}
             city = {'name': city_data.city_ch}
             city['new'] = {
                 'died': city_data.city_new_died if city_data.city_new_died else 0,

@@ -19,6 +19,8 @@ def is_Chinese(ch):
 
 def main():
     for news in news_list:
+        if '美国' in news['title'] or '新加坡' in news['title'] or '英国' in news['title'] or '印' in news['title']:
+            continue
         result = {'title': news['title'], 'img': news['img'], 'url': news['url'], 'media_name': news['media_name'], 'publish_time': news['publish_time']}
         # print(result)
         url = result['url']
