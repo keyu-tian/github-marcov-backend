@@ -1,7 +1,9 @@
 from django.views import View
 from utils.meta_wrapper import JSR
+from utils.dict_ch import city_dict_ch
 from risk.views import get_city_risk_level
 from epidemic.models import HistoryEpidemicData
+from country.models import Policy
 import json
 
 
@@ -11,6 +13,7 @@ class MapProvince(View):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name', 'date'}:
             return 1, []
+        kwargs['name'] = city_dict_ch[kwargs['name']]
         province = {}
         data = HistoryEpidemicData.objects.filter(date=kwargs['date'], province_ch=kwargs['name'])
         if data.count() == 0:
@@ -29,7 +32,12 @@ class MapProvince(View):
         cities = []
         infos = []
         for city_data in data:
-            info = {'level': get_city_risk_level(city_data.city_ch), 'msg': '未知'}
+            msg = Policy.objects.filter(city_name=city_data.city_ch)
+            if msg.count() == 0:
+                msg = '未知'
+            else:
+                msg = msg.first().enter_policy+'\n'+msg.first().outer_policy
+            info = {'level': get_city_risk_level(city_data.city_ch), 'msg': msg}
             city = {'name': city_data.city_ch}
             city['new'] = {
                 'died': city_data.city_new_died if city_data.city_new_died else 0,
@@ -54,6 +62,7 @@ class MapProvinceDt(View):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name'}:
             return 1, []
+        kwargs['name'] = city_dict_ch[kwargs['name']]
         total_data = HistoryEpidemicData.objects.filter(province_ch=kwargs['name'])
         res = []
         date = []
