@@ -36,6 +36,8 @@ def get_input_options_by_json(path):
             res[js['data'][i]['province']] = []
         res[js['data'][i]['province']].append([js['data'][i]['city']])
     # with open('./option_result.json', 'w+', encoding='utf-8') as jsonfile:
+    if not os.path.exists(path):
+        os.makedirs(path)
     with open(os.path.join(path, 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
         fp.write(json.dumps(res) + '\n')
     return res
@@ -70,7 +72,7 @@ def main(path, res):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train-Spider')
-    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'train_spider_all'), type=str)
+    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'travel_policy_spider_all'), type=str)
     args = parser.parse_args()
 
     res = get_input_options_by_json(args.path)

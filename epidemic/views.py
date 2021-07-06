@@ -1,6 +1,7 @@
 from django.views import View
 from utils.meta_wrapper import JSR
-from utils.dict_ch import city_dict_ch
+from utils.dict_ch import city_dict_ch, province_dict_ch
+from utils.country_dict import country_dict
 from risk.views import get_city_risk_level
 from epidemic.models import HistoryEpidemicData
 from country.models import Policy
@@ -13,7 +14,7 @@ class MapProvince(View):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name', 'date'}:
             return 1, []
-        kwargs['name'] = city_dict_ch[kwargs['name']]
+        kwargs['name'] = province_dict_ch[kwargs['name']]
         province = {}
         data = HistoryEpidemicData.objects.filter(date=kwargs['date'], province_ch=kwargs['name'])
         if data.count() == 0:
@@ -30,13 +31,18 @@ class MapProvince(View):
             'confirmed': province_data.province_total_confirmed if province_data.province_total_confirmed else 0
         }
         cities = []
+        msg = Policy.objects.filter(city_name=province_data.province_ch)
+        if msg.count() == 0:
+            msg = '未知'
+        else:
+            msg = msg.first().enter_policy+'\n'+msg.first().outer_policy
         infos = []
         for city_data in data:
             msg = Policy.objects.filter(city_name=city_data.city_ch)
             if msg.count() == 0:
                 msg = '未知'
             else:
-                msg = msg.first().enter_policy+'\n'+msg.first().outer_policy
+                msg = msg.first().enter_policy + '\n' + msg.first().outer_policy
             info = {'level': get_city_risk_level(city_data.city_ch), 'msg': msg}
             city = {'name': city_data.city_ch}
             city['new'] = {
@@ -62,7 +68,7 @@ class MapProvinceDt(View):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name'}:
             return 1, []
-        kwargs['name'] = city_dict_ch[kwargs['name']]
+        kwargs['name'] = country_dict[kwargs['name']]
         total_data = HistoryEpidemicData.objects.filter(province_ch=kwargs['name'])
         res = []
         date = []
@@ -82,4 +88,108 @@ class MapProvinceDt(View):
                 'confirmed': province_data.province_total_confirmed if province_data.province_total_confirmed else 0
             }
             res.append(data)
+        return 0, res
+
+
+class MapOversea(View):
+    @JSR('status', 'country')
+    def post(self, request):
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'name', 'date'}:
+            return 1, []
+        kwargs['name'] = list(country_dict.keys())[list(country_dict.values()).index(kwargs['name'])]
+        country = {}
+        data = HistoryEpidemicData.objects.filter(date=kwargs['date'], country_ch=kwargs['name'])
+        if data.count() == 0:
+            return 6, country
+        country['new'] = {
+            'died': 0,
+            'cured': 0,
+            'confirmed': 0
+        }
+        country['total'] = {
+            'died': 0,
+            'cured': 0,
+            'confirmed': 0
+        }
+        states = []
+        infos = []
+        for state_data in data:
+            # msg = Policy.objects.filter(city_name=state_data.city_ch)
+            # if msg.count() == 0:
+            #     msg = '未知'
+            # else:
+            #     msg = msg.first().enter_policy+'\n'+msg.first().outer_policy
+            info = {'level': get_city_risk_level(state_data.city_ch), 'msg': '未知'}
+            state = {'name': state_data.state_en}
+            state['new'] = {
+                'died': state_data.city_new_died if state_data.city_new_died else 0,
+                'cured': state_data.city_new_cured if state_data.city_new_cured else 0,
+                'confirmed': state_data.city_new_confirmed if state_data.city_new_confirmed else 0
+            }
+            country['new']['died'] += state['new']['died']
+            country['new']['cured'] += state['new']['cured']
+            country['new']['confirmed'] += state['new']['confirmed']
+            state['total'] = {
+                'died': state_data.city_total_died if state_data.city_total_died else 0,
+                'cured': state_data.city_total_cured if state_data.city_total_cured else 0,
+                'confirmed': state_data.city_total_confirmed if state_data.city_total_confirmed else 0,
+            }
+            country['total']['died'] += state['total']['died']
+            country['total']['cured'] += state['total']['cured']
+            country['total']['confirmed'] += state['total']['confirmed']
+            states.append(state)
+            infos.append(info)
+        country['states'] = states
+        country['info'] = infos
+        return 0, country
+
+
+class MapOverseaDt(View):
+    @JSR('status', 'data')
+    def post(self, request):
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'name'}:
+            return 1, []
+        kwargs['name'] = list(country_dict.keys())[list(country_dict.values()).index(kwargs['name'])]
+        country = {}
+        total_data = HistoryEpidemicData.objects.filter(country_ch=kwargs['name'])
+        if total_data.count() == 0:
+            return 6, country
+        date = []
+        for state_data in total_data:
+            if state_data.date not in date:
+                country[state_data.date] = {}
+                date.append(state_data.date)
+                country[state_data.date]['new'] = {
+                    'died': 0,
+                    'cured': 0,
+                    'confirmed': 0
+                }
+                country[state_data.date]['total'] = {
+                    'died': 0,
+                    'cured': 0,
+                    'confirmed': 0
+                }
+            state = {}
+            state['new'] = {
+                'died': state_data.city_new_died if state_data.city_new_died else 0,
+                'cured': state_data.city_new_cured if state_data.city_new_cured else 0,
+                'confirmed': state_data.city_new_confirmed if state_data.city_new_confirmed else 0
+            }
+            country[state_data.date]['new']['died'] += state['new']['died']
+            country[state_data.date]['new']['cured'] += state['new']['cured']
+            country[state_data.date]['new']['confirmed'] += state['new']['confirmed']
+            state['total'] = {
+                'died': state_data.city_total_died if state_data.city_total_died else 0,
+                'cured': state_data.city_total_cured if state_data.city_total_cured else 0,
+                'confirmed': state_data.city_total_confirmed if state_data.city_total_confirmed else 0,
+            }
+            country[state_data.date]['total']['died'] += state['total']['died']
+            country[state_data.date]['total']['cured'] += state['total']['cured']
+            country[state_data.date]['total']['confirmed'] += state['total']['confirmed']
+        dates = list(country.keys())
+        res = []
+        for d in dates:
+            res.append({'date': d, 'new': country[d]['new'], 'total': country[d]['total']})
         return 0, res
