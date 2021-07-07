@@ -109,4 +109,5 @@ def epidemic_global_import(start_dt=None):
         daily_data['countries'] = list(countries.values())
         dataout.append(daily_data)
         start_dt = dt_delta(start_dt, 1)
-    json.dump(dataout, open('global.json', 'w'), ensure_ascii=False)
+    with open(os.path.join(IMPORTER_DATA_DIRNAME, 'global.json'), 'w') as fp:
+        json.dump(dataout, fp, ensure_ascii=False)
