@@ -1,5 +1,7 @@
 from django.views import View
 from django.db.models import Q
+
+from meta_config import SPIDER_DATA_DIRNAME
 from utils.meta_wrapper import JSR
 from utils.dict_ch import province_dict_ch, province_population
 from utils.country_dict import country_dict, country_population
@@ -16,7 +18,7 @@ class DomesticAnalyze(View):
     @JSR('status', 'data')
     def get(self, request):
         print('start')
-        json_path = os.path.join('spiders_data', 'epidemic_domestic_data', 'province.json')
+        json_path = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
         analysis = json.load(open(json_path, 'r', encoding='utf-8'))
         return 0, analysis
 

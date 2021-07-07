@@ -2,6 +2,8 @@ import urllib.request
 import json
 from bs4 import BeautifulSoup
 
+from meta_config import SPIDER_DATA_DIRNAME
+
 url = 'https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=antip&srv_id=pc&offset=0&limit=65&strategy=1&ext={%22pool%22:[%22high%22,%22top%22],%22is_filter%22:10,%22check_type%22:true}'
 headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
 req = urllib.request.Request(url)
@@ -48,7 +50,7 @@ def news_spider():
             continue
         results.append(result)
 
-    with open('../spiders_data/news_data.json', 'w+', encoding='utf-8') as f:
+    with open(f'{SPIDER_DATA_DIRNAME}/news_data.json', 'w+', encoding='utf-8') as f:
         f.write(json.dumps(results, ensure_ascii=False))
     return results
 

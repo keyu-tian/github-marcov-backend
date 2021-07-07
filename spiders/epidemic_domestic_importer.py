@@ -1,27 +1,18 @@
 # -*- coding: utf-8 -*-
-import sys
-import marcov19.settings
-from django.conf import settings
 
-settings.configure(DEBUG=True, default_settings=marcov19.settings)
-import os
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
-import django
-
-django.setup()
-
-from datetime import datetime
 import datetime as dt
 import json
-import re
-from utils.dict_ch import province_dict_ch, province_population
 import os
+import re
+from datetime import datetime
 
-input_file = os.path.join('..', 'spiders_data', 'epidemic_domestic_data', 'DXYArea.csv')  # "t15.csv"
-csv_download_path = os.path.join('..', 'spiders_data', 'epidemic_domestic_data', 'DXYArea.csv')
-area_file = os.path.join('..', 'spiders_data', 'epidemic_domestic_data', 'area.json')
-json_file = os.path.join('..', 'spiders_data', 'epidemic_domestic_data', 'province.json')
+from meta_config import SPIDER_DATA_DIRNAME
+from utils.dict_ch import province_dict_ch, province_population
+
+input_file = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')  # "t15.csv"
+csv_download_path = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')
+area_file = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'area.json')
+json_file = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
 
 # 获取当天数据
 # os.system('wget https://github.com/BlankerL/DXY-COVID-19-Data/releases/download/%s/DXYArea.csv --no-check-certificate -o ' % (dt.datetime.strftime(dt.date.today(), '%Y.%m.%d')) + csv_download_path)
@@ -115,7 +106,7 @@ while d <= end:
         daily_info[nd][city]['city_new_died'] = 0
         daily_info[nd][city]['city_new_cured'] = 0
         daily_info[nd][city]['city_new_confirmed'] = 0
-
+    
     while all_data[idx]['updateTime'] == nd:
         city = all_data[idx]['cityName']
         daily_info[nd][city]['province_new_died'] = max(
@@ -129,7 +120,7 @@ while d <= end:
                                                      0)
         daily_info[nd][city]['city_new_confirmed'] = max(
             all_data[idx]['city_confirmedCount'] - last[city]['city_total_confirmed'], 0)
-
+        
         daily_info[nd][city]['province_total_died'] = max(all_data[idx]['province_deadCount'],
                                                           daily_info[nd][city]['province_total_died'])
         daily_info[nd][city]['province_total_cured'] = max(all_data[idx]['province_curedCount'],
@@ -142,9 +133,9 @@ while d <= end:
                                                        daily_info[nd][city]['city_total_cured'])
         daily_info[nd][city]['city_total_confirmed'] = max(all_data[idx]['city_confirmedCount'],
                                                            daily_info[nd][city]['city_total_confirmed'])
-
+        
         idx += 1
-
+    
     for city in last.keys():
         last[city]['province_total_died'] = max(daily_info[nd][city]['province_total_died'],
                                                 last[city]['province_total_died'])
@@ -156,7 +147,7 @@ while d <= end:
         last[city]['city_total_cured'] = max(daily_info[nd][city]['city_total_cured'], last[city]['city_total_cured'])
         last[city]['city_total_confirmed'] = max(daily_info[nd][city]['city_total_confirmed'],
                                                  last[city]['city_total_confirmed'])
-
+    
     for it in daily_info[nd].items():
         s = nd
         for k in out_title:

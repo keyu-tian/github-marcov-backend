@@ -5,7 +5,6 @@ from django.views import View
 from django.db.models import Q
 from news.models import *
 from utils.meta_wrapper import JSR
-from utils.news_importer import news_spider, news_importer
 
 
 class WeeklyNews(View):

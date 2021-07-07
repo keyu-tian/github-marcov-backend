@@ -8,6 +8,8 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from selenium import webdriver
 
+from meta_config import SPIDER_DATA_DIRNAME
+
 parser = argparse.ArgumentParser(description='Flight-Spider')
 parser.add_argument('--date', required=False, type=str)
 args = parser.parse_args()
@@ -21,7 +23,7 @@ code = []
 
 # 核心城市
 # kernel = '兰州 西宁 西安 郑州 济南 太原 合肥 长沙 武汉 南京 成都 贵阳 昆明 哈尔滨 长春 沈阳 石家庄 杭州 南昌 广州 福州 台北 海口 北京 天津 上海 重庆 南宁 拉萨 银川 乌鲁木齐 呼和浩特 香港 澳门'.split()
-with open('flight.txt', 'r+', encoding='utf-8') as f:
+with open('spiders/flight.txt', 'r+', encoding='utf-8') as f:
     city_list = re.split(',', f.read().replace(' ', '').replace('\n', ''))[1:-1]
     for x in city_list:
         city_name, res_code = x.split(':')
@@ -68,23 +70,23 @@ def get_flight_info(begin_pos):
                     break
             # print(results)
             if begin_pos[0] == 0 and begin_pos[1] == 0:
-                # with open(f'../spiders_data/flights_data/flights_data{now}.json', 'r+', encoding='utf-8') as fp:
+                # with open(f'/{SPIDER_DATA_DIRNAME}/flights_data/flights_data{now}.json', 'r+', encoding='utf-8') as fp:
                 #     context_now = fp.read()
                 #     if context_now == '':
                 #         context_now = []
                 #     else:
                 #         context_now = json.loads(context_now)
-                with open(f'../spiders_data/flights_data/flights_data{now}.json', 'w+', encoding='utf-8') as fp:
+                with open(f'{SPIDER_DATA_DIRNAME}/flights_data/flights_data{now}.json', 'w+', encoding='utf-8') as fp:
                     # context_now.extend(results)
                     fp.write(json.dumps(results, ensure_ascii=False))
             else:
-                with open(f'../spiders_data/flights_data/flights_data{args.date}.json', 'r+', encoding='utf-8') as fp:
+                with open(f'{SPIDER_DATA_DIRNAME}/flights_data/flights_data{args.date}.json', 'r+', encoding='utf-8') as fp:
                     context_now = fp.read()
                     if context_now == '':
                         context_now = []
                     else:
                         context_now = json.loads(context_now)
-                with open(f'../spiders_data/flights_data/flights_data{args.date}.json', 'w+', encoding='utf-8') as fp:
+                with open(f'{SPIDER_DATA_DIRNAME}/flights_data/flights_data{args.date}.json', 'w+', encoding='utf-8') as fp:
                     context_now.extend(results)
                     fp.write(json.dumps(context_now, ensure_ascii=False))
     driver.quit()
@@ -95,7 +97,7 @@ def main():
     begin_pos = [0, 0]
     if args.date:
         try:
-            with open(f'../spiders_data/flights_data/flights_data{args.date}.json', 'r+', encoding='utf-8') as f:
+            with open(f'{SPIDER_DATA_DIRNAME}/flights_data/flights_data{args.date}.json', 'r+', encoding='utf-8') as f:
                 context = json.loads(f.read())[-1]
                 begin_pos[0] = code.index(context['dept_city'])
                 begin_pos[1] = code.index(context['arri_city'])
@@ -103,7 +105,7 @@ def main():
             print('您选择的日期错误（日期格式：y-m-d，例如：2020-07-02')
     else:
         try:
-            with open(f'../spiders_data/flights_data/flights_data{datetime.now().strftime("%Y-%m-%d")}.json', 'r+', encoding='utf-8') as f:
+            with open(f'{SPIDER_DATA_DIRNAME}/flights_data/flights_data{datetime.now().strftime("%Y-%m-%d")}.json', 'r+', encoding='utf-8') as f:
                 context = json.loads(f.read())[-1]
                 begin_pos[0] = code.index(context['dept_city'])
                 begin_pos[1] = code.index(context['arri_city'])

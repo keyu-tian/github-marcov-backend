@@ -1,21 +1,13 @@
 import argparse
 import datetime
 import json
+import os
 import re
+
 from tqdm import tqdm
 
-import marcov19.settings
-from django.conf import settings
-
-settings.configure(DEBUG=True, default_settings=marcov19.settings)
-import os
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
-import django
-
-django.setup()
-
 from country.models import Country, City
+from meta_config import SPIDER_DATA_DIRNAME
 from train.models import Train, Station, MidStation
 from utils.cast import address_to_jingwei, jingwei_to_address
 
@@ -43,7 +35,7 @@ def parse_train_json(path, line_start):
             arri_sta_name = result.get('trainInfo').get(name).get('arriStation')
             arri_time = result.get('trainInfo').get(name).get('arriTime')
             arri_date = result.get('trainInfo').get(name).get('arrDate')
-
+            
             bar.set_postfix_str(f'{dept_city_name} => {arri_city_name}')
             
             dept_city, flag = City.objects.get_or_create(name_ch=dept_city_name)
@@ -55,7 +47,7 @@ def parse_train_json(path, line_start):
                 dept_sta.jingdu, dept_sta.weidu = address_to_jingwei(dept_sta_name + '站')
                 dept_sta.city = dept_city
                 dept_sta.save()
-
+            
             arri_city, flag = City.objects.get_or_create(name_ch=arri_city_name)
             if flag:  # 数据库没有的新的国家，存名字
                 arri_city.country = country
@@ -90,7 +82,7 @@ def parse_train_json(path, line_start):
                             mid_city.save()
                         sta.city = mid_city
                         sta.save()
-
+                    
                     MidStation.objects.create(index=mid_list.index(c) + 1, arri_date=content[2],
                                               arri_time=content[3], station=sta, train=train)
             train.save()
@@ -101,10 +93,10 @@ def parse_train_json(path, line_start):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train-Spider')
-    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'train_spider_all'), type=str)
+    parser.add_argument('--path', required=False, default=os.path.join(SPIDER_DATA_DIRNAME, 'train_spider_all'), type=str)
     parser.add_argument('--line', required=False, default=0, type=int)
     args = parser.parse_args()
-
+    
     start = str(datetime.datetime.now())
     print(f'[{start}] 开始parse...')
     parse_train_json(args.path, args.line)

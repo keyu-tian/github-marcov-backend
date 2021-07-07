@@ -8,6 +8,7 @@ import xml.dom.minidom
 import requests
 
 # 丁香医生辟谣爬取
+from meta_config import SPIDER_DATA_DIRNAME
 
 
 def main(path):
@@ -31,7 +32,7 @@ def main(path):
     response = requests.get(url, headers={'Content-Type': 'application/json'}, timeout=10)
     js = json.loads(response.text)
     if js['code'] == 'success':
-        # with open('./spiders_data/rumor.json', 'a', encoding='utf-8') as fp:
+        # with open(f'{SPIDER_DATA_DIRNAME}/rumor.json', 'a', encoding='utf-8') as fp:
         if not os.path.exists(path):
             os.makedirs(path)
         with open(os.path.join(path, 'rumor.json'), 'a', encoding='utf-8') as fp:
@@ -45,7 +46,7 @@ def main(path):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train-Spider')
-    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'yaoyan_spider_all'), type=str)
+    parser.add_argument('--path', required=False, default=os.path.join(SPIDER_DATA_DIRNAME, 'yaoyan_spider_all'), type=str)
     args = parser.parse_args()
 
     main(args.path)
