@@ -47,7 +47,7 @@ urlpatterns = [
     path('travel/search', TravelSearch.as_view()),
 
     path('news/weekly', WeeklyNews.as_view()),
-    path('', TemplateView.as_view(template_name='index.html')),
+    url(r'^', TemplateView.as_view(template_name='index.html')),
     re_path(r'^upload(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}, name='media')
     # re_path(r'.*', TemplateView.as_view(template_name='index.html')),
 
