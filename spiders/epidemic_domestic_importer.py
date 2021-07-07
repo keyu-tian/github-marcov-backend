@@ -25,9 +25,9 @@ def epidemic_domestic_import():
     title = ['continentName', 'continentEnglishName', 'countryName', 'countryEnglishName', 'provinceName',
              'provinceEnglishName',
              'province_zipCode', 'province_confirmedCount', 'province_suspectedCount', 'province_curedCount',
-             'province_deadCount', 'cityName', 'cityEnglishName', 'city_zipCode', 'city_confirmedCount',
+             'province_deadCount', 'updateTime', 'cityName', 'cityEnglishName', 'city_zipCode', 'city_confirmedCount',
              'city_suspectedCount',
-             'city_curedCount', 'city_deadCount', 'updateTime']
+             'city_curedCount', 'city_deadCount']
     f.readline()
     all_data = []
     for line in f:
