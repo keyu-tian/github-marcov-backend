@@ -30,14 +30,7 @@ class WeeklyNews(View):
         for dis in range(7):
             now = end_date - timedelta(days=dis)
             now = now.strftime('%Y-%m-%d')
-            
-            q1 = News.objects.filter(sub_category_cn__iexact='国际社会', publish_time__icontains=now)
-            q2 = News.objects.filter(sub_category_cn__icontains='国际社会', publish_time__icontains=now)
-            q3 = News.objects.filter(~Q(media='BBC') & ~Q(media='CNN'), publish_time__icontains=now, img__isnull=True)
-            q4 = News.objects.filter(Q(media='BBC') | Q(media='CNN'), img__isnull=True, publish_time__icontains=now)
-            
-            for q in (q1, q2, q3, q4):
-                WeeklyNews.res_append(q, res_china, res_global)
+            WeeklyNews.res_append(News.objects.filter(publish_time__icontains=now), res_china, res_global)
         
         return 0, end_date.strftime('%Y-%m-%d'), res_china, res_global
 
