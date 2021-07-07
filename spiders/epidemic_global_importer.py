@@ -39,7 +39,9 @@ def dt_delta(date, delta):
 #     return int(time.strftime("%Y%m%d", first_time)) - int(time.strftime("%Y%m%d", second_time))
 
 
-def epidemic_global_import(start_dt):
+def epidemic_global_import(start_dt=None):
+    if start_dt is None:
+        start_dt = begin
     dataout = []
     while start_dt < datetime.datetime.now().strftime("%Y-%m-%d"):
         t = time.time()
@@ -49,8 +51,8 @@ def epidemic_global_import(start_dt):
         try:
             file_name = dt_change_mdy(start_dt)
             last_file_name = dt_change_mdy(dt_delta(start_dt, -1))
-            last_data = pandas.read_csv(path, last_file_name + '.csv').fillna(0)
-            data = pandas.read_csv(path, file_name + '.csv').fillna(0)
+            last_data = pandas.read_csv(os.path.join(path, last_file_name + '.csv')).fillna(0)
+            data = pandas.read_csv(os.path.join(path, file_name + '.csv')).fillna(0)
             last_data = pandas.read_csv(os.path.join(path, last_file_name + '.csv')).fillna(0)
             data = pandas.read_csv(os.path.join(path, file_name + '.csv')).fillna(0)
 
