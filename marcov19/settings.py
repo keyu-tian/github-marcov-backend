@@ -24,8 +24,8 @@ STATIC_URL = '/static/'
 # 模块资源引用地址
 STATICFILES_DIRS = (
     # os.path.join(BASE_DIR, FRONTEND_ROOT),
-    os.path.join(BASE_DIR, STATIC_URL),
-    os.path.join(BASE_DIR, "frontend/dist"),
+    # os.path.join(BASE_DIR, 'dist' + STATIC_URL),
+    os.path.join(BASE_DIR, "frontend/dist/static"),
 )
 
 # STATIC_ROOT = ''
@@ -66,10 +66,10 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     # 'cors.corsMiddleware.CustomCorsMiddleware',
     #'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
