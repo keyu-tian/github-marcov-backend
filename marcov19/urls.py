@@ -13,8 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
 from django.contrib import admin
-from django.urls import path
+from django.views.generic import TemplateView
+from django.views.static import serve
+from django.urls import path, re_path
 from train.views import *
 from flight.views import *
 from risk.views import *
@@ -24,7 +27,6 @@ from epidemic.views import *
 
 urlpatterns = [
     path('/', admin.site.urls),
-
 
     path('map/province', MapProvince.as_view()),
     path('map/province_dt', MapProvinceDt.as_view()),
@@ -45,8 +47,9 @@ urlpatterns = [
     path('travel/search', TravelSearch.as_view()),
 
     path('news/weekly', WeeklyNews.as_view()),
-
-
+    path('', TemplateView.as_view(template_name='index.html')),
+    re_path(r'^upload(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}, name='media')
+    # re_path(r'.*', TemplateView.as_view(template_name='index.html')),
 
     # path('account/login', Login.as_view()),
     # path('account/register', Register.as_view()),
