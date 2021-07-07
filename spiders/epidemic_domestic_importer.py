@@ -32,7 +32,8 @@ def epidemic_domestic_import():
     all_data = []
     for line in f:
         single_data = {}
-        ls = re.split(',(?!\\s)', line)
+        ls = re.split(',(?!\\s)', line[:-1])
+        # print(ls)
         if ls[2] != '中国':
             continue
         for it in zip(title, ls):
@@ -72,7 +73,7 @@ def epidemic_domestic_import():
         last[city]['city_total_cured'] = 0
         last[city]['city_total_confirmed'] = 0
     begin = dt.date(2020, 1, 22)
-    end = dt.date(2021, 7, 6)
+    end = dt.date(2021, 7, 3)
     # end = dt.date.today()
     delta = dt.timedelta(days=1)
     d = begin
@@ -102,7 +103,7 @@ def epidemic_domestic_import():
             daily_info[nd][city]['city_new_cured'] = 0
             daily_info[nd][city]['city_new_confirmed'] = 0
         
-        while all_data[idx]['updateTime'] == nd:
+        while idx < len(all_data) and all_data[idx]['updateTime'] == nd:
             for city in last.keys():
                 if all_data[idx]['provinceName'] == last[city]['provinceName']:
                     daily_info[nd][city]['province_new_died'] = max(
