@@ -30,7 +30,7 @@ class WeeklyNews(View):
             end_date = datetime.now()
         else:
             try:
-               end_date = datetime.strptime(kwargs['date'], '%Y-%m-%d')
+                end_date = datetime.strptime(kwargs['date'], '%Y-%m-%d')
             except:
                 return 7, '', [], []
         for dis in range(7):
@@ -39,7 +39,7 @@ class WeeklyNews(View):
             WeeklyNews.res_append(News.objects.filter(publish_time__icontains=now), res_china, res_global)
         
         return 0, end_date.strftime('%Y-%m-%d'), res_china, res_global
-
+    
     @staticmethod
     def res_append(query, res_china, res_global):
         for a in query:
@@ -56,4 +56,3 @@ class WeeklyNews(View):
                 'media_name': a.media,
                 'img_url': a.img if a.img else '',
             })
-
