@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'news',
     'risk',
     'epidemic',
+    'analysis',
 ]
 
 MIDDLEWARE = [
