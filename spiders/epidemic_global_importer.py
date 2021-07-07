@@ -56,6 +56,7 @@ def epidemic_global_import(start_dt=None):
             last_data = pandas.read_csv(os.path.join(path, last_file_name + '.csv')).fillna(0)
             data = pandas.read_csv(os.path.join(path, file_name + '.csv')).fillna(0)
 
+            objs = []
             # data =data.dropna()
             bar = tqdm(list(zip(data.iterrows(), last_data.iterrows())))
             bar.set_description(start_dt)
@@ -63,7 +64,7 @@ def epidemic_global_import(start_dt=None):
             for (index, row), (last_index, last_row) in bar:
                 # if row['Country_Region'] == 'China':
                 #    continue
-                HistoryEpidemicData.objects.create(**{
+                objs.append(HistoryEpidemicData(**{
                     'date': start_dt, 'country_ch': row['Country_Region'],
                     'state_en': row['Province_State'],
                     'province_total_confirmed': row['Confirmed'],
@@ -72,7 +73,7 @@ def epidemic_global_import(start_dt=None):
                     'province_new_died': max(row['Deaths'] - last_row['Deaths'], 0),
                     'province_new_cured': max(row['Recovered'] - last_row['Recovered'], 0),
                     'province_new_confirmed': max(row['Confirmed'] - last_row['Confirmed'], 0)
-                })
+                }))
                 if row['Country_Region'] not in country_dict.keys():
                     continue
                 if row['Country_Region'] not in countries.keys():
@@ -97,7 +98,7 @@ def epidemic_global_import(start_dt=None):
                 countries[row['Country_Region']]['total']['cured'] += row['Recovered']
                 countries[row['Country_Region']]['total']['confirmed'] += row['Confirmed']
 
-
+            HistoryEpidemicData.objects.bulk_create(objs)
             print(time.time() - t)
         except FileNotFoundError:
             print('File not found %s' % file_name)
@@ -108,4 +109,4 @@ def epidemic_global_import(start_dt=None):
         daily_data['countries'] = list(countries.values())
         dataout.append(daily_data)
         start_dt = dt_delta(start_dt, 1)
-    json.dump(dataout, open(os.path.join(IMPORTER_DATA_DIRNAME, 'global.json'), 'w'), ensure_ascii=False)
+    json.dump(dataout, open('global.json', 'w'), ensure_ascii=False)

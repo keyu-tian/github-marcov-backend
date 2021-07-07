@@ -159,7 +159,7 @@ def epidemic_domestic_import():
             # print(s)
         d += delta
     d = begin
-    HistoryEpidemicData.objects.bulk_create(objs)
+    HistoryEpidemicData.objects.bulk_create(objs, batch_size=4096)
     while d <= end:
         nd = d.strftime('%Y-%m-%d')
         daily_analysis = {'date': nd, 'provinces': []}
