@@ -23,3 +23,11 @@ def import_only_once():
     from spiders.yaoyan_importer import yaoyan_import
     # 王振，爬一次
     from spiders.dxy_news_importer import dxy_news_import
+
+    import sys
+    assert len(sys.argv) == 1
+    sys.argv = sys.argv[1:]
+    for import_func in locals().values():
+        import_func()
+    
+    exit(0)

@@ -8,9 +8,9 @@ import requests
 from requests.exceptions import Timeout
 from tqdm import tqdm
 
-from meta_config import SPIDER_DATA_DIRNAME
-from utils.cast import cur_time
-from utils.logger import create_logger
+from ..meta_config import SPIDER_DATA_DIRNAME
+from ..utils.cast import cur_time
+from ..utils.logger import create_logger
 
 URL = 'http://train.qunar.com/qunar/checiInfo.jsp'
 DEFAULT_DATE = datetime.datetime.now()
@@ -116,7 +116,7 @@ def distributed_main():
     分布式爬取
     """
     print('请确保是tky在跑，否则请跑 main 而不是 distributed_main')
-    from utils.pytorch_dist import TorchDistManager
+    from ..utils.pytorch_dist import TorchDistManager
     dist = TorchDistManager(cur_time(), 'auto', 'auto')
     path = os.path.join(SPIDER_DATA_DIRNAME, f'train_spider_distributed{dist.rank}')
     try:
