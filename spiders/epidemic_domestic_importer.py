@@ -8,6 +8,7 @@ from datetime import datetime
 
 from meta_config import IMPORTER_DATA_DIRNAME
 from utils.dict_ch import province_dict_ch, province_population
+from epidemic.models import HistoryEpidemicData
 
 
 def epidemic_domestic_import():
@@ -79,6 +80,7 @@ def epidemic_domestic_import():
     idx = 0
     while all_data[idx]['updateTime'] != d.strftime('%Y-%m-%d'):
         idx += 1
+    objs = []
     while d <= end:
         nd = d.strftime('%Y-%m-%d')
         daily_info[nd] = {}
@@ -148,13 +150,15 @@ def epidemic_domestic_import():
                                                      last[city]['city_total_confirmed'])
 
         for it in daily_info[nd].items():
-            s = nd
+            dic = {'date': nd}
             for k in out_title:
-                s += ',' + str(it[1][k])
+                dic[k] = it[1][k]
+            objs.append(HistoryEpidemicData(**dic))
             # TODO: 导库
             # print(s)
         d += delta
     d = begin
+    HistoryEpidemicData.objects.bulk_create(objs)
     while d <= end:
         nd = d.strftime('%Y-%m-%d')
         daily_analysis = {'date': nd, 'provinces': []}
