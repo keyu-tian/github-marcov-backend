@@ -6,7 +6,7 @@ import pandas
 from tqdm import tqdm
 
 from epidemic.models import HistoryEpidemicData
-from meta_config import SPIDER_DATA_DIRNAME
+from meta_config import IMPORTER_DATA_DIRNAME
 from utils.country_dict import country_dict
 import json
 
@@ -14,7 +14,7 @@ years = [2020, 2021]
 months = [x for x in range(1, 13)]
 days = [30, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-path = os.path.join(SPIDER_DATA_DIRNAME, 'COVID-19', 'csse_covid_19_data', 'csse_covid_19_daily_reports')
+path = os.path.join(IMPORTER_DATA_DIRNAME, 'COVID-19', 'csse_covid_19_data', 'csse_covid_19_daily_reports')
 
 # date	yyyy-mm-dd
 begin = '2020-03-23'
@@ -39,7 +39,7 @@ def dt_delta(date, delta):
 #     return int(time.strftime("%Y%m%d", first_time)) - int(time.strftime("%Y%m%d", second_time))
 
 
-def epidemic_global_importer(start_dt):
+def epidemic_global_import(start_dt):
     dataout = []
     while start_dt < datetime.datetime.now().strftime("%Y-%m-%d"):
         t = time.time()
@@ -108,11 +108,3 @@ def epidemic_global_importer(start_dt):
         dataout.append(daily_data)
         start_dt = dt_delta(start_dt, 1)
     json.dump(dataout, open('global.json', 'w'), ensure_ascii=False)
-
-
-def main():
-    epidemic_global_importer(begin)
-
-
-if __name__ == '__main__':
-    main()
