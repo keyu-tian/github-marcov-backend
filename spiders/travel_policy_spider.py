@@ -25,7 +25,7 @@ import requests
 #     # with open(os.path.join(path, 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
 #     #     fp.write(json.dumps(res) + '\n')
 #     return res
-from meta_config import SPIDER_DATA_DIRNAME
+from ..meta_config import SPIDER_DATA_DIRNAME
 
 
 def get_input_options_by_json(path):

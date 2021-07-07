@@ -2,7 +2,7 @@ import requests
 import json
 from bs4 import BeautifulSoup
 
-from meta_config import SPIDER_DATA_DIRNAME
+from ..meta_config import SPIDER_DATA_DIRNAME
 
 
 def get_html(url):
