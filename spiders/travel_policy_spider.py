@@ -25,6 +25,7 @@ import requests
 #     # with open(os.path.join(path, 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
 #     #     fp.write(json.dumps(res) + '\n')
 #     return res
+from meta_config import SPIDER_DATA_DIRNAME
 
 
 def get_input_options_by_json(path):
@@ -71,7 +72,7 @@ def main(path, res):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train-Spider')
-    parser.add_argument('--path', required=False, default=os.path.join('spiders_data', 'travel_policy_spider_all'), type=str)
+    parser.add_argument('--path', required=False, default=os.path.join(SPIDER_DATA_DIRNAME, 'travel_policy_spider_all'), type=str)
     args = parser.parse_args()
 
     res = get_input_options_by_json(args.path)

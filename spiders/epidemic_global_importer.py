@@ -1,28 +1,20 @@
 import datetime
-import json
 import time
-from tqdm import tqdm
-
-import pandas
-from django.conf import settings
-
-import marcov19.settings
-
-settings.configure(DEBUG=True, default_settings=marcov19.settings)
 import os
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
-import django
-
-django.setup()
+import pandas
+from tqdm import tqdm
 
 from epidemic.models import HistoryEpidemicData
+from meta_config import SPIDER_DATA_DIRNAME
+from utils.country_dict import country_dict
+import json
 
 years = [2020, 2021]
 months = [x for x in range(1, 13)]
 days = [30, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-path = 'C:\\Study\\3.2\\小学期\\COVID-19\\csse_covid_19_data\\csse_covid_19_daily_reports\\'
+path = os.path.join(SPIDER_DATA_DIRNAME, 'COVID-19', 'csse_covid_19_data', 'csse_covid_19_daily_reports')
 
 # date	yyyy-mm-dd
 begin = '2020-03-23'
@@ -48,19 +40,25 @@ def dt_delta(date, delta):
 
 
 def epidemic_global_importer(start_dt):
+    dataout = []
     while start_dt < datetime.datetime.now().strftime("%Y-%m-%d"):
         t = time.time()
         print(start_dt)
+        daily_data = {'date': start_dt}
+        countries = {}
         try:
             file_name = dt_change_mdy(start_dt)
             last_file_name = dt_change_mdy(dt_delta(start_dt, -1))
             last_data = pandas.read_csv(path + last_file_name + '.csv').fillna(0)
             data = pandas.read_csv(path + file_name + '.csv').fillna(0)
+            last_data = pandas.read_csv(os.path.join(path,  + last_file_name + '.csv')).fillna(0)
+            data = pandas.read_csv(os.path.join(path,  + file_name + '.csv')).fillna(0)
 
             objs = []
             # data =data.dropna()
             bar = tqdm(list(zip(data.iterrows(), last_data.iterrows())))
             bar.set_description(start_dt)
+
             for (index, row), (last_index, last_row) in bar:
                 if row['Country_Region'] == 'China':
                     continue
@@ -74,16 +72,42 @@ def epidemic_global_importer(start_dt):
                     'province_new_cured': max(row['Recovered'] - last_row['Recovered'], 0),
                     'province_new_confirmed': max(row['Confirmed'] - last_row['Confirmed'], 0)
                 }))
-            HistoryEpidemicData.objects.bulk_create(objs)
+                if row['Country_Region'] not in country_dict.keys():
+                    continue
+                if row['Country_Region'] not in countries.keys():
+                    countries[row['Country_Region']] = {
+                        'name': country_dict[row['Country_Region']],
+                        'population': 0, # todo: population
+                        'new': {
+                            'died': 0,
+                            'cured': 0,
+                            'confirmed': 0
+                        },
+                        'total': {
+                            'died': 0,
+                            'cured': 0,
+                            'confirmed': 0
+                        }
+                    }
+                countries[row['Country_Region']]['new']['died'] += max(row['Deaths'] - last_row['Deaths'], 0)
+                countries[row['Country_Region']]['new']['cured'] += max(row['Recovered'] - last_row['Recovered'], 0)
+                countries[row['Country_Region']]['new']['confirmed'] += max(row['Confirmed'] - last_row['Confirmed'], 0)
+                countries[row['Country_Region']]['total']['died'] += row['Deaths']
+                countries[row['Country_Region']]['total']['cured'] += row['Recovered']
+                countries[row['Country_Region']]['total']['confirmed'] += row['Confirmed']
+
+
+            # HistoryEpidemicData.objects.bulk_create(objs)
             print(time.time() - t)
         except FileNotFoundError:
             start_dt = dt_delta(start_dt, 1)
             continue
-
         except Exception as e:
             raise e
+        daily_data['countries'] = list(countries.values())
+        dataout.append(daily_data)
         start_dt = dt_delta(start_dt, 1)
-
+    json.dump(dataout, open('global.json', 'w'), ensure_ascii=False)
 
 
 def main():
