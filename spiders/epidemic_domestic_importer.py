@@ -81,7 +81,6 @@ def epidemic_domestic_import():
     idx = 0
     while all_data[idx]['updateTime'] != d.strftime('%Y-%m-%d'):
         idx += 1
-    objs = []
     while d <= end:
         nd = d.strftime('%Y-%m-%d')
         daily_info[nd] = {}
@@ -150,6 +149,7 @@ def epidemic_domestic_import():
             last[city]['city_total_confirmed'] = max(daily_info[nd][city]['city_total_confirmed'],
                                                      last[city]['city_total_confirmed'])
 
+        objs = []
         for it in daily_info[nd].items():
             dic = {'date': nd}
             for k in out_title:
@@ -157,9 +157,10 @@ def epidemic_domestic_import():
             objs.append(HistoryEpidemicData(**dic))
             # TODO: 导库
             # print(s)
+        HistoryEpidemicData.objects.bulk_create(objs)
         d += delta
     d = begin
-    HistoryEpidemicData.objects.bulk_create(objs, batch_size=4096)
+    
     while d <= end:
         nd = d.strftime('%Y-%m-%d')
         daily_analysis = {'date': nd, 'provinces': []}
@@ -179,4 +180,4 @@ def epidemic_domestic_import():
             daily_analysis['provinces'].append(pd)
         analysis.append(daily_analysis)
         d += delta
-    json.dump({'data': analysis}, open(json_file, 'w'), ensure_ascii=False)
+    json.dump(analysis, open(json_file, 'w'), ensure_ascii=False)
