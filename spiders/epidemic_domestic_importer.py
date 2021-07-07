@@ -101,25 +101,30 @@ def epidemic_domestic_import():
             daily_info[nd][city]['city_new_confirmed'] = 0
         
         while all_data[idx]['updateTime'] == nd:
+
+            for city in last.keys():
+                if all_data[idx]['provinceName'] == last[city][]
+                    daily_info[nd][city]['province_new_died'] = max(
+                        all_data[idx]['province_deadCount'] - last[city]['province_total_died'], 0)
+                    daily_info[nd][city]['province_new_cured'] = max(
+                        all_data[idx]['province_curedCount'] - last[city]['province_total_cured'], 0)
+                    daily_info[nd][city]['province_new_confirmed'] = max(
+                        all_data[idx]['province_confirmedCount'] - last[city]['province_total_confirmed'], 0)
+                    daily_info[nd][city]['province_total_died'] = max(all_data[idx]['province_deadCount'],
+                                                                      daily_info[nd][city]['province_total_died'])
+                    daily_info[nd][city]['province_total_cured'] = max(all_data[idx]['province_curedCount'],
+                                                                       daily_info[nd][city]['province_total_cured'])
+                    daily_info[nd][city]['province_total_confirmed'] = max(all_data[idx]['province_confirmedCount'],
+                                                                           daily_info[nd][city]['province_total_confirmed'])
+
             city = all_data[idx]['cityName']
-            daily_info[nd][city]['province_new_died'] = max(
-                all_data[idx]['province_deadCount'] - last[city]['province_total_died'], 0)
-            daily_info[nd][city]['province_new_cured'] = max(
-                all_data[idx]['province_curedCount'] - last[city]['province_total_cured'], 0)
-            daily_info[nd][city]['province_new_confirmed'] = max(
-                all_data[idx]['province_confirmedCount'] - last[city]['province_total_confirmed'], 0)
             daily_info[nd][city]['city_new_died'] = max(all_data[idx]['city_deadCount'] - last[city]['city_total_died'], 0)
             daily_info[nd][city]['city_new_cured'] = max(all_data[idx]['city_curedCount'] - last[city]['city_total_cured'],
                                                          0)
             daily_info[nd][city]['city_new_confirmed'] = max(
                 all_data[idx]['city_confirmedCount'] - last[city]['city_total_confirmed'], 0)
             
-            daily_info[nd][city]['province_total_died'] = max(all_data[idx]['province_deadCount'],
-                                                              daily_info[nd][city]['province_total_died'])
-            daily_info[nd][city]['province_total_cured'] = max(all_data[idx]['province_curedCount'],
-                                                               daily_info[nd][city]['province_total_cured'])
-            daily_info[nd][city]['province_total_confirmed'] = max(all_data[idx]['province_confirmedCount'],
-                                                                   daily_info[nd][city]['province_total_confirmed'])
+
             daily_info[nd][city]['city_total_died'] = max(all_data[idx]['city_deadCount'],
                                                           daily_info[nd][city]['city_total_died'])
             daily_info[nd][city]['city_total_cured'] = max(all_data[idx]['city_curedCount'],
@@ -130,6 +135,7 @@ def epidemic_domestic_import():
             idx += 1
         
         for city in last.keys():
+
             last[city]['province_total_died'] = max(daily_info[nd][city]['province_total_died'],
                                                     last[city]['province_total_died'])
             last[city]['province_total_cured'] = max(daily_info[nd][city]['province_total_cured'],
@@ -140,7 +146,7 @@ def epidemic_domestic_import():
             last[city]['city_total_cured'] = max(daily_info[nd][city]['city_total_cured'], last[city]['city_total_cured'])
             last[city]['city_total_confirmed'] = max(daily_info[nd][city]['city_total_confirmed'],
                                                      last[city]['city_total_confirmed'])
-        
+
         for it in daily_info[nd].items():
             s = nd
             for k in out_title:
