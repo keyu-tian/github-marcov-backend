@@ -43,7 +43,7 @@ def get_input_options_by_json(path):
     return res
 
 
-def main(path, res):
+def spider(path, res):
     '''
     {"success":true,
     "code":0,
@@ -70,12 +70,14 @@ def main(path, res):
                     }) + '\n')
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Train-Spider')
     parser.add_argument('--path', required=False, default=os.path.join(SPIDER_DATA_DIRNAME, 'travel_policy_spider_all'), type=str)
     args = parser.parse_args()
-
     res = get_input_options_by_json(args.path)
     print(res)
+    spider(args.path, res)
 
-    main(args.path, res)
+
+if __name__ == '__main__':
+    main()

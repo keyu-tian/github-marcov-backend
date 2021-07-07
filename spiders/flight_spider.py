@@ -10,30 +10,10 @@ from selenium import webdriver
 
 from meta_config import SPIDER_DATA_DIRNAME
 
-parser = argparse.ArgumentParser(description='Flight-Spider')
-parser.add_argument('--date', required=False, type=str)
-args = parser.parse_args()
 
-options = webdriver.ChromeOptions()
-options.add_argument('--headless')
-options.add_argument(
-    f'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36')
-
-code = []
-
-# 核心城市
-# kernel = '兰州 西宁 西安 郑州 济南 太原 合肥 长沙 武汉 南京 成都 贵阳 昆明 哈尔滨 长春 沈阳 石家庄 杭州 南昌 广州 福州 台北 海口 北京 天津 上海 重庆 南宁 拉萨 银川 乌鲁木齐 呼和浩特 香港 澳门'.split()
-with open('spiders/flight.txt', 'r+', encoding='utf-8') as f:
-    city_list = re.split(',', f.read().replace(' ', '').replace('\n', ''))[1:-1]
-    for x in city_list:
-        city_name, res_code = x.split(':')
-        res_code = res_code[1:-1]
-        code.append(res_code)
-
-
-def get_flight_info(begin_pos):
+def get_flight_info(begin_pos, city_list, code, args, options):
     if begin_pos[0] == len(city_list)-1 and begin_pos[1] == len(city_list)-1:
-        print('改天的航班爬取已完成')
+        print('该天的航班爬取已完成')
         return
     driver = webdriver.Chrome(executable_path='./chromedriver.exe', options=options)
     now = datetime.now().strftime("%Y-%m-%d")
@@ -93,6 +73,25 @@ def get_flight_info(begin_pos):
 
 
 def main():
+    options = webdriver.ChromeOptions()
+    options.add_argument('--headless')
+    options.add_argument(
+        f'user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36')
+    
+    parser = argparse.ArgumentParser(description='Flight-Spider')
+    parser.add_argument('--date', required=False, type=str)
+    args = parser.parse_args()
+    code = []
+    
+    # 核心城市
+    # kernel = '兰州 西宁 西安 郑州 济南 太原 合肥 长沙 武汉 南京 成都 贵阳 昆明 哈尔滨 长春 沈阳 石家庄 杭州 南昌 广州 福州 台北 海口 北京 天津 上海 重庆 南宁 拉萨 银川 乌鲁木齐 呼和浩特 香港 澳门'.split()
+    with open('spiders/flight.txt', 'r+', encoding='utf-8') as f:
+        city_list = re.split(',', f.read().replace(' ', '').replace('\n', ''))[1:-1]
+        for x in city_list:
+            city_name, res_code = x.split(':')
+            res_code = res_code[1:-1]
+            code.append(res_code)
+            
     start = time.time()
     begin_pos = [0, 0]
     if args.date:
@@ -112,7 +111,7 @@ def main():
         except FileNotFoundError:
             pass
     print('begin_pos:', begin_pos[0], begin_pos[1])
-    get_flight_info(begin_pos)
+    get_flight_info(begin_pos, city_list, code, args, options)
     end = time.time()
     print(f'cost time: {end - start}s')
 

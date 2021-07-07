@@ -11,7 +11,7 @@ import requests
 from meta_config import SPIDER_DATA_DIRNAME
 
 
-def main(path):
+def spider(path):
     '''
     {
     "code": "success",
@@ -44,9 +44,12 @@ def main(path):
                 }) + '\n')
 
 
-if __name__ == '__main__':
+def main():
     parser = argparse.ArgumentParser(description='Train-Spider')
     parser.add_argument('--path', required=False, default=os.path.join(SPIDER_DATA_DIRNAME, 'yaoyan_spider_all'), type=str)
     args = parser.parse_args()
+    spider(args.path)
 
-    main(args.path)
+
+if __name__ == '__main__':
+    main()

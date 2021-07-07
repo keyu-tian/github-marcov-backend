@@ -4,15 +4,11 @@ import json
 
 from country.models import City
 from flight.models import Flight
-from meta_config import SPIDER_DATA_DIRNAME
-
-parser = argparse.ArgumentParser(description='Flight-Spider')
-parser.add_argument('--date', required=False, type=str)
-args = parser.parse_args()
+from meta_config import IMPORTER_DATA_DIRNAME
 
 
 def flights_storage(date):
-    with open(f'{SPIDER_DATA_DIRNAME}/flights_data/flights_data{date}.json', 'r+', encoding='utf-8') as f:
+    with open(f'{IMPORTER_DATA_DIRNAME}/flights_data/flights_data{date}.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
     
     for line in data:
@@ -32,12 +28,11 @@ def flights_storage(date):
         #     print('插入新闻数据错误')
 
 
-def main():
+def flight_import():
+    parser = argparse.ArgumentParser(description='Flight-Spider')
+    parser.add_argument('--date', required=False, type=str)
+    args = parser.parse_args()
     if args.date:
         flights_storage(args.date)
     else:
         flights_storage(datetime.datetime.now().strftime('%Y-%m-%d'))
-
-
-if __name__ == '__main__':
-    main()

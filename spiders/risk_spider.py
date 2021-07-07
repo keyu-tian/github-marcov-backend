@@ -4,8 +4,6 @@ from bs4 import BeautifulSoup
 
 from meta_config import SPIDER_DATA_DIRNAME
 
-result = {'中风险地区': [], '高风险地区': []}
-
 
 def get_html(url):
     try:
@@ -25,7 +23,7 @@ def get_content(url):
     return paras
 
 
-def generate_result(text):
+def generate_result(text, result):
     now = ''
     for t in text[:-2]:
         line = t.get_text().strip()
@@ -41,9 +39,10 @@ def generate_result(text):
 
 def risk_area_spider():
     url = 'http://www.gd.gov.cn/gdywdt/zwzt/yqfk/content/mpost_3021711.html'
+    result = {'中风险地区': [], '高风险地区': []}
     text = get_content(url)
-    generate_result(text)
-
+    generate_result(text, result)
+    
     with open(f'{SPIDER_DATA_DIRNAME}/risk_areas.json', 'w+', encoding='utf-8') as f:
         f.write(json.dumps(result, ensure_ascii=False))
 

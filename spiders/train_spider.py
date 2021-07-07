@@ -51,12 +51,12 @@ def getinfo(logger, train_number='G99', date=DEFAULT_DATE_STR):
     return result
 
 
-def main(verbose, path, index=0, st=1):
+def spider(verbose, path, index=0, st=1):
     if not os.path.exists(path):
         os.makedirs(path)
-
+    
     logger = create_logger(logger_name=os.path.basename(path), log_path=os.path.join(path, f'log.log'), to_stdout=False)
-
+    
     for current_index in range(index, len(mingming)):
         if verbose:
             bar = tqdm(range(st, mingming[current_index][1]), dynamic_ncols=True)
@@ -76,7 +76,7 @@ def main(verbose, path, index=0, st=1):
                     bar.set_description(f'[{name}]')
                     bar.set_postfix_str(f'{data["deptCity"]} => {data["arriCity"]}')
                 with open(os.path.join(path, '火车班次爬到哪了.txt'), 'w', encoding='utf-8') as fp:
-                    fp.write(f'index={current_index}, st={current_st+1}\n')
+                    fp.write(f'index={current_index}, st={current_st + 1}\n')
                 with open(os.path.join(path, '火车班次json数据.json'), 'a', encoding='utf-8') as fp:
                     fp.write(json.dumps(result) + '\n')
                 with open(os.path.join(path, '火车班次列表.json'), 'a', encoding='utf-8') as fp:
@@ -87,7 +87,7 @@ def main(verbose, path, index=0, st=1):
                     bar.set_postfix_str('failed')
 
 
-def local_main():
+def main():
     """
     在单机上爬取
     """
@@ -102,7 +102,7 @@ def local_main():
     args.path += f'_index{args.index}_st{args.st}'
     print(f'{start} 开始爬！path={args.path}, index={args.index}, st={args.st}...')
     try:
-        main(args.verbose, args.path, args.index, args.st)
+        spider(args.verbose, args.path, args.index, args.st)
     except:
         with open(os.path.join(args.path, '火车班次爬到哪了.txt'), 'r', encoding='utf-8') as fp:
             s = fp.read()
@@ -115,12 +115,12 @@ def distributed_main():
     """
     分布式爬取
     """
-    print('请确保是tky在跑，否则请跑 local_main 而不是 distributed_main')
+    print('请确保是tky在跑，否则请跑 main 而不是 distributed_main')
     from utils.pytorch_dist import TorchDistManager
     dist = TorchDistManager(cur_time(), 'auto', 'auto')
     path = os.path.join(SPIDER_DATA_DIRNAME, f'train_spider_distributed{dist.rank}')
     try:
-        main(dist.is_master(), path, dist.rank, 1)
+        spider(dist.is_master(), path, dist.rank, 1)
     except:
         with open(os.path.join(path, '火车班次爬到哪了.txt'), 'r', encoding='utf-8') as fp:
             s = fp.read()
@@ -130,16 +130,4 @@ def distributed_main():
 
 
 if __name__ == '__main__':
-    local_main()
-
-    # res = getinfo('G1317')
-    # print(res)
-
-    # url = 'http://train.qunar.com/qunar/checiSuggest.jsp?callback=jQuery17208000492092391186_1460000280989&include_coach_suggest=true&lang=zh&q=G1316&sa=true&format=js&_=1460000429009'
-    # try:
-    #     response = requests.get(url=url, timeout=10)
-    # except Timeout:
-    #     logger.error('无法从服务器获取数据')
-    #     logger.error('url: '+url)
-    # results=json.loads('{'+response.text.split('({')[1].split('})')[0]+'}')['result']
-    # print(results[0].get('key'))
+    main()

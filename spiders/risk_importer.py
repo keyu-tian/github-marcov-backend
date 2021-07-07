@@ -1,13 +1,13 @@
 import json
 import re
 
-from meta_config import SPIDER_DATA_DIRNAME
+from meta_config import IMPORTER_DATA_DIRNAME
 from risk.models import RiskArea
 from utils.cast import address_to_jingwei
 
 
 def risk_area_storage():
-    with open(f'{SPIDER_DATA_DIRNAME}/risk_areas.json', 'r+', encoding='utf-8') as f:
+    with open(f'{IMPORTER_DATA_DIRNAME}/risk_areas.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
     
     old_area = RiskArea.objects.all()
@@ -33,9 +33,5 @@ def risk_area_storage():
         RiskArea.objects.create(**kwargs)
 
 
-def main():
+def risk_import():
     risk_area_storage()
-
-
-if __name__ == '__main__':
-    main()

@@ -2,7 +2,8 @@ import re
 
 DEBUG = True
 
-SPIDER_DATA_DIRNAME = 'spiders_data'
+IMPORTER_DATA_DIRNAME = 'spiders_data'
+SPIDER_DATA_DIRNAME = '../spiders_data'
 
 HOST_IP = 'localhost'
 

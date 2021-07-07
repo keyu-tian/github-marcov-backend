@@ -6,10 +6,10 @@ import os
 from tqdm import tqdm
 
 from country.models import Country, Policy, City, Province
-from meta_config import SPIDER_DATA_DIRNAME
+from meta_config import IMPORTER_DATA_DIRNAME
 
 
-def main(path, line_start):
+def spider(path, line_start):
     with open(os.path.join(path, 'policy_by_city.json'), 'r', encoding='utf-8') as file:
         bar = tqdm(list(enumerate(file.readlines())), dynamic_ncols=True)
     country = Country.objects.get(name_ch='中国')
@@ -43,14 +43,12 @@ def main(path, line_start):
             bar.set_postfix_str(f'failed!')
 
 
-if __name__ == '__main__':
+def travel_policy_import():
     parser = argparse.ArgumentParser(description='Train-Spider')
-    parser.add_argument('--path', required=False, default=os.path.join(SPIDER_DATA_DIRNAME, 'travel_policy_spider_all'), type=str)
+    parser.add_argument('--path', required=False, default=os.path.join(IMPORTER_DATA_DIRNAME, 'travel_policy_spider_all'), type=str)
     parser.add_argument('--line', required=False, default=0, type=int)
     args = parser.parse_args()
-    
     start = str(datetime.datetime.now())
     print(f'[{start}] 开始parse...')
-    main(args.path, args.line)
-    end = str(datetime.datetime.now())
+    spider(args.path, args.line)
     print('over')
