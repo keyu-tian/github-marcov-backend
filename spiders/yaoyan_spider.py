@@ -8,7 +8,7 @@ import xml.dom.minidom
 import requests
 
 # 丁香医生辟谣爬取
-from ..meta_config import SPIDER_DATA_DIRNAME
+from meta_config import SPIDER_DATA_DIRNAME
 
 
 def spider(path):

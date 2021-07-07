@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 from selenium import webdriver
 
-from ..meta_config import SPIDER_DATA_DIRNAME
+from meta_config import SPIDER_DATA_DIRNAME
 
 
 def get_flight_info(begin_pos, city_list, code, args, options):
