@@ -15,6 +15,7 @@ from utils.cast import address_to_jingwei, jingwei_to_address
 def parse_train_json(path, line_start):
     with open(os.path.join(path, '火车班次json数据.json'), 'r', encoding='utf-8') as file:
         bar = tqdm(list(enumerate(file.readlines())), dynamic_ncols=True)
+    objs = []
     for line, result in bar:
         bar.set_description(f'[line{line}]')
         if line < line_start:
@@ -82,12 +83,14 @@ def parse_train_json(path, line_start):
                         sta.city = mid_city
                         sta.save()
                     
-                    MidStation.objects.create(index=mid_list.index(c) + 1, arri_date=content[2],
-                                              arri_time=content[3], station=sta, train=train)
+                    objs.append(MidStation(
+                        index=mid_list.index(c) + 1, arri_date=content[2],
+                        arri_time=content[3], station=sta, train=train
+                    ))
             train.save()
-        
         else:
             bar.set_postfix_str(f'failed!')
+    MidStation.objects.bulk_create(objs)
 
 
 def train_import():
