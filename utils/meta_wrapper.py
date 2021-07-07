@@ -53,13 +53,17 @@ def JSR(*keys): # 这里的 keys 是 @JSR(...) 里面填的 keys
                 [values.append('') for _ in range(len(keys) - len(values))]                 # 这个是在给没填的返回值位置自动填充空字符串作为返回值
                 ret_dict = dict(zip(keys, values))      # 打包成返回值
                 
-                if meta_config.DEBUG and func_name not in ['user.UnreadCount.GET', 'chat.ChatCount.GET', 'entity.DocumentOnline.GET']:
+                if meta_config.DEBUG:
                     c = Fore.RED if ret_dict.get('status', 0) else Fore.GREEN
                     cur_dt = datetime.now()
                     dt_str = cur_dt.strftime("%H:%M:%S.") + f'{float(cur_dt.strftime("0.%f")):.2f}'[-2:]
                     # 【关键】给正常返回的请求打印一下
-                    # todo: tky double check pformat(ret_dict)
-                    print(c + f'[{func_name}] input: {inputs}\n ret: {"NONE!"}, time: {time_cost:.2f}s, at [{dt_str}]', flush=True)
+                    if func_name in ['analysis.CountryAnalyze.POST', 'analysis.DomesticAnalyze.GET', 'analysis.InternationalAnalyze.GET', 'analysis.SearchAnalyse.POST']:
+                        ret_str = str(dict(status=ret_dict.get('status', 0)))
+                    else:
+                        ret_str = pformat(ret_dict)
+                    
+                    print(c + f'[{func_name}] input: {inputs}\n ret: {ret_str}, time: {time_cost:.2f}s, at [{dt_str}]', flush=True)
                 if ret_dict.get('status', 0) == 403:
                     return HttpResponseForbidden()
                 
