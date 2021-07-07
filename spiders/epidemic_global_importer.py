@@ -51,8 +51,8 @@ def epidemic_global_import(start_dt):
             last_file_name = dt_change_mdy(dt_delta(start_dt, -1))
             last_data = pandas.read_csv(path + last_file_name + '.csv').fillna(0)
             data = pandas.read_csv(path + file_name + '.csv').fillna(0)
-            last_data = pandas.read_csv(os.path.join(path,  + last_file_name + '.csv')).fillna(0)
-            data = pandas.read_csv(os.path.join(path,  + file_name + '.csv')).fillna(0)
+            last_data = pandas.read_csv(os.path.join(path, last_file_name + '.csv')).fillna(0)
+            data = pandas.read_csv(os.path.join(path, file_name + '.csv')).fillna(0)
 
             objs = []
             # data =data.dropna()
@@ -60,8 +60,8 @@ def epidemic_global_import(start_dt):
             bar.set_description(start_dt)
 
             for (index, row), (last_index, last_row) in bar:
-                if row['Country_Region'] == 'China':
-                    continue
+                # if row['Country_Region'] == 'China':
+                #    continue
                 objs.append(HistoryEpidemicData(**{
                     'date': start_dt, 'country_ch': row['Country_Region'],
                     'state_en': row['Province_State'],
@@ -97,9 +97,10 @@ def epidemic_global_import(start_dt):
                 countries[row['Country_Region']]['total']['confirmed'] += row['Confirmed']
 
 
-            # HistoryEpidemicData.objects.bulk_create(objs)
+            HistoryEpidemicData.objects.bulk_create(objs)
             print(time.time() - t)
         except FileNotFoundError:
+            print('File not found %s' % file_name)
             start_dt = dt_delta(start_dt, 1)
             continue
         except Exception as e:
