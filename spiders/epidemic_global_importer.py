@@ -49,8 +49,8 @@ def epidemic_global_import(start_dt):
         try:
             file_name = dt_change_mdy(start_dt)
             last_file_name = dt_change_mdy(dt_delta(start_dt, -1))
-            last_data = pandas.read_csv(path + last_file_name + '.csv').fillna(0)
-            data = pandas.read_csv(path + file_name + '.csv').fillna(0)
+            last_data = pandas.read_csv(path, last_file_name + '.csv').fillna(0)
+            data = pandas.read_csv(path, file_name + '.csv').fillna(0)
             last_data = pandas.read_csv(os.path.join(path, last_file_name + '.csv')).fillna(0)
             data = pandas.read_csv(os.path.join(path, file_name + '.csv')).fillna(0)
 
