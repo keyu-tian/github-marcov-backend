@@ -8,6 +8,8 @@ from utils.meta_wrapper import JSR
 
 
 class WeeklyNews(View):
+    OVERSEA_KEYS = {'英格兰', '澳', '日本', '全美', '瑞士', '印尼', '智利', '老挝', '巴西', '印度', '新加坡', '泰', '首尔', '东京', '英国', '希腊', '美国'}
+    
     @JSR('status', 'date', 'china', 'global')
     def post(self, request):
         # new_news = news_spider()
@@ -28,59 +30,34 @@ class WeeklyNews(View):
         for dis in range(7):
             now = end_date - timedelta(days=dis)
             now = now.strftime('%Y-%m-%d')
+            
             query_china = News.objects.filter(sub_category_cn__iexact='国际社会', publish_time__icontains=now)
             query_global = News.objects.filter(sub_category_cn__icontains='国际社会', publish_time__icontains=now)
-            for a in query_china:
-                res_china.append({
-                    'title': a.title,
-                    'body': a.context,
-                    'url': a.url,
-                    'publish_time': a.publish_time,
-                    'media_name': a.media,
-                    'img_url': a.img,
-                })
-            for a in query_global:
-                res_global.append({
-                    'title': a.title,
-                    'body': a.context,
-                    'url': a.url,
-                    'publish_time': a.publish_time,
-                    'media_name': a.media,
-                    'img_url': a.img,
-                })
+            WeeklyNews.res_append(query_china, res_china)
+            WeeklyNews.res_append(query_global, res_global)
+            
             query_china = News.objects.filter(~Q(media='BBC') & ~Q(media='CNN'), publish_time__icontains=now, img__isnull=True)
-            # print(query_china)
             query_global = News.objects.filter(Q(media='BBC') | Q(media='CNN'), img__isnull=True, publish_time__icontains=now)
-            oversea_keys = {'英格兰', '澳', '日本', '全美', '瑞士', '印尼', '智利', '老挝', '巴西', '印度', '新加坡', '泰', '首尔', '东京', '英国', '希腊', '美国'}
-            for a in query_china:
-                append, title = True, a.title
-                for oversea_key in oversea_keys:
-                    if oversea_key in title:
-                        append = False
-                        break
-                if append:
-                    res_china.append({
-                        'title': a.title,
-                        'body': a.context,
-                        'url': a.url,
-                        'publish_time': a.publish_time,
-                        'media_name': a.media,
-                        'img_url': '',
-                    })
-            for a in query_global:
-                append, title = True, a.title
-                for oversea_key in oversea_keys:
-                    if oversea_key in title:
-                        append = False
-                        break
-                if append:
-                    res_global.append({
-                        'title': a.title,
-                        'body': a.context,
-                        'url': a.url,
-                        'publish_time': a.publish_time,
-                        'media_name': a.media,
-                        'img_url': '',
-                    })
+            WeeklyNews.res_append(query_china, res_china)
+            WeeklyNews.res_append(query_global, res_global)
+        
         return 0, end_date.strftime('%Y-%m-%d'), res_china, res_global
+
+    @staticmethod
+    def res_append(query, res):
+        for a in query:
+            append, title = True, a.title
+            for oversea_key in WeeklyNews.OVERSEA_KEYS:
+                if oversea_key in title:
+                    append = False
+                    break
+            if append:
+                res.append({
+                    'title': a.title,
+                    'body': a.context,
+                    'url': a.url,
+                    'publish_time': a.publish_time,
+                    'media_name': a.media,
+                    'img_url': a.img if a.img else '',
+                })
 
