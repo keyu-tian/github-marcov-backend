@@ -1,0 +1,2 @@
+#!/usr/bin/sh
+python utils/searcher.py "$1" "$2"
