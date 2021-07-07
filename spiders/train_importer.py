@@ -90,7 +90,7 @@ def parse_train_json(path, line_start):
             train.save()
         else:
             bar.set_postfix_str(f'failed!')
-    MidStation.objects.bulk_create(objs)
+    MidStation.objects.bulk_create(objs, batch_size=8192)
 
 
 def train_import():
