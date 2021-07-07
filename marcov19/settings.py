@@ -15,7 +15,7 @@ import logging.config
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
+LOGGING_CONFIG = 'logging.config.dictConfig'
 # 前端路径
 # FRONTEND_ROOT = 'frontend/dist'
 # 静态资源地址
