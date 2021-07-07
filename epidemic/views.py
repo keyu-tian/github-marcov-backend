@@ -135,7 +135,7 @@ class MapOversea(View):
             # else:
             #     msg = msg.first().enter_policy+'\n'+msg.first().out_policy
             info = {'level': get_city_risk_level(state_data.city_ch), 'msg': '未知'}
-            state = {'name': state_data.state_en}
+            state = {'name': state_data.state_en if state_data.state_en else ''}
             state['new'] = {
                 'died': state_data.city_new_died if state_data.city_new_died else 0,
                 'cured': state_data.city_new_cured if state_data.city_new_cured else 0,

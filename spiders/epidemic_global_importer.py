@@ -1,28 +1,18 @@
 import datetime
-import json
 import time
-from tqdm import tqdm
-
-import pandas
-from django.conf import settings
-
-import marcov19.settings
-
-settings.configure(DEBUG=True, default_settings=marcov19.settings)
 import os
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
-import django
-
-django.setup()
+import pandas
+from tqdm import tqdm
 
 from epidemic.models import HistoryEpidemicData
+from meta_config import SPIDER_DATA_DIRNAME
 
 years = [2020, 2021]
 months = [x for x in range(1, 13)]
 days = [30, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
 
-path = 'C:\\Study\\3.2\\小学期\\COVID-19\\csse_covid_19_data\\csse_covid_19_daily_reports\\'
+path = os.path.join(SPIDER_DATA_DIRNAME, 'COVID-19', 'csse_covid_19_data', 'csse_covid_19_daily_reports')
 
 # date	yyyy-mm-dd
 begin = '2020-03-23'
@@ -54,8 +44,8 @@ def epidemic_global_importer(start_dt):
         try:
             file_name = dt_change_mdy(start_dt)
             last_file_name = dt_change_mdy(dt_delta(start_dt, -1))
-            last_data = pandas.read_csv(path + last_file_name + '.csv').fillna(0)
-            data = pandas.read_csv(path + file_name + '.csv').fillna(0)
+            last_data = pandas.read_csv(os.path.join(path,  + last_file_name + '.csv')).fillna(0)
+            data = pandas.read_csv(os.path.join(path,  + file_name + '.csv')).fillna(0)
 
             objs = []
             # data =data.dropna()

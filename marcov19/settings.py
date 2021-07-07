@@ -11,11 +11,12 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-import logging.config
+
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 # 前端路径
 # FRONTEND_ROOT = 'frontend/dist'
 # 静态资源地址
@@ -24,8 +25,8 @@ STATIC_URL = '/static/'
 # 模块资源引用地址
 STATICFILES_DIRS = (
     # os.path.join(BASE_DIR, FRONTEND_ROOT),
-    os.path.join(BASE_DIR, STATIC_URL),
-    os.path.join(BASE_DIR, "frontend/dist"),
+    # os.path.join(BASE_DIR, 'dist' + STATIC_URL),
+    os.path.join(BASE_DIR, "frontend/dist/static"),
 )
 
 # STATIC_ROOT = ''
@@ -62,13 +63,14 @@ INSTALLED_APPS = [
     'news',
     'risk',
     'epidemic',
+    'analysis',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     # 'cors.corsMiddleware.CustomCorsMiddleware',
     #'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

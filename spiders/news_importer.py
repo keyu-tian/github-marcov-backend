@@ -1,21 +1,13 @@
 import json
-import marcov19.settings
-from django.conf import settings
 
-settings.configure(DEBUG=True, default_settings=marcov19.settings)
-import os
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
-import django
-
-django.setup()
-from news.models import *
+from meta_config import SPIDER_DATA_DIRNAME
+from news.models import News
 
 
 def news_importer():
-    with open('../spiders_data/news_data.json', 'r+', encoding='utf-8') as f:
+    with open(f'{SPIDER_DATA_DIRNAME}/news_data.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
-
+    
     # 如果想要在存新的新闻之前删去旧的，可以去掉下面三行的注释
     # old_news = News.objects.all()
     # while old_news.count():

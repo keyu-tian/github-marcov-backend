@@ -1,23 +1,15 @@
-import re
 import json
-import marcov19.settings
-from django.conf import settings
+import re
 
-settings.configure(DEBUG=True, default_settings=marcov19.settings)
-import os
-
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
-import django
-
-django.setup()
+from meta_config import SPIDER_DATA_DIRNAME
 from risk.models import RiskArea
 from utils.cast import address_to_jingwei
 
 
 def risk_area_storage():
-    with open('../spiders_data/risk_areas.json', 'r+', encoding='utf-8') as f:
+    with open(f'{SPIDER_DATA_DIRNAME}/risk_areas.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
-
+    
     old_area = RiskArea.objects.all()
     while old_area.count():
         old_area.delete()
