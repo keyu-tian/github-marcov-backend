@@ -72,8 +72,8 @@ def epidemic_domestic_import():
         last[city]['city_total_died'] = 0
         last[city]['city_total_cured'] = 0
         last[city]['city_total_confirmed'] = 0
-    begin = dt.date(2020, 1, 22)
-    end = dt.date(2021, 7, 3)
+    begin = dt.date(2021, 7, 4)
+    end = dt.date(2021, 7, 6)
     # end = dt.date.today()
     delta = dt.timedelta(days=1)
     d = begin
@@ -84,6 +84,7 @@ def epidemic_domestic_import():
     objs = []
     while d <= end:
         nd = d.strftime('%Y-%m-%d')
+        print(nd)
         daily_info[nd] = {}
         for city in last.keys():
             daily_info[nd][city] = {}
@@ -163,8 +164,8 @@ def epidemic_domestic_import():
     while d <= end:
         nd = d.strftime('%Y-%m-%d')
         daily_analysis = {'date': nd, 'provinces': []}
-        for city in province_dict_ch.values():
-            pd = {'name': city}
+        for city_front, city in province_dict_ch.items():
+            pd = {'name': city_front}
             for it in province_population.items():
                 if it[0] in city:
                     pd['population'] = it[1]
@@ -179,4 +180,4 @@ def epidemic_domestic_import():
             daily_analysis['provinces'].append(pd)
         analysis.append(daily_analysis)
         d += delta
-    json.dump({'data': analysis}, open(json_file, 'w'), ensure_ascii=False)
+    # json.dump(analysis, open(json_file, 'w'), ensure_ascii=False)
