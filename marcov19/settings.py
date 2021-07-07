@@ -576,6 +576,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = (
     # os.path.join(BASE_DIR, FRONTEND_ROOT),
     os.path.join(BASE_DIR, STATIC_URL),
+    os.path.join(BASE_DIR, 'frontend/dist/static'),
 )
 
 # STATIC_ROOT = ''
