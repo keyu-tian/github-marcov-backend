@@ -24,6 +24,7 @@ from risk.views import *
 from user.views import *
 from news.views import *
 from epidemic.views import *
+from analysis.views import *
 
 urlpatterns = [
     path('/', admin.site.urls),
@@ -47,19 +48,25 @@ urlpatterns = [
     path('travel/search', TravelSearch.as_view()),
 
     path('news/weekly', WeeklyNews.as_view()),
+
+
+    path('account/login', Login.as_view()),
+    path('account/register', Register.as_view()),
+    path('account/forget_pwd_send', ForgetPwdSend.as_view()),
+    path('account/forget_pwd_change', ForgetPwdChange.as_view()),
+    path('account/logout', Logout.as_view()),
+    path('account/send_ver', SendVer.as_view()),
+    path('account/change_pwd', ChangePwd.as_view()),
+    path('account/change_info', ChangeInfo.as_view()),
+    path('user_info', UserInfo.as_view()),
+    path('identity', Identity.as_view()),
+    path('upload_pic', UploadPic.as_view()),
+
+    path('data/domestic_analyze', DomesticAnalyze.as_view()),
+    path('data/search', SearchAnalyse.as_view()),
+    path('data/country_analyze', CountryAnalyze.as_view()),
+    
     path('', TemplateView.as_view(template_name='index.html')),
     re_path(r'^upload(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}, name='media')
     # re_path(r'.*', TemplateView.as_view(template_name='index.html')),
-
-    # path('account/login', Login.as_view()),
-    # path('account/register', Register.as_view()),
-    # path('account/forget_pwd_send', ForgetPwdSend.as_view()),
-    # path('account/forget_pwd_change', ForgetPwdChange.as_view()),
-    # path('account/logout', Logout.as_view()),
-    # path('account/send_ver', SendVer.as_view()),
-    # path('account/change_pwd', ChangePwd.as_view()),
-    # path('account/change_info', ChangeInfo.as_view()),
-    # path('user_info', UserInfo.as_view()),
-    # path('identity', Identity.as_view()),
-    # path('upload_pic', UploadPic.as_view()),
 ]
