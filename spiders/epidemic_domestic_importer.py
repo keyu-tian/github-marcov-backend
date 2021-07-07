@@ -72,7 +72,7 @@ def epidemic_domestic_import():
         last[city]['city_total_cured'] = 0
         last[city]['city_total_confirmed'] = 0
     begin = dt.date(2020, 1, 22)
-    end = dt.date(2021, 7, 3)
+    end = dt.date(2021, 7, 6)
     # end = dt.date.today()
     delta = dt.timedelta(days=1)
     d = begin
