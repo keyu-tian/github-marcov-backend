@@ -22,6 +22,13 @@ class DomesticAnalyze(View):
         return 0, analysis
 
 
+class DomesticTodayAnalyze(View):
+    @JSR('status', 'data')
+    def get(self, request):
+        json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
+        analysis = json.load(open(json_path, 'r', encoding='utf-8'))
+
+
 class InternationalAnalyze(View):
     @JSR('status', 'data')
     def get(self, request):
@@ -42,10 +49,10 @@ class SearchAnalyse(View):
             name_dict[it[1]] = it[0]
         try:
             if province_dict_ch.get(kwargs['name'], None):
-                epidemics = HistoryEpidemicData.objects.filter(Q(province_ch__exact=province_dict_ch[kwargs['name']]))
+                epidemics = HistoryEpidemicData.objects.filter(province_ch__exact=province_dict_ch[kwargs['name']])
                 population = province_population.get(kwargs['name'], '未知')
             else:
-                epidemics = HistoryEpidemicData.objects.filter(Q(country_ch__exact=name_dict[kwargs['name']]))
+                epidemics = HistoryEpidemicData.objects.filter(country_ch__exact=name_dict[kwargs['name']])
                 population = '未知'
                 for it in country_population.items():
                     # TODO: 查询国家人口模糊匹配
@@ -73,13 +80,20 @@ class SearchAnalyse(View):
                     'total_cured': 0,
                     'total_confirmed': 0
                 }
-
-            daily_data[epidemic.date] = {
-                'date': epidemic.date,
-                'total_died': max(epidemic.province_total_died, daily_data[epidemic.date]['total_died']),
-                'total_cured': max(epidemic.province_total_cured, daily_data[epidemic.date]['total_cured']),
-                'total_confirmed': max(epidemic.province_total_confirmed, daily_data[epidemic.date]['total_confirmed'])
-            }
+            if province_dict_ch.get(kwargs['name'], None):
+                daily_data[epidemic.date] = {
+                    'date': epidemic.date,
+                    'total_died': max(epidemic.province_total_died, daily_data[epidemic.date]['total_died']),
+                    'total_cured': max(epidemic.province_total_cured, daily_data[epidemic.date]['total_cured']),
+                    'total_confirmed': max(epidemic.province_total_confirmed, daily_data[epidemic.date]['total_confirmed'])
+                }
+            else:
+                daily_data[epidemic.date] = {
+                    'date': epidemic.date,
+                    'total_died': epidemic.province_total_died + daily_data[epidemic.date]['total_died'],
+                    'total_cured': epidemic.province_total_cured + daily_data[epidemic.date]['total_cured'],
+                    'total_confirmed': epidemic.province_total_confirmed + daily_data[epidemic.date]['total_confirmed']
+                }
 
         return 0, population, list(daily_data.values())
         # return 0, population, data
@@ -96,10 +110,10 @@ class CountryAnalyze(View):
             name_dict[it[1]] = it[0]
         try:
             if kwargs['name'] in province_dict_ch.keys():
-                epidemics = HistoryEpidemicData.objects.filter(Q(province_ch__exact=province_dict_ch[kwargs['name']]))
+                epidemics = HistoryEpidemicData.objects.filter(province_ch__exact=province_dict_ch[kwargs['name']])
                 population = province_population.get(kwargs['name'], '未知')
             else:
-                epidemics = HistoryEpidemicData.objects.filter(Q(country_ch__exact=name_dict[kwargs['name']]))
+                epidemics = HistoryEpidemicData.objects.filter(country_ch__exact=name_dict[kwargs['name']])
                 population = '未知'
                 for it in country_population.items():
                     # TODO: 查询国家人口模糊匹配
