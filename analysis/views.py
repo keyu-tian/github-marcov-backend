@@ -48,7 +48,7 @@ class SearchAnalyse(View):
         for it in country_dict.items():
             name_dict[it[1]] = it[0]
         try:
-            if province_dict_ch.get(kwargs['name'], None):
+            if kwargs['name'] in province_dict_ch.keys():
                 epidemics = HistoryEpidemicData.objects.filter(province_ch__exact=province_dict_ch[kwargs['name']])
                 population = province_population.get(kwargs['name'], '未知')
             else:
@@ -80,7 +80,7 @@ class SearchAnalyse(View):
                     'total_cured': 0,
                     'total_confirmed': 0
                 }
-            if province_dict_ch.get(kwargs['name'], None):
+            if kwargs['name'] in province_dict_ch.keys():
                 daily_data[epidemic.date] = {
                     'date': epidemic.date,
                     'total_died': max(epidemic.province_total_died, daily_data[epidemic.date]['total_died']),
@@ -138,20 +138,34 @@ class CountryAnalyze(View):
                         'confirmed': 0
                     }
                 }
-            daily_data[epidemic.date] = {
-                'date': epidemic.date,
-                'total': {
-                    'died': max(epidemic.province_total_died, daily_data[epidemic.date]['total']['died']),
-                    'cured': max(epidemic.province_total_cured, daily_data[epidemic.date]['total']['cured']),
-                    'confirmed': max(epidemic.province_total_confirmed, daily_data[epidemic.date]['total']['confirmed'])
-                },
-                'new': {
-                    'died': max(epidemic.province_new_died, daily_data[epidemic.date]['new']['died']),
-                    'cured': max(epidemic.province_new_cured, daily_data[epidemic.date]['new']['cured']),
-                    'confirmed': max(epidemic.province_new_confirmed, daily_data[epidemic.date]['new']['confirmed'])
+            if kwargs['name'] in province_dict_ch.keys():
+                daily_data[epidemic.date] = {
+                    'date': epidemic.date,
+                    'total': {
+                        'died': max(epidemic.province_total_died, daily_data[epidemic.date]['total']['died']),
+                        'cured': max(epidemic.province_total_cured, daily_data[epidemic.date]['total']['cured']),
+                        'confirmed': max(epidemic.province_total_confirmed, daily_data[epidemic.date]['total']['confirmed'])
+                    },
+                    'new': {
+                        'died': max(epidemic.province_new_died, daily_data[epidemic.date]['new']['died']),
+                        'cured': max(epidemic.province_new_cured, daily_data[epidemic.date]['new']['cured']),
+                        'confirmed': max(epidemic.province_new_confirmed, daily_data[epidemic.date]['new']['confirmed'])
+                    }
                 }
-
-            }
+            else:
+                daily_data[epidemic.date] = {
+                    'date': epidemic.date,
+                    'total': {
+                        'died': epidemic.province_total_died + daily_data[epidemic.date]['total']['died'],
+                        'cured': epidemic.province_total_cured + daily_data[epidemic.date]['total']['cured'],
+                        'confirmed': epidemic.province_total_confirmed + daily_data[epidemic.date]['total']['confirmed']
+                    },
+                    'new': {
+                        'died': epidemic.province_new_died + daily_data[epidemic.date]['new']['died'],
+                        'cured': epidemic.province_new_cured + daily_data[epidemic.date]['new']['cured'],
+                        'confirmed': epidemic.province_new_confirmed + daily_data[epidemic.date]['new']['confirmed']
+                    }
+                }
 
         return 0, population, list(daily_data.values())
 
