@@ -6,7 +6,6 @@ from utils.meta_wrapper import JSR
 from utils.dict_ch import province_dict_ch, province_population
 from utils.country_dict import country_dict, country_population
 from epidemic.models import HistoryEpidemicData
-from analysis.models import ProvinceData
 import datetime as dt
 import json
 import os
@@ -22,6 +21,7 @@ class DomesticAnalyze(View):
         analysis = json.load(open(json_path, 'r', encoding='utf-8'))
         return 0, analysis
 
+
 class InternationalAnalyze(View):
     @JSR('status', 'data')
     def get(self, request):
@@ -29,6 +29,7 @@ class InternationalAnalyze(View):
         json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'global.json')
         analysis = json.load(open(json_path, 'r', encoding='utf-8'))
         return 0, analysis
+
 
 class SearchAnalyse(View):
     @JSR('status', 'population', 'data')
@@ -42,12 +43,7 @@ class SearchAnalyse(View):
         try:
             if province_dict_ch.get(kwargs['name'], None):
                 epidemics = HistoryEpidemicData.objects.filter(Q(province_ch__exact=province_dict_ch[kwargs['name']]))
-                population = '未知'
-                for it in province_population.items():
-                    if it[0] in province_dict_ch[kwargs['name']]:
-                        population = it[1]
-                if province_dict_ch[kwargs['name']] == '中国':
-                    population = 1439323776
+                population = province_population.get(kwargs['name'], '未知')
             else:
                 epidemics = HistoryEpidemicData.objects.filter(Q(country_ch__exact=name_dict[kwargs['name']]))
                 population = '未知'
@@ -99,14 +95,9 @@ class CountryAnalyze(View):
         for it in country_dict.items():
             name_dict[it[1]] = it[0]
         try:
-            if province_dict_ch.get(kwargs['name'], None):
+            if kwargs['name'] in province_dict_ch.keys():
                 epidemics = HistoryEpidemicData.objects.filter(Q(province_ch__exact=province_dict_ch[kwargs['name']]))
-                population = '未知'
-                for it in province_population.items():
-                    if it[0] in province_dict_ch[kwargs['name']]:
-                        population = it[1]
-                if province_dict_ch[kwargs['name']] == '中国':
-                    population = 1439323776
+                population = province_population.get(kwargs['name'], '未知')
             else:
                 epidemics = HistoryEpidemicData.objects.filter(Q(country_ch__exact=name_dict[kwargs['name']]))
                 population = '未知'
