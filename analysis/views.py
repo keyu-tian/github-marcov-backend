@@ -81,7 +81,7 @@ class SearchAnalyse(View):
                 for c in d['provinces']:
                     if c['name'] == kwargs['name']:
                         daily_data.append({
-                            'date': c['date'],
+                            'date': d['date'],
                             'total_died': c['total']['died'],
                             'total_cured': c['total']['cured'],
                             'total_confirmed': c['total']['confirmed']
@@ -92,7 +92,7 @@ class SearchAnalyse(View):
                 for c in d['country']:
                     if c['name'] == kwargs['name']:
                         daily_data.append({
-                            'date': c['date'],
+                            'date': d['date'],
                             'total_died': c['total']['died'],
                             'total_cured': c['total']['cured'],
                             'total_confirmed': c['total']['confirmed']
