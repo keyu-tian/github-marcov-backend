@@ -16,26 +16,47 @@ epidemic_start_date = dt.date(2021, 7, 1)
 class DomesticAnalyze(View):
     @JSR('status', 'data')
     def get(self, request):
-        # json_path = os.path.join('spiders_data', 'epidemic_domestic_data', 'province.json')
-        json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
-        analysis = json.load(open(json_path, 'r', encoding='utf-8'))
+        try:
+            json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
+            analysis = json.load(open(json_path, 'r', encoding='utf-8'))
+        except:
+            return 7
         return 0, analysis
 
 
 class DomesticTodayAnalyze(View):
     @JSR('status', 'data')
     def get(self, request):
-        json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
-        analysis = json.load(open(json_path, 'r', encoding='utf-8'))
+        try:
+            json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
+            analysis = json.load(open(json_path, 'r', encoding='utf-8'))
+        except:
+            return 7
+        return 0, [analysis[-1]]
 
 
 class InternationalAnalyze(View):
     @JSR('status', 'data')
     def get(self, request):
         # json_path = os.path.join('spiders_data', 'epidemic_domestic_data', 'province.json')
-        json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'global.json')
-        analysis = json.load(open(json_path, 'r', encoding='utf-8'))
+        try:
+            json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'global.json')
+            analysis = json.load(open(json_path, 'r', encoding='utf-8'))
+        except:
+            return 7
         return 0, analysis
+
+
+class InternationalTodayAnalyze(View):
+    @JSR('status', 'data')
+    def get(self, request):
+        # json_path = os.path.join('spiders_data', 'epidemic_domestic_data', 'province.json')
+        try:
+            json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'global.json')
+            analysis = json.load(open(json_path, 'r', encoding='utf-8'))
+        except:
+            return 7
+        return 0, [analysis[-1]]
 
 
 class SearchAnalyse(View):
@@ -44,6 +65,41 @@ class SearchAnalyse(View):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name'}:
             return 1, []
+
+        try:
+            global_json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'global.json')
+            province_json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
+        except:
+            return 7
+
+        #TODO: 未测试
+        population = 0
+        daily_data = []
+        if kwargs['name'] in province_dict_ch.keys():
+            province_analysis = json.load(open(province_json_path, 'r', encoding='utf-8'))
+            for d in province_analysis:
+                for c in d['provinces']:
+                    if c['name'] == kwargs['name']:
+                        daily_data.append({
+                            'date': c['date'],
+                            'total_died': c['total']['died'],
+                            'total_cured': c['total']['cured'],
+                            'total_confirmed': c['total']['confirmed']
+                        })
+        else:
+            global_analysis = json.load(open(global_json_path, 'r', encoding='utf-8'))
+            for d in global_analysis:
+                for c in d['country']:
+                    if c['name'] == kwargs['name']:
+                        daily_data.append({
+                            'date': c['date'],
+                            'total_died': c['total']['died'],
+                            'total_cured': c['total']['cured'],
+                            'total_confirmed': c['total']['confirmed']
+                        })
+
+
+        """
         name_dict = {}
         for it in country_dict.items():
             name_dict[it[1]] = it[0]
@@ -60,17 +116,7 @@ class SearchAnalyse(View):
                         population = it[1]
         except:
             return 7
-
-        data = []
-        for epidemic in epidemics:
-            daily_data = {
-                'date': epidemic.date,
-                'total_died': epidemic.province_total_died,
-                'total_cured': epidemic.province_total_cured,
-                'total_confirmed': epidemic.province_total_confirmed
-            }
-            data.append(daily_data)
-
+        
         daily_data = {}
         for epidemic in epidemics:
             if epidemic.date not in daily_data.keys():
@@ -94,9 +140,10 @@ class SearchAnalyse(View):
                     'total_cured': epidemic.province_total_cured + daily_data[epidemic.date]['total_cured'],
                     'total_confirmed': epidemic.province_total_confirmed + daily_data[epidemic.date]['total_confirmed']
                 }
+        """
 
-        return 0, population, list(daily_data.values())
-        # return 0, population, data
+
+        return 0, population, daily_data
 
 
 class CountryAnalyze(View):
@@ -105,6 +152,38 @@ class CountryAnalyze(View):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name'}:
             return 1, []
+
+
+        try:
+            global_json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'global.json')
+            province_json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
+        except:
+            return 7
+
+        population = 0
+        daily_data = []
+        if kwargs['name'] in province_dict_ch.keys():
+            province_analysis = json.load(open(province_json_path, 'r', encoding='utf-8'))
+            for d in province_analysis:
+                for c in d['provinces']:
+                    if c['name'] == kwargs['name']:
+                        daily_data.append({
+                            'date': d['date'],
+                            'new': c['new'],
+                            'total': c['total']
+                        })
+        else:
+            global_analysis = json.load(open(global_json_path, 'r', encoding='utf-8'))
+            for d in global_analysis:
+                for c in d['countries']:
+                    if c['name'] == kwargs['name']:
+                        daily_data.append({
+                            'date': d['date'],
+                            'new': c['new'],
+                            'total': c['total']
+                        })
+
+        '''
         name_dict = {}
         for it in country_dict.items():
             name_dict[it[1]] = it[0]
@@ -166,8 +245,8 @@ class CountryAnalyze(View):
                         'confirmed': epidemic.province_new_confirmed + daily_data[epidemic.date]['new']['confirmed']
                     }
                 }
-
-        return 0, population, list(daily_data.values())
+        '''
+        return 0, population, daily_data
 
 
 class CountryList(View):
