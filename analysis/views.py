@@ -72,7 +72,6 @@ class SearchAnalyse(View):
         except:
             return 7
 
-        #TODO: 未测试
         population = 0
         daily_data = []
         if kwargs['name'] in province_dict_ch.keys():
@@ -89,7 +88,7 @@ class SearchAnalyse(View):
         else:
             global_analysis = json.load(open(global_json_path, 'r', encoding='utf-8'))
             for d in global_analysis:
-                for c in d['country']:
+                for c in d['countries']:
                     if c['name'] == kwargs['name']:
                         daily_data.append({
                             'date': d['date'],
