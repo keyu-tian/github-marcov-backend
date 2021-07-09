@@ -41,12 +41,10 @@ urlpatterns = [
     path('map/oversea_dt', MapOverseaDt.as_view()),
     
     # ======== 三、数据分析 ========
-    # path('data/country_list', .as_view()), # todo
-    # path('data/province_list', .as_view()), # todo
     path('data/international_analyze', InternationalAnalyze.as_view()),
-    path('data/today/international_analyze', InternationalTodayAnalyze.as_view()), # todo
+    path('data/today/international_analyze', InternationalTodayAnalyze.as_view()),
     path('data/domestic_analyze', DomesticAnalyze.as_view()),
-    path('data/today/domestic_analyze', DomesticTodayAnalyze.as_view()), # todo
+    path('data/today/domestic_analyze', DomesticTodayAnalyze.as_view()),
     path('data/search', SearchAnalyse.as_view()),
     path('data/country_analyze', CountryAnalyze.as_view()),
     
