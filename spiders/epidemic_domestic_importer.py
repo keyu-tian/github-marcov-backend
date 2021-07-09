@@ -14,7 +14,7 @@ delta = dt.timedelta(days=1)
 
 
 # from spiders.epidemic_domestic_importer import epidemic_domestic_import
-def epidemic_domestic_import(to_database=False, date_begin='2020-01-22',
+def epidemic_domestic_import(date_begin='2020-01-22',
                              date_end=datetime.strftime(dt.date(2021, 7, 8) - delta, '%Y-%m-%d')):
     # 正式版本参数中应为datetime.today()
 
@@ -163,16 +163,12 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22',
             last[city]['city_total_cured'] = max(daily_info[nd][city]['city_total_cured'], 0)
             last[city]['city_total_confirmed'] = max(daily_info[nd][city]['city_total_confirmed'], 0)
 
-        if to_database:
-            objs = []
-            for it in daily_info[nd].items():
-                dic = {'date': nd}
-                for k in out_title:
-                    dic[k] = it[1][k]
-                objs.append(HistoryEpidemicData(**dic))
-            HistoryEpidemicData.objects.bulk_create(objs)
         d += delta
     d = begin
+
+    # TODO: 在此更新最新一天的数据，数据源为akshare的丁香园接口，可以考虑写新importer更新当天最新数据
+    # TODO: 发现akshare不行，丁香园就是不靠谱，考虑采用腾讯api
+    # TODO: 现有最新数据7.8，今天7.10可以用akshare获取7.9数据，再使用腾讯api回去10号以及之后的最新数据
 
     # Build jsons
     print('building jsons...')
