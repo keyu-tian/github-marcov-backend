@@ -23,6 +23,8 @@ def misc_import():
     print(colorama.Fore.CYAN + '[train_import]:')
     train_import(line_start=0)
     
+    print(colorama.Fore.GREEN + '=> finished.')
+    
 
 def epidemic_import():
     # todo

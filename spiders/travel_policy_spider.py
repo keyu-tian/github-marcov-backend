@@ -1,5 +1,6 @@
 import json
 import os
+from tqdm import tqdm
 
 from selenium import webdriver
 import argparse
@@ -53,15 +54,18 @@ def spider(path, res):
     "province":"辽宁",
     "city":"朝阳","param1":    {"success":false,"code":2,"msg":"没有查询的城市","data":null}
     '''
+    output_json_fname = os.path.join(path, 'policy_by_city.json')
+    os.remove(output_json_fname)
+    
     url = 'http://wx.wind.com.cn/alert/traffic/getPolicy?city='
-    for i in range(len(list(res.keys()))):
+    for i in tqdm(range(len(list(res.keys()))), dynamic_ncols=True):
         city_list = res.get(list(res.keys())[i])
         for j in range(len(city_list)):
             get_url = url + city_list[j][0]
             response = requests.get(get_url, headers={'Content-Type': 'application/json'}, timeout=10)
             js = json.loads(response.text)
             if js['success']:
-                with open(os.path.join(path, 'policy_by_city.json'), 'w', encoding='utf-8') as fp:
+                with open(output_json_fname, 'a', encoding='utf-8') as fp:
                     fp.write(json.dumps({
                         'province': js['data']['province'],
                         'city': js['data']['city'],
