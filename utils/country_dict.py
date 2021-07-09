@@ -16,12 +16,12 @@ country_dict = {
     "Samoa": "萨摩亚",
     "Malta": "马耳他",
     "Suriname": "苏里南",
-    "United Arab Emirates": "阿拉伯联合酋长国",
+    "United Arab Emirates": "阿联酋",
     "Tajikistan": "塔吉克斯坦",
-    "Central African Republic": "中非共和国",
+    "Central African Republic": "中非",
     "France": "法国",
     "Zambia": "赞比亚",
-    "Bosnia and Herzegovina": "波斯尼亚-黑塞哥维那",
+    "Bosnia and Herzegovina": "波斯尼亚和黑塞哥维那",
     "US": "美国",
     "Djibouti": "吉布提",
     "Oman": "阿曼",
@@ -175,7 +175,10 @@ country_dict = {
     "Kuwait": "科威特",
     "Denmark": "丹麦",
     "Iceland": "冰岛",
-    "Nicaragua": "尼加拉瓜"
+    "Nicaragua": "尼加拉瓜",
+    "Myanmar": "缅甸",
+    "Congo-Brazzaville": "刚果",
+    "Congo-Kinshasa": "刚果民主共和国",
 }
 
 country_population = {'China': 1439323776, 'India': 1380004385, 'US': 331002651, 'Indonesia': 273523615,
