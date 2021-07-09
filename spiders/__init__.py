@@ -9,9 +9,16 @@ def import_daily():
     from spiders.epidemic_global_importer import epidemic_global_import
     
     # from spiders.flight_importer import flight_import
+
+    import sys
+    assert len(sys.argv) == 1
+    sys.argv = sys.argv[1:]
     
-    for import_func in locals().values():
-        import_func()
+    
+    # for import_func in locals().values():
+    #     import_func()
+    
+    exit(0)
 
 
 def import_only_once():
@@ -27,7 +34,7 @@ def import_only_once():
     import sys
     assert len(sys.argv) == 1
     sys.argv = sys.argv[1:]
-    for import_func in locals().values():
-        import_func()
+    # for import_func in locals().values():
+    #     import_func()
     
     exit(0)

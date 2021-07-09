@@ -12,8 +12,8 @@ from train.models import Train, Station, MidStation
 from utils.cast import address_to_jingwei, jingwei_to_address
 
 
-def parse_train_json(path, line_start):
-    with open(os.path.join(path, '火车班次json数据.json'), 'r', encoding='utf-8') as file:
+def train_import(line_start=0):
+    with open(os.path.join(IMPORTER_DATA_DIRNAME, 'train_spider_all', '火车班次json数据.json'), 'r', encoding='utf-8') as file:
         bar = tqdm(list(enumerate(file.readlines())), dynamic_ncols=True)
     objs = []
     for line, result in bar:
@@ -91,15 +91,3 @@ def parse_train_json(path, line_start):
         else:
             bar.set_postfix_str(f'failed!')
     MidStation.objects.bulk_create(objs, batch_size=8192)
-
-
-def train_import():
-    parser = argparse.ArgumentParser(description='Train-Spider')
-    parser.add_argument('--path', required=False, default=os.path.join(IMPORTER_DATA_DIRNAME, 'train_spider_all'), type=str)
-    parser.add_argument('--line', required=False, default=0, type=int)
-    args = parser.parse_args()
-    start = str(datetime.datetime.now())
-    print(f'[{start}] 开始parse...')
-    parse_train_json(args.path, args.line)
-    end = str(datetime.datetime.now())
-    print('over')
