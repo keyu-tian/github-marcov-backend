@@ -5,7 +5,7 @@ import re
 from tqdm import tqdm
 
 from country.models import Country, City
-from meta_config import IMPORTER_DATA_DIRNAME
+from meta_config import IMPORTER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
 from train.models import Train, Station, MidStation
 from utils.cast import address_to_jingwei, jingwei_to_address
 
@@ -88,4 +88,4 @@ def train_import(line_start=0):
             train.save()
         else:
             bar.set_postfix_str(f'failed!')
-    MidStation.objects.bulk_create(objs, batch_size=8192)
+    MidStation.objects.bulk_create(objs, batch_size=BULK_CREATE_BATCH_SIZE)
