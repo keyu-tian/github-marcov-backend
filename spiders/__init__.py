@@ -2,6 +2,9 @@ import colorama
 
 
 def misc_import():
+    # todo：有一些import函数，应该在调用它前，调用对应spider的函数
+    # todo：import函数的开头要删库，spider函数的开头要删爬取到的数据文件
+    
     colorama.init(autoreset=True)
     from spiders.risk_importer import risk_import
     from spiders.news_importer import news_import
