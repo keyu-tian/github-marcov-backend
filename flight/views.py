@@ -43,14 +43,16 @@ def get_flight_info_by_code(code, date=datetime.now().strftime('%Y-%m-%d')):
         soup = BeautifulSoup(res.text, 'html.parser')
         state = soup.find(attrs={'class': 'state'})
         if state is not None:
-            condition = state.text.strip()
+            city_num = len(state.find_all('div'))
+            # print(city_num)
+            condition = state.text.strip()[:2]
             city = soup.find(attrs={'title': code + ' 航班详情'})
             city = [x.strip() for x in city.text.split(' --- ')]
             dept_city = city[0]
             arri_city = city[1]
             t = soup.find_all(attrs={'class': 'time'})
-            dept_time = get_num_by_image(t[1].find('img').get('src'))
-            arri_time = get_num_by_image(t[2].find('img').get('src'))
+            dept_time = get_num_by_image(t[city_num].find('img').get('src'))
+            arri_time = get_num_by_image(t[-1].find('img').get('src'))
             return code, condition, dept_city, arri_city, date + ' ' + dept_time + ':00', date + ' ' + arri_time + ':00'
         fail_num += 1
 
@@ -206,6 +208,7 @@ class TravelPlane(View):
             dept_city = list(code_to_city.keys())[list(code_to_city.values()).index(dept_city)]
         except IndexError:
             print('你的城市表不全啊 giegie')
+            return 1, [], {}, []
         print(code, condition, dept_city, arri_city, dept_time, arri_time)
         start_station = {
             'station_name': code_to_airport.get(dept_city, ''),
@@ -219,7 +222,8 @@ class TravelPlane(View):
             if city.count() == 0:
                 start_station['country_name'] = ''
             else:
-                start_station['country_name'] = city.first().country.name_ch
+                start_station['country_name'] = ''
+                # start_station['country_name'] = city.first().country.name_ch
         else:
             start_station['risk_level'] = 0
             start_station['pos'] = [0, 0]
@@ -235,7 +239,8 @@ class TravelPlane(View):
             if city.count() == 0:
                 end_station['country_name'] = ''
             else:
-                end_station['country_name'] = city.first().country.name_ch
+                start_station['country_name'] = ''
+                # end_station['country_name'] = city.first().country.name_ch
         else:
             end_station['risk_level'] = 0
             end_station['pos'] = [0, 0]
