@@ -85,7 +85,7 @@ def train_import(line_start=0):
                         index=mid_list.index(c) + 1, arri_date=content[2],
                         arri_time=content[3], station=sta, train=train
                     ))
-            train.save()
+                train.save()
         else:
             bar.set_postfix_str(f'failed!')
     MidStation.objects.bulk_create(objs, batch_size=BULK_CREATE_BATCH_SIZE)
