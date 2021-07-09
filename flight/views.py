@@ -206,6 +206,7 @@ class TravelPlane(View):
             dept_city = list(code_to_city.keys())[list(code_to_city.values()).index(dept_city)]
         except IndexError:
             print('你的城市表不全啊 giegie')
+            return 1, [], {}, []
         print(code, condition, dept_city, arri_city, dept_time, arri_time)
         start_station = {
             'station_name': code_to_airport.get(dept_city, ''),
