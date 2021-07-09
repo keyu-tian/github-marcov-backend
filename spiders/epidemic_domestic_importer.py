@@ -11,7 +11,7 @@ from utils.dict_ch import province_dict_ch, province_population
 from epidemic.models import HistoryEpidemicData
 
 
-def epidemic_domestic_import():
+def epidemic_domestic_import(to_database=False):
     global title, city
     input_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')  # "t15.csv"
     csv_download_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')
@@ -72,8 +72,8 @@ def epidemic_domestic_import():
         last[city]['city_total_died'] = 0
         last[city]['city_total_cured'] = 0
         last[city]['city_total_confirmed'] = 0
-    begin = dt.date(2021, 7, 4)
-    end = dt.date(2021, 7, 6)
+    begin = dt.date(2020, 1, 22)
+    end = dt.date(2021, 7, 5)
     # end = dt.date.today()
     delta = dt.timedelta(days=1)
     d = begin
@@ -112,12 +112,9 @@ def epidemic_domestic_import():
                         all_data[idx]['province_curedCount'] - last[city]['province_total_cured'], 0)
                     daily_info[nd][city]['province_new_confirmed'] = max(
                         all_data[idx]['province_confirmedCount'] - last[city]['province_total_confirmed'], 0)
-                    daily_info[nd][city]['province_total_died'] = max(all_data[idx]['province_deadCount'],
-                                                                      daily_info[nd][city]['province_total_died'])
-                    daily_info[nd][city]['province_total_cured'] = max(all_data[idx]['province_curedCount'],
-                                                                       daily_info[nd][city]['province_total_cured'])
-                    daily_info[nd][city]['province_total_confirmed'] = max(all_data[idx]['province_confirmedCount'],
-                                                                           daily_info[nd][city]['province_total_confirmed'])
+                    daily_info[nd][city]['province_total_died'] = max(all_data[idx]['province_deadCount'], 0)
+                    daily_info[nd][city]['province_total_cured'] = max(all_data[idx]['province_curedCount'], 0)
+                    daily_info[nd][city]['province_total_confirmed'] = max(all_data[idx]['province_confirmedCount'], 0)
 
             city = all_data[idx]['cityName']
             daily_info[nd][city]['city_new_died'] = max(all_data[idx]['city_deadCount'] - last[city]['city_total_died'], 0)
@@ -127,38 +124,33 @@ def epidemic_domestic_import():
                 all_data[idx]['city_confirmedCount'] - last[city]['city_total_confirmed'], 0)
             
 
-            daily_info[nd][city]['city_total_died'] = max(all_data[idx]['city_deadCount'],
-                                                          daily_info[nd][city]['city_total_died'])
-            daily_info[nd][city]['city_total_cured'] = max(all_data[idx]['city_curedCount'],
-                                                           daily_info[nd][city]['city_total_cured'])
-            daily_info[nd][city]['city_total_confirmed'] = max(all_data[idx]['city_confirmedCount'],
-                                                               daily_info[nd][city]['city_total_confirmed'])
+            daily_info[nd][city]['city_total_died'] = max(all_data[idx]['city_deadCount'], 0)
+            daily_info[nd][city]['city_total_cured'] = max(all_data[idx]['city_curedCount'], 0)
+            daily_info[nd][city]['city_total_confirmed'] = max(all_data[idx]['city_confirmedCount'], 0)
             
             idx += 1
         
         for city in last.keys():
             for city2 in last.keys():
                 if last[city]['provinceName'] == last[city2]['provinceName']:
-                    last[city]['province_total_died'] = max(daily_info[nd][city2]['province_total_died'],
-                                                            last[city]['province_total_died'])
-                    last[city]['province_total_cured'] = max(daily_info[nd][city2]['province_total_cured'],
-                                                             last[city]['province_total_cured'])
-                    last[city]['province_total_confirmed'] = max(daily_info[nd][city2]['province_total_confirmed'],
-                                                                 last[city]['province_total_confirmed'])
-            last[city]['city_total_died'] = max(daily_info[nd][city]['city_total_died'], last[city]['city_total_died'])
-            last[city]['city_total_cured'] = max(daily_info[nd][city]['city_total_cured'], last[city]['city_total_cured'])
-            last[city]['city_total_confirmed'] = max(daily_info[nd][city]['city_total_confirmed'],
-                                                     last[city]['city_total_confirmed'])
+                    last[city]['province_total_died'] = max(daily_info[nd][city2]['province_total_died'], 0)
+                    last[city]['province_total_cured'] = max(daily_info[nd][city2]['province_total_cured'], 0)
+                    last[city]['province_total_confirmed'] = max(daily_info[nd][city2]['province_total_confirmed'], 0)
+            last[city]['city_total_died'] = max(daily_info[nd][city]['city_total_died'], 0)
+            last[city]['city_total_cured'] = max(daily_info[nd][city]['city_total_cured'], 0)
+            last[city]['city_total_confirmed'] = max(daily_info[nd][city]['city_total_confirmed'], 0)
 
-        objs = []
-        for it in daily_info[nd].items():
-            dic = {'date': nd}
-            for k in out_title:
-                dic[k] = it[1][k]
-            objs.append(HistoryEpidemicData(**dic))
-            # TODO: 导库
-            # print(s)
-        HistoryEpidemicData.objects.bulk_create(objs)
+        if to_database:
+            objs = []
+            for it in daily_info[nd].items():
+                dic = {'date': nd}
+                for k in out_title:
+                    dic[k] = it[1][k]
+                objs.append(HistoryEpidemicData(**dic))
+                # TODO: 导库
+                # print(s)
+            HistoryEpidemicData.objects.bulk_create(objs)
+
         d += delta
     d = begin
     

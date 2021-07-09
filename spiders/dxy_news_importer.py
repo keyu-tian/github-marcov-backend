@@ -1,16 +1,31 @@
 import pandas
+from tqdm import tqdm
+from datetime import datetime
 
-from meta_config import IMPORTER_DATA_DIRNAME
+from meta_config import IMPORTER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
 from news.models import News
 
 
-def dxy_news_import():
-    context = pandas.read_csv(f'{IMPORTER_DATA_DIRNAME}/DXYNews-3.csv').loc[:, ['pubDate', 'title', 'summary', 'infoSource', 'sourceUrl']]
-    for ind in range(10935):
-        line = context.iloc[ind].values
-        News.objects.get_or_create(title=line[1], defaults={
-            'url': line[4],
-            'media': line[3],
-            'publish_time': line[0],
-            'context': line[2]
-        })
+def dxy_news_import(delete_old_data):
+    if delete_old_data:
+        News.objects.all().delete()
+    
+    target_keys = ['pubDate', 'title', 'summary', 'infoSource', 'sourceUrl']
+    context: pandas.DataFrame = pandas.read_csv(f'{IMPORTER_DATA_DIRNAME}/DXYNews-3.csv').loc[:, target_keys]
+    bar = tqdm([row for _, row in context.iterrows()], dynamic_ncols=True)
+    
+    objs = []
+    for row in bar:
+        bar.set_postfix_str(f'from {row["infoSource"]}')
+        kw = {
+            'title': row['title'],
+            'url': row['sourceUrl'],
+            'media': row['infoSource'],
+            'context': row['summary']
+        }
+        try:
+            kw['publish_time'] = datetime.strptime(row['pubDate'][:10], '%Y-%m-%d').date()
+        except:
+            pass
+        objs.append(News(**kw))
+    News.objects.bulk_create(objs, batch_size=BULK_CREATE_BATCH_SIZE)

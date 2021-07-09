@@ -1,33 +1,34 @@
-def import_daily():
-    # 王振，每天爬
+import colorama
+
+
+def misc_import():
+    # todo：有一些import函数，应该在调用它前，调用对应spider的函数
+    # todo：import函数的开头要删库，spider函数的开头要删爬取到的数据文件
+    
+    colorama.init(autoreset=True)
     from spiders.risk_importer import risk_import
-    # wlt，每天爬
     from spiders.news_importer import news_import
-    # lrq，每天爬
-    from spiders.epidemic_domestic_importer import epidemic_domestic_import
-    # wcy，每天爬
-    from spiders.epidemic_global_importer import epidemic_global_import
-    
-    # from spiders.flight_importer import flight_import
-    
-    for import_func in locals().values():
-        import_func()
-
-
-def import_only_once():
-    # wlt，爬一次
-    from spiders.train_importer import train_import
-    # wlt，爬一次
-    from spiders.travel_policy_importer import travel_policy_import
-    # wlt，爬一次
-    from spiders.yaoyan_importer import yaoyan_import
-    # 王振，爬一次
     from spiders.dxy_news_importer import dxy_news_import
+    from spiders.yaoyan_importer import yaoyan_import
+    from spiders.train_importer import train_import
+    from spiders.travel_policy_importer import travel_policy_import
 
-    import sys
-    assert len(sys.argv) == 1
-    sys.argv = sys.argv[1:]
-    for import_func in locals().values():
-        import_func()
+    print(colorama.Fore.CYAN + '[risk_import]:')
+    risk_import()
+    print(colorama.Fore.CYAN + '[news_import]:')
+    news_import(delete_old_data=True)
+    print(colorama.Fore.CYAN + '[dxy_news_import]:')
+    dxy_news_import(delete_old_data=False)
+    print(colorama.Fore.CYAN + '[yaoyan_import]:')
+    yaoyan_import(line_start=0)
+    print(colorama.Fore.CYAN + '[travel_policy_import]:')
+    travel_policy_import(line_start=0)
+    print(colorama.Fore.CYAN + '[train_import]:')
+    train_import(line_start=0)
     
-    exit(0)
+    print(colorama.Fore.GREEN + '=> finished.')
+    
+
+def epidemic_import():
+    # todo
+    ...
