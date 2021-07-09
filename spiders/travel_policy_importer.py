@@ -8,6 +8,8 @@ from meta_config import IMPORTER_DATA_DIRNAME
 
 
 def travel_policy_import(line_start=0):
+    Policy.objects.all().delete()
+    
     with open(os.path.join(IMPORTER_DATA_DIRNAME, 'travel_policy_spider_all', 'policy_by_city.json'), 'r', encoding='utf-8') as file:
         bar = tqdm(list(enumerate(file.readlines())), dynamic_ncols=True)
     country, created = Country.objects.get_or_create(name_ch='中国')

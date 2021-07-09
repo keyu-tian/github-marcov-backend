@@ -9,10 +9,11 @@ from utils.cast import address_to_jingwei
 
 
 def risk_import():
+    RiskArea.objects.all().delete()
+    
     with open(f'{IMPORTER_DATA_DIRNAME}/risk_areas.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
     
-    RiskArea.objects.all().delete()
     for level_num, level_str in ((1, '中'), (2, '高')):
         bar = tqdm(data[level_str + '风险地区'], dynamic_ncols=True)
         for area in bar:
