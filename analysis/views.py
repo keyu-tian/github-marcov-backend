@@ -1,11 +1,8 @@
 from django.views import View
-from django.db.models import Q
 
 from meta_config import IMPORTER_DATA_DIRNAME
 from utils.meta_wrapper import JSR
-from utils.dict_ch import province_dict_ch, province_population
-from utils.country_dict import country_dict, country_population
-from epidemic.models import HistoryEpidemicData
+from utils.dict_ch import province_dict_ch
 import datetime as dt
 import json
 import os
@@ -138,14 +135,3 @@ class CountryAnalyze(View):
 
         return 0, population, daily_data
 
-
-class CountryList(View):
-    @JSR('status', 'names')
-    def get(self, request):
-        return 0, list(country_dict.values())
-
-
-class ProvinceList(View):
-    @JSR('status', 'names')
-    def get(self, request):
-        return 0, list(province_dict_ch.keys())[:-1]

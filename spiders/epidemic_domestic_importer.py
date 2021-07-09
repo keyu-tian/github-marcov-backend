@@ -10,16 +10,20 @@ from meta_config import IMPORTER_DATA_DIRNAME
 from utils.dict_ch import province_dict_ch, province_population, city_dict_ch
 from epidemic.models import HistoryEpidemicData
 
+delta = dt.timedelta(days=1)
 
-def epidemic_domestic_import(to_database=False, date_begin='2020-01-22', date_end='2021-07-08'):
-    global title, city
+
+# from spiders.epidemic_domestic_importer import epidemic_domestic_import
+def epidemic_domestic_import(to_database=False, date_begin='2020-01-22',
+                             date_end=datetime.strftime(dt.date(2021, 7, 8) - delta, '%Y-%m-%d')):
+    # 正式版本参数中应为datetime.today()
 
     date_begin = date_begin.split('-')
     date_end = date_end.split('-')
     begin = dt.date(int(date_begin[0]), int(date_begin[1]), int(date_begin[2]))
     end = dt.date(int(date_end[0]), int(date_end[1]), int(date_end[2]))
 
-    input_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')  # "t15.csv"
+    input_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')
     csv_download_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')
     area_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'area.json')
     province_json_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
@@ -33,7 +37,13 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22', date_en
 
     print('loading...')
     # TODO: 获取当天数据
-    # os.system('wget https://github.com/BlankerL/DXY-COVID-19-Data/releases/download/%s/DXYArea.csv --no-check-certificate -o ' % (dt.datetime.strftime(dt.date.today(), '%Y.%m.%d')) + csv_download_path)
+    '''
+    try:
+        os.system('wget https://github.com/BlankerL/DXY-COVID-19-Data/releases/download/%s/DXYArea.csv --no-check-certificate -o ' % (dt.datetime.strftime(dt.date.today(), '%Y.%m.%d')) + csv_download_path)
+    except:
+        print('更新数据失败')
+        return
+    '''
 
     f = open(input_file, "r", encoding='utf-8')
     title = f.readline()[:-1].split(',')
@@ -84,11 +94,10 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22', date_en
         last[city]['city_total_confirmed'] = 0
 
     print('extracting...')
-    delta = dt.timedelta(days=1)
     d = begin
     analysis = []
     idx = 0
-    while all_data[idx]['updateTime'] != d.strftime('%Y-%m-%d'):
+    while all_data[idx]['updateTime'] != (d + delta).strftime('%Y-%m-%d'):
         idx += 1
     while d <= end:
         nd = d.strftime('%Y-%m-%d')
@@ -112,7 +121,7 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22', date_en
             daily_info[nd][city]['city_new_cured'] = 0
             daily_info[nd][city]['city_new_confirmed'] = 0
 
-        while idx < len(all_data) and all_data[idx]['updateTime'] == nd:
+        while idx < len(all_data) and all_data[idx]['updateTime'] == (d + delta).strftime('%Y-%m-%d'):
             for city in last.keys():
                 if all_data[idx]['provinceName'] == last[city]['provinceName']:
                     daily_info[nd][city]['province_new_died'] = max(
@@ -214,6 +223,5 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22', date_en
     json.dump(analysis, open(province_json_file, 'w'), ensure_ascii=False)
     for province_front, province in province_dict_ch.items():
         print('Building %s.json' % province)
-        json.dump(provinces[province], open(os.path.join(city_json_file_directory, '%s.json' % province), 'w'), ensure_ascii=False)
-
-# from spiders.epidemic_domestic_importer import epidemic_domestic_import
+        json.dump(provinces[province], open(os.path.join(city_json_file_directory, '%s.json' % province), 'w'),
+                  ensure_ascii=False)
