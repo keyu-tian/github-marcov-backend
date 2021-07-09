@@ -8,7 +8,6 @@ from datetime import datetime
 
 from meta_config import IMPORTER_DATA_DIRNAME
 from utils.dict_ch import province_dict_ch, province_population, city_dict_ch
-from epidemic.models import HistoryEpidemicData
 
 delta = dt.timedelta(days=1)
 
@@ -28,12 +27,6 @@ def epidemic_domestic_import(date_begin='2020-01-22',
     area_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'area.json')
     province_json_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
     city_json_file_directory = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'provinces')
-    out_title = [
-        'country_ch', 'province_ch', 'city_ch', 'province_total_died', 'province_total_cured',
-        'province_total_confirmed', 'province_new_died', 'province_new_cured', 'province_new_confirmed',
-        'city_total_died', 'city_total_cured', 'city_total_confirmed', 'city_new_died', 'city_new_cured',
-        'city_new_confirmed'
-    ]
 
     print('loading...')
     # TODO: 获取当天数据
