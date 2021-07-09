@@ -1,2 +1,5 @@
 #sh ./make_migs.sh
-python manage.py runserver
+
+PORT="0.0.0.0:${1:-"80"}"
+echo "PORT=${PORT}"
+python manage.py runserver ${PORT}
