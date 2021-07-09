@@ -9,23 +9,6 @@ from xml.dom.minidom import parse
 import xml.dom.minidom
 import requests
 
-# 城市的出行政策爬取
-
-# def get_input_options_by_xml(path):
-#     DOMTree = xml.dom.minidom.parse(os.path.join(os.path.split(path)[0], 'CountryProvinceCityLocListCH_and_Code.xml'))
-#     china = DOMTree.documentElement.getElementsByTagName('CountryRegion').item(0).getElementsByTagName('State')
-#     res = {}
-#     for i in range(len(china)):
-#         state = china[i]
-#         city_list = state.getElementsByTagName('City')
-#         state_name = china[i].getAttribute('Name')
-#         res[state_name] = []
-#         for j in range(len(city_list)):
-#             city_name = city_list[j].getAttribute('Name')
-#             res[state_name].append(city_name)
-#     # with open(os.path.join(path, 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
-#     #     fp.write(json.dumps(res) + '\n')
-#     return res
 from meta_config import SPIDER_DATA_DIRNAME
 
 
@@ -33,7 +16,7 @@ def get_input_options_by_json(path):
     res = {}
     if not os.path.exists(path):
         os.makedirs(path)
-    with open(os.path.join(os.path.split(path)[0], 'City.json'), 'r', encoding='utf-8') as jsonfile:
+    with open(os.path.join(os.path.split(path)[0], 'travel_policy_cities.json'), 'r', encoding='utf-8') as jsonfile:
         js = json.load(jsonfile)
     for i in range(len(js['data'])):
         if js['data'][i]['province'] not in res.keys():
