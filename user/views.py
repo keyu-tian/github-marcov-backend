@@ -11,6 +11,7 @@ from django.db.utils import IntegrityError, DataError
 from marcov19.settings import SERVER_HOST
 from user.models import User, VerifyCode
 from user.hypers import *
+from utils.cast import cur_time
 from utils.email_sender import send_code
 from utils.meta_wrapper import JSR
 
@@ -219,6 +220,12 @@ class UserInfo(View):
             return -1, '', '', 1, '',
         u = u.get()
         return 0, u.name, u.avatar, u.identity, u.id,
+
+
+class TimeInfo(View):
+    @JSR('status', 'time')
+    def get(self, request):
+        return 0, cur_time()
 
 
 class Identity(View):
