@@ -15,7 +15,7 @@ def dxy_news_import(delete_old_data):
     bar = tqdm([row for _, row in context.iterrows()], dynamic_ncols=True)
     
     objs = []
-    for i, row in bar:
+    for row in bar:
         bar.set_postfix_str(f'from {row["infoSource"]}')
         kw = {
             'title': row['title'],
