@@ -62,7 +62,7 @@ class MapProvince(View):
             cities.append(city)
             msg = Policy.objects.filter(city_name=city_data.city_ch)
             if msg.count() != 0:
-                msg = f'进入{ city_data.city_ch }管控政策：{ msg.first().enter_policy }' + '\n' + f'离开{ city_data.city_ch }管控政策：{ msg.first().out_policy }'
+                msg = f'进入{ city_data.city_ch }管控政策：{ msg.first().enter_policy }\n离开{ city_data.city_ch }管控政策：{ msg.first().out_policy }'
                 info = {'level': get_city_risk_level(city_data.city_ch), 'msg': msg}
                 infos.append(info)
             news_list = News.objects.filter(Q(title__icontains=city_data.city_ch) |
