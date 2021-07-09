@@ -7,7 +7,7 @@ import re
 from datetime import datetime
 
 from meta_config import IMPORTER_DATA_DIRNAME
-from utils.dict_ch import province_dict_ch, province_population
+from utils.dict_ch import province_dict_ch, province_population, city_dict_ch
 from epidemic.models import HistoryEpidemicData
 
 
@@ -22,7 +22,8 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22', date_en
     input_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')  # "t15.csv"
     csv_download_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')
     area_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'area.json')
-    json_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
+    province_json_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
+    city_json_file_directory = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'provinces')
     out_title = [
         'country_ch', 'province_ch', 'city_ch', 'province_total_died', 'province_total_cured',
         'province_total_confirmed', 'province_new_died', 'province_new_cured', 'province_new_confirmed',
@@ -30,12 +31,14 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22', date_en
         'city_new_confirmed'
     ]
 
+    print('loading...')
     # TODO: 获取当天数据
     # os.system('wget https://github.com/BlankerL/DXY-COVID-19-Data/releases/download/%s/DXYArea.csv --no-check-certificate -o ' % (dt.datetime.strftime(dt.date.today(), '%Y.%m.%d')) + csv_download_path)
 
     f = open(input_file, "r", encoding='utf-8')
     title = f.readline()[:-1].split(',')
     all_data = []
+    cities_in_province = {}
     for line in f:
         single_data = {}
         ls = re.split(',(?!\\s)', line[:-1])
@@ -57,9 +60,17 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22', date_en
             single_data['cityName'] += '-' + single_data['provinceName']
         if single_data['cityName'] == '':
             single_data['cityName'] = single_data['provinceName']
-        single_data['updateTime'] = datetime.strptime(single_data['updateTime'].split(' ')[0].replace('/', '-'), '%Y-%m-%d')
-        single_data['updateTime'] = datetime.strftime(single_data['updateTime'], '%Y-%m-%d')
+        single_data['updateTime'] = datetime.strptime(
+            single_data['updateTime'].split(' ')[0].replace('/', '-'), '%Y-%m-%d')
+        single_data['updateTime'] = datetime.strftime(
+            single_data['updateTime'], '%Y-%m-%d')
         all_data.append(single_data)
+
+        if single_data['provinceName'] not in cities_in_province.keys():
+            cities_in_province[single_data['provinceName']] = []
+        if single_data['cityName'] not in cities_in_province[single_data['provinceName']]:
+            cities_in_province[single_data['provinceName']].append(single_data['cityName'])
+
     all_data.reverse()
 
     daily_info = {}
@@ -72,6 +83,7 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22', date_en
         last[city]['city_total_cured'] = 0
         last[city]['city_total_confirmed'] = 0
 
+    print('extracting...')
     delta = dt.timedelta(days=1)
     d = begin
     analysis = []
@@ -153,23 +165,55 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22', date_en
         d += delta
     d = begin
 
+    # Build jsons
+    print('building jsons...')
+    city_back_to_front = {}
+    for v, k in city_dict_ch.items():
+        city_back_to_front[k] = v
+    provinces = {}
+    for p in province_dict_ch.values():
+        provinces[p] = {}
     while d <= end:
         nd = d.strftime('%Y-%m-%d')
+        print(nd)
         daily_analysis = {'date': nd, 'provinces': []}
-        for city_front, city in province_dict_ch.items():
-            pd = {'name': city_front}
+        for province_front, province in province_dict_ch.items():
+            pd = {'name': province_front}
+            provinces[province][nd] = []
+            # TODO: 人口查询方式优化
             for it in province_population.items():
-                if it[0] in city:
+                if it[0] in province:
                     pd['population'] = it[1]
-            data_new = {'died': daily_info[nd][city]['province_new_died'],
-                        'cured': daily_info[nd][city]['province_new_cured'],
-                        'confirmed': daily_info[nd][city]['province_new_confirmed']}
-            data_total = {'died': daily_info[nd][city]['province_total_died'],
-                          'cured': daily_info[nd][city]['province_total_cured'],
-                          'confirmed': daily_info[nd][city]['province_total_confirmed']}
+            data_new = {'died': daily_info[nd][province]['province_new_died'],
+                        'cured': daily_info[nd][province]['province_new_cured'],
+                        'confirmed': daily_info[nd][province]['province_new_confirmed']}
+            data_total = {'died': daily_info[nd][province]['province_total_died'],
+                          'cured': daily_info[nd][province]['province_total_cured'],
+                          'confirmed': daily_info[nd][province]['province_total_confirmed']}
             pd['new'] = data_new
             pd['total'] = data_total
             daily_analysis['provinces'].append(pd)
+            for city in cities_in_province[province]:
+                if city in city_back_to_front.keys():
+                    provinces[province][nd].append({
+                        'name': city_back_to_front[city],
+                        'new': {
+                            'died': daily_info[nd][city]['city_new_died'],
+                            'cured': daily_info[nd][city]['city_new_cured'],
+                            'confirmed': daily_info[nd][city]['city_new_confirmed'],
+                        },
+                        'total': {
+                            'died': daily_info[nd][city]['city_total_died'],
+                            'cured': daily_info[nd][city]['city_total_cured'],
+                            'confirmed': daily_info[nd][city]['city_total_confirmed'],
+                        }
+                    })
+
         analysis.append(daily_analysis)
         d += delta
-    json.dump(analysis, open(json_file, 'w'), ensure_ascii=False)
+    json.dump(analysis, open(province_json_file, 'w'), ensure_ascii=False)
+    for province_front, province in province_dict_ch.items():
+        print('Building %s.json' % province)
+        json.dump(provinces[province], open(os.path.join(city_json_file_directory, '%s.json' % province), 'w'), ensure_ascii=False)
+
+# from spiders.epidemic_domestic_importer import epidemic_domestic_import
