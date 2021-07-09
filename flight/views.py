@@ -222,8 +222,8 @@ class TravelPlane(View):
             if city.count() == 0:
                 start_station['country_name'] = ''
             else:
-                start_station['country_name'] = ''
-                # start_station['country_name'] = city.first().country.name_ch
+                # start_station['country_name'] = ''
+                start_station['country_name'] = city.first().country.name_ch
         else:
             start_station['risk_level'] = 0
             start_station['pos'] = [0, 0]
@@ -239,8 +239,8 @@ class TravelPlane(View):
             if city.count() == 0:
                 end_station['country_name'] = ''
             else:
-                start_station['country_name'] = ''
-                # end_station['country_name'] = city.first().country.name_ch
+                # start_station['country_name'] = ''
+                end_station['country_name'] = city.first().country.name_ch
         else:
             end_station['risk_level'] = 0
             end_station['pos'] = [0, 0]
