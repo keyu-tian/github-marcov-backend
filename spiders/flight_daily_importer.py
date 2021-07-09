@@ -7,7 +7,10 @@ from flight.models import Flight
 from meta_config import IMPORTER_DATA_DIRNAME
 
 
-def flights_storage(date):
+def flight_import(date=None):
+    if date is None:
+        date = datetime.datetime.now().strftime('%Y-%m-%d')
+
     with open(f'{IMPORTER_DATA_DIRNAME}/flights_data/flights_data{date}.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
     
@@ -22,17 +25,9 @@ def flights_storage(date):
             arri_city = None
         else:
             arri_city = City.objects.filter(code=arri_city).get()
+        if arri_city is None or dept_city is None:
+            continue
         kwargs = {'code': line['code'], 'dept_time': line['dept_time'], 'dept_city': dept_city, 'arri_time': line['arri_time'], 'arri_city': arri_city, 'condition': line['condition']}
         Flight.objects.create(**kwargs)
         # except:
         #     print('插入新闻数据错误')
-
-
-def flight_import():
-    parser = argparse.ArgumentParser(description='Flight-Spider')
-    parser.add_argument('--date', required=False, type=str)
-    args = parser.parse_args()
-    if args.date:
-        flights_storage(args.date)
-    else:
-        flights_storage(datetime.datetime.now().strftime('%Y-%m-%d'))
