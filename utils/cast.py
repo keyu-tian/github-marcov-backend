@@ -57,7 +57,11 @@ def address_to_jingwei(address) -> (float, float):
 
 def jingwei_to_address(jingdu, weidu):
     '''
-    返回的是json：
+    res = jingwei_to_address(jingdu, weidu)
+    查询省：res['result']['addressComponent']['province']
+    查询市：res['result']['addressComponent']['city']
+    查询区：res['result']['addressComponent']['district']
+    res是json：
 {
   "status": 0,
   "result": {
