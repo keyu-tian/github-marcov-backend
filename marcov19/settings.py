@@ -628,7 +628,7 @@ MIDDLEWARE = [
     # 'user.middleware.Login_Middleware.IsLogin',
 ]
 
-CORS_ORIGIN_ALLOW_ALL  = True
+CORS_ORIGIN_ALLOW_ALL = True
 
 # SESSION_COOKIE_HTTPONLY = False
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  #默认设置为50M

@@ -5,6 +5,7 @@ from selenium import webdriver
 
 
 def spider(path):
+    assert os.path.sep == '\\', '这个代码只能在windows上运行哈'
     driver = webdriver.Chrome(executable_path='chromedriver.exe')
 
     driver.implicitly_wait(10)
