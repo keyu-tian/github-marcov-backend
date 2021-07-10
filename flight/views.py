@@ -265,7 +265,7 @@ class TravelPlane(View):
         msg1 = Policy.objects.filter(city_name=start_station['city_name'])
         msg2 = Policy.objects.filter(city_name=end_station['city_name'])
         if msg1.count() != 0:
-            msg += msg1.first().out_policy
+            msg += msg1.first().out_policy + '\n'
         if msg2.count() != 0:
             msg += msg2.first().enter_policy
         info = {
