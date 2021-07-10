@@ -54,7 +54,7 @@ dataout = []
 
 @retry(stop_max_attempt_number=10, wait_fixed=100)
 def requests_get(url, headers):
-    return requests.get(url, headers=headers, verify=False)
+    return requests.get(url, headers=headers)
 
 
 def epidemic_global_import(start_dt=None):
