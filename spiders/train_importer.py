@@ -16,7 +16,7 @@ from tqdm import tqdm
 from country.models import Country, City, Province
 from meta_config import SPIDER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
 from train.models import Train, Station, MidStation
-from utils.cast import address_to_jingwei, jingwei_to_address, gd_address_to_jingwei_and_province_city
+from utils.cast import gd_address_to_jingwei_and_province_city
 day_ch = ['第未知天', '第一天', '第二天', '第三天', '第四天', '第五天', '第六天', '第七天', '第八天', '第九天', '第十天', '终到站']
 
 
@@ -135,16 +135,7 @@ def train_import(line_start=0):
                                 sta.jingdu, sta.weidu = 0, 0
                             else:
                                 sta.jingdu, sta.weidu = res['jingdu'], res['weidu']
-                        js = jingwei_to_address(sta.jingdu, sta.weidu)
-                        if js['result']['addressComponent']['city'] in city_dict_ch.keys():
-                            city_name = city_dict_ch[js['result']['addressComponent']['city']]
-                        else:
-                            # print(f"city_dict_ch表中无{js['result']['addressComponent']['city']}映射")
-                            city_name = re.findall(r'(.*)市', js['result']['addressComponent']['city'])
-                            if len(city_name):
-                                city_name = city_name[0]
-                            else:
-                                city_name = js['result']['addressComponent']['city']
+                        city_name = res['city']
                         mid_city, flag = City.objects.get_or_create(name_ch=city_name)
                         if flag:  # 数据库没有的新的国家，存名字
                             mid_city.country = country

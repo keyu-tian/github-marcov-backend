@@ -14,7 +14,7 @@ from risk.views import get_city_risk_level
 from train.models import *
 from requests import Timeout
 
-from utils.cast import address_to_jingwei, jingwei_to_address
+from utils.cast import address_to_jingwei, gd_address_to_jingwei_and_province_city
 from utils.meta_wrapper import JSR
 
 DEFAULT_DATE = datetime.datetime.now()
@@ -150,19 +150,13 @@ def query_train_info(train_number):
     return None
 
 
-def query_train_info_by_city(city_name):
+def query_train_info_by_city(query_name):
     # return: query_set(Train)
-    city = City.objects.filter(name_ch=city_name)
+    city = City.objects.filter(name_ch=query_name)
     if city.exists():
         city = city.get()
     else:
-        jingdu, weidu = address_to_jingwei(city)
-        js = jingwei_to_address(jingdu, weidu)
-        city_name = re.findall(r'(.*)市', js['result']['addressComponent']['city'])
-        if len(city_name):
-            city_name = city_name[0]
-        else:
-            city_name = js['result']['addressComponent']['city']
+        city_name = gd_address_to_jingwei_and_province_city(query_name)['city']
         city = City.objects.filter(name_ch=city_name)
         if not city.exists():
             return None

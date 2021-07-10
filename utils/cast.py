@@ -1,23 +1,8 @@
 import datetime
 import re
 import json
-import base64
-import urllib
 
 import requests
-
-#
-# def encode(s):
-#     return urllib.parse.quote(base64.b64encode(str(s).encode()).decode(encoding="utf-8"))
-#     # return str(s)
-#
-#
-# def decode(s):
-#     if isinstance(s, bytes):
-#         s = s.decode()
-#     s = urllib.parse.unquote(s)
-#     return base64.b64decode(s).decode(encoding="utf-8")
-#     # return s
 
 
 def data_to_str(data: object):
@@ -37,6 +22,10 @@ def cur_time():
 
 
 def address_to_jingwei(address) -> (float, float):
+    ret = gd_address_to_jingwei_and_province_city(address)
+    return ret['jingdu'], ret['weidu']
+
+    # todo: 下面的代码可以考虑全部删除了
     # 'showLocation&&showLocation({"status":0,"result":{"location":{"lng":116.38548789747735,"lat":39.871280236128878},"precise":0,"confidence":50,"comprehension":0,"level":"火车站"}})'
     # ak = '4PKHdx8ujI2T3R53ZvgC1ZOTWViHK8am'   # ？的
     # ak = '0wem7DQG7HjCVpzKk5y8y3kGnhPmMFRk'   # tky的
@@ -61,6 +50,7 @@ def address_to_jingwei(address) -> (float, float):
         print(js['msg'], '地址：' + address)
         return 0, 0
     return jingdu, weidu
+
 
 
 def gd_address_to_jingwei_and_province_city(address):
@@ -99,56 +89,57 @@ def gd_address_to_jingwei_and_province_city(address):
     }
 
 
-def jingwei_to_address(jingdu, weidu):
-    '''
-    res = jingwei_to_address(jingdu, weidu)
-    查询省：res['result']['addressComponent']['province']
-    查询市：res['result']['addressComponent']['city']
-    查询区：res['result']['addressComponent']['district']
-    res是json：
-{
-  "status": 0,
-  "result": {
-    "location": {
-      "lng": 121.50989077799084,    # 经度
-      "lat": 31.22932842411674
-    },
-    "formatted_address": "上海市黄浦区中山南路187",
-    "business": "外滩,陆家嘴,董家渡",
-    "addressComponent": {
-      "country": "中国",
-      "country_code": 0,
-      "country_code_iso": "CHN",
-      "country_code_iso2": "CN",
-      "province": "上海市",
-      "city": "上海市",
-      "city_level": 2,
-      "district": "黄浦区",
-      "town": "",
-      "town_code": "",
-      "adcode": "310101",
-      "street": "中山南路",
-      "street_number": "187",
-      "direction": "东北",
-      "distance": "91"
-    },
-    "pois": [],
-    "roads": [],
-    "poiRegions": [],
-    "sematic_description": "",
-    "cityCode": 289
-  }
-}
-    '''
-    # ak = '4PKHdx8ujI2T3R53ZvgC1ZOTWViHK8am'   # ？的
-    # ak = '0wem7DQG7HjCVpzKk5y8y3kGnhPmMFRk'   # tky的
-    # ak = 'vnRXRCTGp9RMnO6xbuGU497wta2P1FFj'   # wlt的
-    ak = '11Z8uiP8kIz6AG0Vjiwzbc5f9Ii0cdHd'     # 网上找的
-    url = "http://api.map.baidu.com/reverse_geocoding/v3/?ak=" + ak \
-        +'&output=json&coordtype=wgs84ll&language=zh-CN&location=' + str(weidu) + ',' + str(jingdu)
-    try:
-        res = requests.get(url=url)
-    except:
-        return None, None
-    js = json.loads(res.text)
-    return js
+# todo：下面的代码已经无用，可以考虑删除
+# def jingwei_to_address(jingdu, weidu):
+#     '''
+#     res = jingwei_to_address(jingdu, weidu)
+#     查询省：res['result']['addressComponent']['province']
+#     查询市：res['result']['addressComponent']['city']
+#     查询区：res['result']['addressComponent']['district']
+#     res是json：
+# {
+#   "status": 0,
+#   "result": {
+#     "location": {
+#       "lng": 121.50989077799084,    # 经度
+#       "lat": 31.22932842411674
+#     },
+#     "formatted_address": "上海市黄浦区中山南路187",
+#     "business": "外滩,陆家嘴,董家渡",
+#     "addressComponent": {
+#       "country": "中国",
+#       "country_code": 0,
+#       "country_code_iso": "CHN",
+#       "country_code_iso2": "CN",
+#       "province": "上海市",
+#       "city": "上海市",
+#       "city_level": 2,
+#       "district": "黄浦区",
+#       "town": "",
+#       "town_code": "",
+#       "adcode": "310101",
+#       "street": "中山南路",
+#       "street_number": "187",
+#       "direction": "东北",
+#       "distance": "91"
+#     },
+#     "pois": [],
+#     "roads": [],
+#     "poiRegions": [],
+#     "sematic_description": "",
+#     "cityCode": 289
+#   }
+# }
+#     '''
+#     # ak = '4PKHdx8ujI2T3R53ZvgC1ZOTWViHK8am'   # ？的
+#     # ak = '0wem7DQG7HjCVpzKk5y8y3kGnhPmMFRk'   # tky的
+#     # ak = 'vnRXRCTGp9RMnO6xbuGU497wta2P1FFj'   # wlt的
+#     ak = '11Z8uiP8kIz6AG0Vjiwzbc5f9Ii0cdHd'     # 网上找的
+#     url = "http://api.map.baidu.com/reverse_geocoding/v3/?ak=" + ak \
+#         +'&output=json&coordtype=wgs84ll&language=zh-CN&location=' + str(weidu) + ',' + str(jingdu)
+#     try:
+#         res = requests.get(url=url)
+#     except:
+#         return None, None
+#     js = json.loads(res.text)
+#     return js
