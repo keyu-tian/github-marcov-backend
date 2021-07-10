@@ -143,10 +143,14 @@ def epidemic_global_import(start_dt=None):
                 tmp.append({"date": date, "country_info": country_info})
     
     # 遍历每个时间直到当前
+    days = (datetime.datetime.now().date() - datetime.datetime.strptime(start_dt, '%Y-%m-%d')).days + 1
+    bar = tqdm(
+        total=days, initial=0, dynamic_ncols=True,
+    )
     while start_dt <= datetime.datetime.now().strftime("%Y-%m-%d"):
-        print(start_dt)
-        # bar = tqdm(tmp)
-        # bar.set_description(start_dt)
+        bar.set_description('[parsing]')
+        bar.update(1)
+        bar.set_postfix_str(start_dt)
         countries = []
         for i in tmp:
             if i["date"] == start_dt:
@@ -156,6 +160,7 @@ def epidemic_global_import(start_dt=None):
             "countries": countries
         })
         start_dt = dt_delta(start_dt, 1)
+    bar.close()
     
     res = requests_get(url_world, headers=headers)
     response_data = json.loads(res.text)["data"]["FAutoGlobalStatis"]
