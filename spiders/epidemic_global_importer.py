@@ -8,9 +8,10 @@ from retrying import retry
 from tqdm import tqdm
 
 from meta_config import SPIDER_DATA_DIRNAME
+from spiders.epidemic_China_total_importer import epidemic_China_total_import
 from utils.country_dict import country_dict, re_country_vaacinations_dict
 from utils.download import download_from_url
-from spiders.epidemic_China_total_importer import epidemic_China_total_import
+
 
 def dt_change_ymd(date):
     # 月-日-年 -> 年-月-日
@@ -64,7 +65,7 @@ def epidemic_global_import(start_dt=None):
         os.remove(vacc_file)
     download_from_url('https://github.com.cnpmjs.org/owid/covid-19-data/raw/master/public/data/vaccinations/vaccinations.csv', vacc_file)
     data_vaccinations = pandas.read_csv(vacc_file).fillna(0)
-
+    
     requests.packages.urllib3.disable_warnings()
     if start_dt is None:
         start_dt = begin
@@ -151,7 +152,7 @@ def epidemic_global_import(start_dt=None):
                             "vaccinated": total_vaccinated
                         }}
                 tmp.append({"date": date, "country_info": country_info})
-
+    
     # 遍历每个时间直到当前
     days = (datetime.datetime.now().date() - datetime.datetime.strptime(start_dt, '%Y-%m-%d').date()).days + 1
     bar = tqdm(
@@ -172,8 +173,7 @@ def epidemic_global_import(start_dt=None):
         start_dt = dt_delta(start_dt, 1)
     bar.close()
 
-    res = requests_get(url_world, headers=headers)
-    response_data = json.loads(res.text)["data"]["FAutoGlobalStatis"]
+    response_data = requests_get(url_world, headers=headers)["FAutoGlobalStatis"]
     # "nowConfirm":27722322,"confirm":186625242,"heal":154877929,"dead":4024991,"nowConfirmAdd":67126,
     # "confirmAdd":265520,"healAdd":194268,"deadAdd":4126,"lastUpdateTime":"2021-07-10 10:22:42"}}}
     today = {
@@ -190,7 +190,7 @@ def epidemic_global_import(start_dt=None):
         }
     }
     dataout.append(today)
-
+    
     with open(os.path.join(SPIDER_DATA_DIRNAME, 'global.json'), 'w', encoding='utf-8') as f:
         json.dump(dataout, f, ensure_ascii=False, indent=2)
 
