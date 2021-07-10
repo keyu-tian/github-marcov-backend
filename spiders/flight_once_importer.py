@@ -25,7 +25,7 @@ def flight_once_import():
         City.objects.get_or_create(
             name_ch=city, defaults=dict(
                 name_en='', jingdu=jingdu, weidu=weidu,
-                country=Country.objects.filter(name_ch=city_to_country.get(city, '中国'))
+                country=Country.objects.get(name_ch=city_to_country.get(city, '中国'))
             )
         )
     for c in code_to_city.keys():
