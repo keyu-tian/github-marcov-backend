@@ -32,6 +32,6 @@ def flight_once_import():
                 country=Country.objects.get(name_ch=city_to_country.get(city, '中国'))
             )
         )
-    for c in code_to_city.keys():
+    for c in set(code_to_city.keys()):
         city = City.objects.get(name_ch=code_to_city[c])
         Airport.objects.create(name=code_to_airport[c], airport_code=c, city=city)
