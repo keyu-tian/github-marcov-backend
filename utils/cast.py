@@ -56,6 +56,20 @@ def address_to_jingwei(address) -> (float, float):
 
 
 def gd_address_to_jingwei_and_province_city(address):
+    for x in [
+        address + '',
+        address + '站',
+        address + '市',
+        address + '县',
+        address + '区',
+    ]:
+        ret = __gd_address_to_jingwei_and_province_city(x)
+        if ret is not None:
+            return ret
+    return None
+    
+
+def __gd_address_to_jingwei_and_province_city(address):
     '''
     return: res = {
         "jingdu": ,
