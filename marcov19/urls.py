@@ -51,9 +51,9 @@ urlpatterns = [
     path('travel/risk_area', RiskAreaList.as_view(), name='risk_area'),
     path('travel/search', TravelSearch.as_view()),
     path('travel/train_info', TravelTrain.as_view()),
-    path('travel/plane', TravelPlane.as_view()),
-    # path('travel/city', ?.as_view()), # todo
-    path('travel/country', CountryFlightInfo.as_view()),
+    path('travel/plane_info', TravelPlane.as_view()),
+    path('travel/city', TravelCity.as_view()),
+    # path('travel/country', CountryFlightInfo.as_view()),
     path('travel/policy', TravelPolicy.as_view()),
 
     # ======== 五、新闻 ========
