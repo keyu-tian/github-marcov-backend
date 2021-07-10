@@ -8,12 +8,21 @@ from country.models import Country, City
 from meta_config import IMPORTER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
 from train.models import Train, Station, MidStation
 from utils.cast import address_to_jingwei, jingwei_to_address
+day_ch = ['第未知天', '第一天', '第二天', '第三天', '第四天', '第五天', '第六天', '第七天', '第八天', '第九天', '第十天', '终到站']
+
+
+def cmp(a):
+    a_content = a.get('content')
+    if a_content[3] == '起点站':
+        return '0'
+    a_index = day_ch.index(a_content[2])
+    return str(a_index) + a_content[3]
 
 
 def train_import(line_start=0):
     MidStation.objects.all().delete()
     
-    with open(os.path.join(IMPORTER_DATA_DIRNAME, 'train_spider_all', '火车班次json数据.json'), 'r', encoding='utf-8') as file:
+    with open(os.path.join(IMPORTER_DATA_DIRNAME, 'train_spider', '火车班次json数据.json'), 'r', encoding='utf-8') as file:
         bar = tqdm(list(enumerate(file.readlines())), dynamic_ncols=True)
     objs = []
     for line, result in bar:
@@ -69,6 +78,7 @@ def train_import(line_start=0):
                 train.interval = result.get('extInfo').get('allTime')
                 train.kilometer = result.get('extInfo').get('allMileage')
                 mid_list = result.get('trainScheduleBody')
+                mid_list.sort(key=cmp)
                 for c in mid_list:
                     content = c.get('content')
                     sta, flag = Station.objects.get_or_create(name_cn=content[1])

@@ -34,4 +34,4 @@ class MidStation(models.Model):
     train = models.ForeignKey(Train, related_name='mid_station', on_delete=models.CASCADE)
 
     class Meta:
-        ordering = ('-index',)
+        ordering = ('index',)
