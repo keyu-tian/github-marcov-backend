@@ -7,11 +7,11 @@ from utils.cast import address_to_jingwei
 
 
 def city_and_airport_import():
-    with open(f'{IMPORTER_DATA_DIRNAME}/code_to_city.json', 'r+', encoding='utf-8') as f:
+    with open(f'spiders/flight_code_to_city.json', 'r+', encoding='utf-8') as f:
         context = json.loads(f.read())
         code_to_city = context[0]
         city_to_country = context[1]
-    with open(f'{IMPORTER_DATA_DIRNAME}/code_to_airport.json', 'r+', encoding='utf-8') as f:
+    with open(f'spiders/flight_code_to_airport.json', 'r+', encoding='utf-8') as f:
         code_to_airport = json.loads(f.read())
     for country in list(set(city_to_country.values())):
         Country.objects.get_or_create(name_ch=country)
