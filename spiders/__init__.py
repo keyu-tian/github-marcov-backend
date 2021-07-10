@@ -11,7 +11,7 @@ def re_import(name, launch_spider, *args, **kwargs):
     exec(f'main(*args, **kwargs)')
 
 
-def misc_delete_and_import(re_import_train=False):
+def init_import(re_import_train=False):
     colorama.init(autoreset=True)
 
     re_import('risk', True)
@@ -25,6 +25,6 @@ def misc_delete_and_import(re_import_train=False):
     print(colorama.Fore.GREEN + '=> finished.')
     
 
-def epidemic_import():
+def daily_import():
     # todo
     ...
