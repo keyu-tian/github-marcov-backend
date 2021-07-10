@@ -12,10 +12,11 @@ def dxy_news_import(delete_old_data):
     
     target_keys = ['pubDate', 'title', 'summary', 'infoSource', 'sourceUrl']
     context: pandas.DataFrame = pandas.read_csv(f'{IMPORTER_DATA_DIRNAME}/DXYNews-3.csv').loc[:, target_keys]
-    bar = tqdm([row for _, row in context.iterrows()], dynamic_ncols=True)
+    bar = tqdm(list(context.iterrows()), dynamic_ncols=True)
     
     objs = []
-    for row in bar:
+    for line, row in bar:
+        bar.set_description(f'[line{line}]')
         bar.set_postfix_str(f'from {row["infoSource"]}')
         kw = {
             'title': row['title'],
@@ -28,4 +29,5 @@ def dxy_news_import(delete_old_data):
         except:
             pass
         objs.append(News(**kw))
+    bar.close()
     News.objects.bulk_create(objs, batch_size=BULK_CREATE_BATCH_SIZE)

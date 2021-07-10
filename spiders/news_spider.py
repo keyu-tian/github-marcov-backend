@@ -1,6 +1,7 @@
 import urllib.request
 import json
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 from meta_config import SPIDER_DATA_DIRNAME
 
@@ -24,7 +25,9 @@ def main():
     分类: 社会（国际社会、港澳台时政） 时政（国际时政） 健康（心理、学术健康） 教育（幼儿园教育）
     '''
     
-    for news in news_list:
+    bar = tqdm(list(enumerate(news_list)), dynamic_ncols=True)
+    for line, news in bar:
+        bar.set_description(f'[line{line}]')
         result = {'title': news['title'],
                   'img': news['img'],
                   'url': news['url'],
@@ -49,8 +52,9 @@ def main():
         if len(result['context']) == 0:
             continue
         results.append(result)
+    bar.close()
     
-    with open(f'{SPIDER_DATA_DIRNAME}/news_data.json', 'w+', encoding='utf-8') as f:
+    with open(f'{SPIDER_DATA_DIRNAME}/news_data.json', 'w', encoding='utf-8') as f:
         f.write(json.dumps(results, ensure_ascii=False))
     return results
 

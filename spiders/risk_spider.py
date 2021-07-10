@@ -43,7 +43,7 @@ def risk_area_spider():
     text = get_content(url)
     generate_result(text, result)
     
-    with open(f'{SPIDER_DATA_DIRNAME}/risk_areas.json', 'w+', encoding='utf-8') as f:
+    with open(f'{SPIDER_DATA_DIRNAME}/risk_areas.json', 'w', encoding='utf-8') as f:
         f.write(json.dumps(result, ensure_ascii=False))
 
 

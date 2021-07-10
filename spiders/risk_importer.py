@@ -11,7 +11,7 @@ from utils.cast import address_to_jingwei
 def risk_import():
     RiskArea.objects.all().delete()
     
-    with open(f'{IMPORTER_DATA_DIRNAME}/risk_areas.json', 'r+', encoding='utf-8') as f:
+    with open(f'{IMPORTER_DATA_DIRNAME}/risk_areas.json', 'r', encoding='utf-8') as f:
         data = json.loads(f.read())
     
     for level_num, level_str in ((1, '中'), (2, '高')):
@@ -26,3 +26,4 @@ def risk_import():
             bar.set_postfix(地址=area, 经度=jingdu, 纬度=weidu)
             kwargs = {'province': province, 'city': city, 'address': address, 'level': level_num, 'jingdu': jingdu, 'weidu': weidu}
             RiskArea.objects.create(**kwargs)
+        bar.close()

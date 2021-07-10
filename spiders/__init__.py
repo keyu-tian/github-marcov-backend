@@ -1,31 +1,26 @@
 import colorama
 
 
-def misc_import():
-    # todo：有一些import函数，应该在调用它前，调用对应spider的函数
-    # todo：import函数的开头要删库，spider函数的开头要删爬取到的数据文件
-    
-    colorama.init(autoreset=True)
-    from spiders.risk_importer import risk_import
-    from spiders.news_importer import news_import
-    from spiders.dxy_news_importer import dxy_news_import
-    from spiders.yaoyan_importer import yaoyan_import
-    from spiders.train_importer import train_import
-    from spiders.travel_policy_importer import travel_policy_import
+def re_import(name, launch_spider, *args, **kwargs):
+    if launch_spider:
+        print(colorama.Fore.CYAN + f'[{name}_spider]:')
+        exec(f'from spiders.{name}_spider import main')
+        exec(f'main()')
+    print(colorama.Fore.CYAN + f'[{name}_importer]:')
+    exec(f'from spiders.{name}_importer import {name}_import as main')
+    exec(f'main(*args, **kwargs)')
 
-    print(colorama.Fore.CYAN + '[risk_import]:')
-    risk_import()
-    print(colorama.Fore.CYAN + '[news_import]:')
-    news_import(delete_old_data=True)
-    print(colorama.Fore.CYAN + '[dxy_news_import]:')
-    dxy_news_import(delete_old_data=False)
-    print(colorama.Fore.CYAN + '[yaoyan_import]:')
-    yaoyan_import(line_start=0)
-    print(colorama.Fore.CYAN + '[travel_policy_import]:')
-    travel_policy_import(line_start=0)
-    print(colorama.Fore.CYAN + '[train_import]:')
-    train_import(line_start=0)
-    
+
+def misc_delete_and_import():
+    colorama.init(autoreset=True)
+
+    re_import('risk', True)
+    re_import('news', True, delete_old_data=True)
+    re_import('dxy_news', False, delete_old_data=False) # 不launch是因为dxy_news没有爬虫，只有导入者
+    re_import('yaoyan', True, line_start=0)
+    re_import('travel_policy', True, line_start=0)
+    re_import('train', False, line_start=0)
+
     print(colorama.Fore.GREEN + '=> finished.')
     
 
