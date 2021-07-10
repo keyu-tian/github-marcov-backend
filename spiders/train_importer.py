@@ -22,7 +22,7 @@ def cmp(a):
 def train_import(line_start=0):
     MidStation.objects.all().delete()
     
-    with open(os.path.join(IMPORTER_DATA_DIRNAME, 'train_spider', '火车班次json数据.json'), 'r', encoding='utf-8') as file:
+    with open(os.path.join(IMPORTER_DATA_DIRNAME, 'train_spider_all', '火车班次json数据.json'), 'r', encoding='utf-8') as file:
         bar = tqdm(list(enumerate(file.readlines())), dynamic_ncols=True)
     objs = []
     for line, result in bar:
