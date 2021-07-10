@@ -48,28 +48,16 @@ def get_train_info_res(train):
     res = {'stations': []}
     total_risk_level = 0
     count = train.schedule_station.count() + 2
-    res['stations'].append({
-        'station_name': train.dept_station,
-        'city_name': train.dept_city,
-        'risk_level': get_city_risk_level(train.dept_city),
-        'pos': [train.dept_station.jingdu, train.dept_station.weidu],
-    })
     total_risk_level += float(get_city_risk_level(train.dept_city)) / count
-    for a in train.schedule_station.all():
-        risk_level = get_city_risk_level(a.city.name_ch)
+    for a in MidStation.objects.filter(train=train):
+        risk_level = get_city_risk_level(a.station.city.name_ch)
         res['stations'].append({
-            'station_name': a.name_cn,
-            'city_name': a.city.name_ch,
+            'station_name': a.station.name_cn,
+            'city_name': a.station.city.name_ch,
             'risk_level': risk_level,
-            'pos': [a.jingdu, a.weidu],
+            'pos': [a.station.jingdu, a.station.weidu],
         })
         total_risk_level += float(risk_level) / count
-    res['stations'].append({
-        'station_name': train.arri_station,
-        'city_name': train.arri_city,
-        'risk_level': get_city_risk_level(train.arri_city),
-        'pos': [train.arri_station.jingdu, train.arri_station.weidu],
-    })
     total_risk_level += float(get_city_risk_level(train.dept_city)) / count
     res['info'] = {
         'level': math.ceil(total_risk_level) if math.ceil(total_risk_level) <= 5 else 5,
@@ -204,14 +192,14 @@ class TravelTrain(View):
     @JSR('status', 'stations', 'info')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
-        if kwargs.keys() != {'rid', 'op'}:
+        if kwargs.keys() != {'number'}:
             return 1,
         try:
             key = kwargs['number']
         except:
             return -1,
 
-        res = get_train_info_res(query_train_info(key))
+        res = get_train_info_res(query_train_info(key)[0])
         if res:
             return 0, res['stations'], res['info']
         else:
@@ -243,3 +231,20 @@ class TravelSearch(View):
                 for a in flight_query:
                     res['results'].append(get_flight_dept_and_arri_info_res(a))
         return 0, res
+
+
+class TravelPolicy(View):
+    @JSR('status', 'enter_policy', 'out_policy')
+    def post(self, request):
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'city'}:
+            return 1,
+        city_str = kwargs['city']
+        # 获取该地所属区
+        jingdu, weidu = address_to_jingwei(city_str)
+        city_name = jingwei_to_address(jingdu, weidu)['result']['addressComponent']['city']
+        # enter_policy = get_travel_enter_policy_msg(city_name)
+        # out_policy = get_travel_enter_policy_msg(city_name)
+        # if enter_policy == '':
+        #     # 获取省会
+        #     city_name = jingwei_to_address(jingdu, weidu)['result']['addressComponent']['province']

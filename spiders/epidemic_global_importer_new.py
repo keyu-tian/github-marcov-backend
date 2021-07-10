@@ -53,8 +53,6 @@ def epidemic_global_import(start_dt=None):
             res = requests.get(url + "日本本土", headers=headers)
         elif country == "印度尼西亚, 印尼":
             res = requests.get(url + "印度尼西亚", headers=headers)
-        elif country == "几内亚比索":
-            res = requests.get(url + "几内亚比绍", headers=headers)
         elif country == "刚果":
             res = requests.get(url + "刚果（布）", headers=headers)
         elif country == "刚果民主共和国":
@@ -67,6 +65,10 @@ def epidemic_global_import(start_dt=None):
             res = requests.get(url + "波黑", headers=headers)
         elif country == "多米尼加共和国":
             res = requests.get(url + "多米尼加", headers=headers)
+        elif country == "马其顿":
+            res = requests.get(url + "北马其顿", headers=headers)
+        elif country == "列支敦士登":
+            res = requests.get(url + "列支敦士登公国", headers=headers)
         else:
             res = requests.get(url + country, headers=headers)
         response_data = json.loads(res.text)['data']
