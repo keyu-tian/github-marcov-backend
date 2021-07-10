@@ -38,7 +38,7 @@ def cur_time():
 
 def address_to_jingwei(address) -> (float, float):
     # 'showLocation&&showLocation({"status":0,"result":{"location":{"lng":116.38548789747735,"lat":39.871280236128878},"precise":0,"confidence":50,"comprehension":0,"level":"火车站"}})'
-    ak = 'vnRXRCTGp9RMnO6xbuGU497wta2P1FFj'
+    ak = '4PKHdx8ujI2T3R53ZvgC1ZOTWViHK8am'
     url = 'http://api.map.baidu.com/geocoding/v3/?address=' + address + '&output=json&ak=' + ak \
           + '&callback=showLocation'
     try:
