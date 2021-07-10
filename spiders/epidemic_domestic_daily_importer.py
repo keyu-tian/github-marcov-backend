@@ -1,10 +1,11 @@
 import datetime as dt
 import json
 import os
-import re
 import requests
 from utils.dict_ch import city_dict_ch, province_dict_ch
 from meta_config import SPIDER_DATA_DIRNAME
+
+from tqdm import tqdm
 
 city_new_to_old = {
     '东城': '东城区',
@@ -410,10 +411,12 @@ city_new_to_old = {
 
 
 def epidemic_domestic_daily_importer():
-    daily_data = json.load(open(os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', '2021-07-09.json'), 'r', encoding='utf-8'))
-    # r = requests.get('https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5')
 
-    # daily_data = json.loads(r.text.replace('\\', '').replace('"{', '{').replace('}"', '}'))
+    # 获取数据
+    # daily_data = json.load(open(os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', '2021-07-09.json'), 'r', encoding='utf-8'))
+    print('[loading]')
+    r = requests.get('https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5')
+    daily_data = json.loads(r.text.replace('\\', '').replace('"{', '{').replace('}"', '}'))
     today_provinces_data_list = daily_data['data']['areaTree'][0]['children']
     today_provinces_data = {}
     for it in today_provinces_data_list:
@@ -436,9 +439,10 @@ def epidemic_domestic_daily_importer():
 
     today_date = dt.datetime.strptime(daily_data['data']['lastUpdateTime'].split(' ')[0], '%Y-%m-%d')
     time_delta = dt.timedelta(days=1)
-    today_str = dt.datetime.strftime(today_date - time_delta, '%Y-%m-%d')
-    yesterday_str = dt.datetime.strftime(today_date - time_delta - time_delta, '%Y-%m-%d')
+    today_str = dt.datetime.strftime(today_date, '%Y-%m-%d')
+    yesterday_str = dt.datetime.strftime(today_date - time_delta, '%Y-%m-%d')
 
+    # 更新省数据
     # for province in province_dict_ch.keys():
     yesterday_provinces_data_list = []
     for it in provinces:
@@ -448,7 +452,15 @@ def epidemic_domestic_daily_importer():
     for it in yesterday_provinces_data_list:
         yesterday_provinces_data[it['name']] = it
     today_data = []
+
+    bar = tqdm(
+        total=len(province_dict_ch), initial=0, dynamic_ncols=True,
+    )
+
     for province in province_dict_ch.keys():
+        bar.set_description('[updating province]')
+        bar.update(1)
+        bar.set_postfix_str(province)
         if province in yesterday_provinces_data.keys():
             cal_add = today_provinces_data[province]['total']['confirm'] - yesterday_provinces_data[province]['total'][
                 'confirmed']
@@ -485,16 +497,23 @@ def epidemic_domestic_daily_importer():
                     'confirmed': yesterday_provinces_data[province]['total']['confirmed'],
                 }
             })
-    # TODO: 更新到文件中
     provinces.append({
         'date': today_str,
         'provinces': today_data
     })
     json.dump(provinces, open(provinces_json, 'w'), ensure_ascii=False)
-    # print(today_data)
 
+    # 更新城市数据
     province_data_directory = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'provinces')
+
+    bar = tqdm(
+        total=len(province_dict_ch), initial=0, dynamic_ncols=True,
+    )
+
     for province in province_dict_ch.keys():
+        bar.set_description('[updating cities]')
+        bar.update(1)
+        bar.set_postfix_str(province)
         province_data = json.load(
             open(os.path.join(province_data_directory, '%s.json' % province_dict_ch[province]), 'r', encoding='utf-8'))
         yesterday_data_list = province_data[yesterday_str]
@@ -540,14 +559,10 @@ def epidemic_domestic_daily_importer():
                     }
                 })
 
-        # TODO: 更新到文件中
-
         province_data[today_str] = today_data
         json.dump(province_data,
                   open(os.path.join(province_data_directory,
                                     '%s.json' % province_dict_ch[province]), 'w', encoding='utf-8'), ensure_ascii=False)
-        # print(province)
-        # print(today_data)
 
 
 if __name__ == '__main__':
