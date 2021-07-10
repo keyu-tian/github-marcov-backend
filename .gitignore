@@ -21,4 +21,3 @@ logging/
 spiders_data/
 spiders/chromedriver.exe
 flight/chromedriver.exe
-flight/*.json
