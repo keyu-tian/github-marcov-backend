@@ -2,18 +2,21 @@ import json
 import os
 from meta_config import SPIDER_DATA_DIRNAME
 
+
 # date -> str: 2021-07-09
 def epidemic_China_total_import(date):
     China_data = {
-        'new': {
-            'died': 0,
-            'cured': 0,
-            'confirmed': 0,
+        "new": {
+            "died": 0,
+            "cured": 0,
+            "confirmed": 0,
+            "vaccinated": "未知",
         },
         'total': {
             'died': 0,
             'cured': 0,
             'confirmed': 0,
+            "vaccinated": "未知",
         },
     }
     provinces_json = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
@@ -34,4 +37,3 @@ def epidemic_China_total_import(date):
         China_data['new']['confirmed'] += it['new']['confirmed']
 
     return China_data
-
