@@ -3,10 +3,10 @@ import colorama
 
 def re_import(name, launch_spider, *args, **kwargs):
     if launch_spider:
-        print(colorama.Fore.CYAN + f'[{name}_spider]:')
+        print(colorama.Fore.CYAN + f'\n[{name}_spider]:')
         exec(f'from spiders.{name}_spider import main')
         exec(f'main()')
-    print(colorama.Fore.CYAN + f'[{name}_importer]:')
+    print(colorama.Fore.CYAN + f'\n[{name}_importer]:')
     exec(f'from spiders.{name}_importer import {name}_import as main')
     exec(f'main(*args, **kwargs)')
 
