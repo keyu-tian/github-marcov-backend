@@ -44,7 +44,6 @@ def get_flight_info_two_area(src, dst):
 
 
 def get_flight_info():
-    now = datetime.now().strftime("%Y-%m-%d")
     results = []
     total_num = len(code) + len(foreign_code)
     finished = 0
@@ -66,7 +65,7 @@ def get_flight_info():
         finished += 1
         print(f'已完成 {finished}/{total_num}')
 
-    with open(f'{SPIDER_DATA_DIRNAME}/flights_data{now}.json', 'w+', encoding='utf-8') as fp:
+    with open(f'{SPIDER_DATA_DIRNAME}/flights_data.json', 'w+', encoding='utf-8') as fp:
         fp.write(json.dumps(results, ensure_ascii=False))
 
 

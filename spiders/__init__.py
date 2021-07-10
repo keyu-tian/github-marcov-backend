@@ -11,20 +11,33 @@ def re_import(name, launch_spider, *args, **kwargs):
     exec(f'main(*args, **kwargs)')
 
 
-def init_import(re_import_train=False):
+def init_import(re_import_train):
+    from country.models import Country, City, Province
     colorama.init(autoreset=True)
 
+    Country.objects.all().delete()
+    City.objects.all().delete()
+    Province.objects.all().delete()
+    
     re_import('risk', True)
     re_import('news', True, delete_old_data=True)
-    re_import('dxy_news', False, delete_old_data=False) # 不launch是因为dxy_news没有爬虫，只有导入者
+    re_import('dxy_news', False, delete_old_data=False) # 不launch是因为 dxy_news 没有 spider，只有 importer
     re_import('yaoyan', True, line_start=0)
     re_import('travel_policy', True, line_start=0)
     if re_import_train:
-        re_import('train', False, line_start=0)
+        re_import('train', False, line_start=0)         # 不launch是因为 train 的 spider 太慢（超过6h）
+    re_import('epidemic_domestic', False)               # 不launch是因为 epidemic_domestic 没有 spider，只有 importer
+    re_import('epidemic_global', False)                 # 不launch是因为 epidemic_global 没有 spider，只有 importer
+    re_import('flight_once', False)                     # 不launch是因为 flight_once 的 spider 太慢（超过2h），而且需要 chromedrive.exe
 
-    print(colorama.Fore.GREEN + '=> finished.')
+    print('')
+    print(colorama.Fore.WHITE + '=> finished.')
     
 
 def daily_import():
-    # todo
-    ...
+    re_import('flight_daily', False)
+    # todo:
+    # re_import('epidemic_domestic_daily', False)
+
+    print('')
+    print(colorama.Fore.WHITE + '=> finished.')
