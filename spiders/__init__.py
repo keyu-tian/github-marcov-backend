@@ -63,7 +63,7 @@ def re_import(name, launch_spider, *args, **kwargs):
     exec(f'main(*args, **kwargs)')
 
 
-def init_import(re_import_train):
+def init_import():
     colorama.init(autoreset=True)
     
     print('')
@@ -76,8 +76,7 @@ def init_import(re_import_train):
     re_import('dxy_news', False, delete_old_data=False) # 不launch是因为 dxy_news 没有 spider，只有 importer
     re_import('yaoyan', True, line_start=0)
     re_import('travel_policy', True, line_start=0)
-    if re_import_train:
-        re_import('train', False, line_start=0)         # 不launch是因为 train 的 spider 太慢（超过6h）
+    re_import('train', False, line_start=0)         # 不launch是因为 train 的 spider 太慢（超过6h）
     from spiders.station_exporter import station_export
     station_export()                            # 输出一个文件，给前端
     re_import('epidemic_domestic', False)               # 不launch是因为 epidemic_domestic 没有 spider，只有 importer
