@@ -11,7 +11,7 @@ def re_import(name, launch_spider, *args, **kwargs):
     exec(f'main(*args, **kwargs)')
 
 
-def misc_delete_and_import():
+def misc_delete_and_import(re_import_train):
     colorama.init(autoreset=True)
 
     re_import('risk', True)
@@ -19,7 +19,8 @@ def misc_delete_and_import():
     re_import('dxy_news', False, delete_old_data=False) # 不launch是因为dxy_news没有爬虫，只有导入者
     re_import('yaoyan', True, line_start=0)
     re_import('travel_policy', True, line_start=0)
-    re_import('train', False, line_start=0)
+    if re_import_train:
+        re_import('train', False, line_start=0)
 
     print(colorama.Fore.GREEN + '=> finished.')
     
