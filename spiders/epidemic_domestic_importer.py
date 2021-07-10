@@ -8,13 +8,14 @@ from datetime import datetime
 
 from meta_config import IMPORTER_DATA_DIRNAME
 from utils.dict_ch import province_dict_ch, province_population, city_dict_ch
+from utils.download import download_from_url
 
 delta = dt.timedelta(days=1)
 
 
 # from spiders.epidemic_domestic_importer import epidemic_domestic_import
 def epidemic_domestic_import(date_begin='2020-01-22',
-                             date_end=datetime.strftime(dt.date(2021, 7, 8) - delta, '%Y-%m-%d')):
+                             date_end=datetime.strftime(datetime.today() - delta, '%Y-%m-%d')):
     # 正式版本参数中应为datetime.today()
 
     date_begin = date_begin.split('-')
@@ -23,20 +24,18 @@ def epidemic_domestic_import(date_begin='2020-01-22',
     end = dt.date(int(date_end[0]), int(date_end[1]), int(date_end[2]))
 
     input_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')
-    csv_download_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')
     area_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'area.json')
     province_json_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
     city_json_file_directory = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'provinces')
 
     print('loading...')
     # TODO: 获取当天数据
-    '''
     try:
-        os.system('wget https://github.com/BlankerL/DXY-COVID-19-Data/releases/download/%s/DXYArea.csv --no-check-certificate -o ' % (dt.datetime.strftime(dt.date.today(), '%Y.%m.%d')) + csv_download_path)
+        os.remove(input_file)
     except:
-        print('更新数据失败')
-        return
-    '''
+        pass
+    url = 'https://github.com.cnpmjs.org/BlankerL/DXY-COVID-19-Data/releases/download/%s/DXYArea.csv' % datetime.strftime(datetime.today(), '%Y-%m-%d')
+    download_from_url(url, input_file)
 
     f = open(input_file, "r", encoding='utf-8')
     title = f.readline()[:-1].split(',')
@@ -214,3 +213,8 @@ def epidemic_domestic_import(date_begin='2020-01-22',
         print('Building %s.json' % province)
         json.dump(provinces[province], open(os.path.join(city_json_file_directory, '%s.json' % province), 'w'),
                   ensure_ascii=False)
+
+
+if __name__ == '__main__':
+    epidemic_domestic_import()
+
