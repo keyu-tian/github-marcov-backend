@@ -38,14 +38,22 @@ def cur_time():
 
 def address_to_jingwei(address) -> (float, float):
     # 'showLocation&&showLocation({"status":0,"result":{"location":{"lng":116.38548789747735,"lat":39.871280236128878},"precise":0,"confidence":50,"comprehension":0,"level":"火车站"}})'
-    ak = '4PKHdx8ujI2T3R53ZvgC1ZOTWViHK8am'
+    # ak = '4PKHdx8ujI2T3R53ZvgC1ZOTWViHK8am'   # ？的
+    # ak = '0wem7DQG7HjCVpzKk5y8y3kGnhPmMFRk'   # tky的
+    # ak = 'vnRXRCTGp9RMnO6xbuGU497wta2P1FFj'   # wlt的
+    ak = '11Z8uiP8kIz6AG0Vjiwzbc5f9Ii0cdHd'     # 网上找的
     url = 'http://api.map.baidu.com/geocoding/v3/?address=' + address + '&output=json&ak=' + ak \
           + '&callback=showLocation'
     try:
         res = requests.get(url=url)
     except:
         return None, None
-    js = json.loads(re.findall(r'showLocation&&showLocation\((.+)\)', res.text)[0])
+    js_list = re.findall(r'showLocation&&showLocation\((.+)\)', res.text)
+    if len(js_list):
+        js = json.loads(js_list[0])
+    else:
+        print(res.text)
+        return 0, 0
     if int(js['status']) == 0:
         jingdu = float(js['result']['location']['lng'])
         weidu = float(js['result']['location']['lat'])
@@ -53,6 +61,42 @@ def address_to_jingwei(address) -> (float, float):
         print(js['msg'], '地址：' + address)
         return 0, 0
     return jingdu, weidu
+
+
+def gd_address_to_jingwei_and_province_city(address):
+    '''
+    return: res = {
+        "jingdu": ,
+        "weidu": ,
+        "country": ,
+        "province": ,
+        "city": ,
+        "district": ,
+        "citycode": ,
+    }
+    '''
+    # 推荐用高德！！比百度准好多！！查city还不用二次调用
+    ak = '7275224ca913b751868e4076eb8212d5'
+    url = 'https://restapi.amap.com/v3/geocode/geo?key=' + ak + '&address=' + address
+    try:
+        res = requests.get(url=url)
+    except:
+        return None
+    js = json.loads(res.text)
+    if 'geocodes' not in js.keys():
+        print(json.dumps(js) + f"address:{address}")
+        return None
+    if len(js['geocodes']) == 0:
+        return None
+    return {
+        "jingdu": js['geocodes'][0]['location'].split(',')[0],
+        "weidu": js['geocodes'][0]['location'].split(',')[1],
+        "country": js['geocodes'][0]['country'],
+        "province": js['geocodes'][0]['province'],
+        "city": js['geocodes'][0]['city'],
+        "district": js['geocodes'][0]['district'],
+        "citycode": js['geocodes'][0]['citycode'] if 'citycode' in js['geocodes'][0].keys() else '',
+    }
 
 
 def jingwei_to_address(jingdu, weidu):
@@ -96,7 +140,10 @@ def jingwei_to_address(jingdu, weidu):
   }
 }
     '''
-    ak = "vnRXRCTGp9RMnO6xbuGU497wta2P1FFj"
+    # ak = '4PKHdx8ujI2T3R53ZvgC1ZOTWViHK8am'   # ？的
+    # ak = '0wem7DQG7HjCVpzKk5y8y3kGnhPmMFRk'   # tky的
+    # ak = 'vnRXRCTGp9RMnO6xbuGU497wta2P1FFj'   # wlt的
+    ak = '11Z8uiP8kIz6AG0Vjiwzbc5f9Ii0cdHd'     # 网上找的
     url = "http://api.map.baidu.com/reverse_geocoding/v3/?ak=" + ak \
         +'&output=json&coordtype=wgs84ll&language=zh-CN&location=' + str(weidu) + ',' + str(jingdu)
     try:

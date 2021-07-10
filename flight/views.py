@@ -1,3 +1,5 @@
+import re
+
 from django.views import View
 from utils.meta_wrapper import JSR
 import json
@@ -46,14 +48,13 @@ def get_flight_info_by_code(code, date=datetime.now().strftime('%Y-%m-%d')):
             city_num = len(state.find_all('div'))
             # print(city_num)
             condition = state.text.strip()[:2]
-            city = soup.find(attrs={'title': code + ' 航班详情'})
-            city = [x.strip() for x in city.text.split(' --- ')]
-            dept_city = city[0]
-            arri_city = city[1]
+            city = soup.find_all('h2')
+            dept_airport = re.split('[()]', city[0].text)[1].strip()
+            arri_airport = re.split('[()]', city[-1].text)[1].strip()
             t = soup.find_all(attrs={'class': 'time'})
             dept_time = get_num_by_image(t[city_num].find('img').get('src'))
             arri_time = get_num_by_image(t[-1].find('img').get('src'))
-            return code, condition, dept_city, arri_city, date + ' ' + dept_time + ':00', date + ' ' + arri_time + ':00'
+            return code, condition, dept_airport, arri_airport, date + ' ' + dept_time + ':00', date + ' ' + arri_time + ':00'
         fail_num += 1
 
 
@@ -246,17 +247,17 @@ class TravelPlane(View):
             return 1, [], {}, []
         with open('flight/airport_to_jingwei.json', 'r+', encoding='utf-8') as f:
             airport_to_jingwei = json.loads(f.read())
-        code, condition, dept_city, arri_city, dept_time, arri_time = get_flight_info_by_code(kwargs['number'])
+        code, condition, dept_airport, arri_airport, dept_time, arri_time = get_flight_info_by_code(kwargs['number'])
         if code == '':
             return 1, [], {}, []
         stations = []
+        print(dept_airport, arri_airport)
         try:
-            arri_airport = Airport.objects.get(city__name_ch=dept_city)
-            dept_airport = Airport.objects.get(city__name_ch=arri_city)
-        except IndexError:
+            dept_airport = Airport.objects.get(airport_code=dept_airport)
+            arri_airport = Airport.objects.get(airport_code=arri_airport)
+        except:
             print('你的城市表不全啊 giegie')
             return 1, [], {}, []
-        print(code, condition, dept_city, arri_city, dept_time, arri_time)
         start_station = {
             'station_name': dept_airport.name,
             'city_name': dept_airport.city.name_ch,
@@ -311,9 +312,9 @@ class TravelCity(View):
     @JSR('status', 'flights')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
-        if kwargs.keys() != {'dept_city', 'arri_city'}:
+        if kwargs.keys() != {'dept_airport', 'arri_airport'}:
             return 1, []
-        flights = Flight.objects.filter(dept_airport__city__name_ch=kwargs['dept_city'], arri_airport__city__name_ch=kwargs['arri_city'])
+        flights = Flight.objects.filter(dept_airport__name=kwargs['dept_airport'], arri_airport__name=kwargs['arri_airport'])
         with open('flight/airport_to_jingwei.json', 'r+', encoding='utf-8') as f:
             airport_to_jingwei = json.loads(f.read())
         # print(flights)

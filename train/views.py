@@ -225,11 +225,18 @@ class TravelSearch(View):
         except:
             return -1,
 
+        if len(key) < 3 and key not in {
+            'G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'G8',
+            'Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7', 'Z8', 'Z9',
+            'T1', 'T2', 'T9',
+            'K3', 'K5', 'K6'
+        }:
+            return 3,
+        
         res = {'results': []}
         key_list = key.split(' ')
         for key in key_list:
             train_query = query_train_info(key)
-            print(train_query)
             if train_query and not (len(train_query) == 1 and train_query[0] is None):
                 for a in train_query:
                     res['results'].append(get_train_dept_and_arri_info_res(a))
