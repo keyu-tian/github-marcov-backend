@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from datetime import datetime
 from django.db.models import Q
-from country.models import Country, City, Policy
+from country.models import City, Policy
 
 
 def get_num_by_image(url):

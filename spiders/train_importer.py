@@ -43,6 +43,7 @@ def train_import(line_start=0):
         except:
             result = None
         if result:
+            # todo wlt：删除这里；因为国家是一次性导入的，在这里不要再用get_or_create
             country, flag = Country.objects.get_or_create(name_ch='中国', defaults={'name_en': 'Chinese'})
             name = list(result.get('trainInfo').keys())[0]
             dept_city_name = result.get('trainInfo').get(name).get('deptCity')
@@ -56,6 +57,7 @@ def train_import(line_start=0):
             
             bar.set_postfix_str(f'{dept_city_name} => {arri_city_name}')
             
+            # todo wlt：删除这里；因为城市是一次性导入的，在这里不要再用get_or_create
             dept_city, flag = City.objects.get_or_create(name_ch=dept_city_name)
             if flag:  # 数据库没有的新的city，存名字
                 dept_city.country = country
@@ -66,6 +68,7 @@ def train_import(line_start=0):
                 else:
                     dept_city.jingdu, dept_city.weidu = res['jingdu'], res['weidu']
                     province_name = res['province']
+                # todo wlt：删除这里；因为省是一次性导入的，在这里不要再用get_or_create
                 dept_province, flag = Province.objects.get_or_create(name_ch=province_name)
                 if flag:
                     dept_province.country = country
@@ -81,7 +84,8 @@ def train_import(line_start=0):
                     dept_sta.jingdu, dept_sta.weidu = res['jingdu'], res['weidu']
                 dept_sta.city = dept_city
                 dept_sta.save()
-            
+
+            # todo wlt：删除这里；因为城市是一次性导入的，在这里不要再用get_or_create
             arri_city, flag = City.objects.get_or_create(name_ch=arri_city_name)
             if flag:  # 数据库没有的新的国家，存名字
                 arri_city.country = country
@@ -92,6 +96,7 @@ def train_import(line_start=0):
                 else:
                     arri_city.jingdu, arri_city.weidu = res['jingdu'], res['weidu']
                     province_name = res['province']
+                # todo wlt：删除这里；因为省是一次性导入的，在这里不要再用get_or_create
                 arri_province, flag = Province.objects.get_or_create(name_ch=province_name)
                 if flag:
                     arri_province.country = country
@@ -130,6 +135,8 @@ def train_import(line_start=0):
                             if res is None:
                                 continue
                         sta.jingdu, sta.weidu, city_name = res['jingdu'], res['weidu'], res['city']
+
+                        # todo wlt：删除这里；因为城市是一次性导入的，在这里不要再用get_or_create
                         mid_city, flag = City.objects.get_or_create(name_ch=city_name)
                         if flag:  # 数据库没有的新的国家，存名字
                             mid_city.country = country
@@ -140,6 +147,7 @@ def train_import(line_start=0):
                             else:
                                 mid_city.jingdu, mid_city.weidu = res['jingdu'], res['weidu']
                                 province_name = res['province']
+                            # todo wlt：删除这里；因为省是一次性导入的，在这里不要再用get_or_create
                             mid_province, flag = Province.objects.get_or_create(name_ch=province_name)
                             if flag:
                                 mid_province.country = country

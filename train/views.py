@@ -100,6 +100,7 @@ def query_train_info(train_number):
         return train
     else:
         result = search_train_by_number(train_number)
+        # todo wlt：删除这里；因为国家是一次性导入的，在这里不要再用get_or_create
         country, flag = Country.objects.get_or_create(name_ch='中国', defaults={'name_en': 'Chinese'})
         if result and not Train.objects.filter(name=train_number).exists():
             dept_city_name = result.get('trainInfo').get(train_number).get('deptCity')
@@ -110,6 +111,7 @@ def query_train_info(train_number):
             arri_sta_name = result.get('trainInfo').get(train_number).get('arriStation')
             arri_time = result.get('trainInfo').get(train_number).get('arriTime')
             arri_date = result.get('trainInfo').get(train_number).get('arrDate')
+            # todo wlt：删除这里；因为城市是一次性导入的，在这里不要再用get_or_create
             dept_city, flag = City.objects.get_or_create(name_ch=dept_city_name)
             if flag:
                 dept_city.country = country
@@ -119,6 +121,7 @@ def query_train_info(train_number):
                 dept_sta.jingdu, dept_sta.weidu = address_to_jingwei(dept_sta_name + '站')
                 dept_sta.city = dept_city
                 dept_sta.save()
+            # todo wlt：删除这里；因为城市是一次性导入的，在这里不要再用get_or_create
             arri_city, flag = City.objects.get_or_create(name_ch=arri_city_name)
             if flag:
                 arri_city.country = country
