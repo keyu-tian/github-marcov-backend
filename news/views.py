@@ -32,6 +32,7 @@ class WeeklyNews(View):
         else:
             try:
                 someday_date = datetime.strptime(kwargs['date'].split('T')[0], '%Y-%m-%d').date()
+                print(someday_date)
                 WeeklyNews.res_append(News.objects.filter(publish_time=someday_date), res_china, res_global)
             except:
                 return 2, '', [], []
