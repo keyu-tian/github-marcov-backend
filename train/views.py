@@ -229,7 +229,6 @@ class TravelSearch(View):
         key_list = key.split(' ')
         for key in key_list:
             train_query = query_train_info(key)
-            print(train_query)
             if train_query and not (len(train_query) == 1 and train_query[0] is None):
                 for a in train_query:
                     res['results'].append(get_train_dept_and_arri_info_res(a))
