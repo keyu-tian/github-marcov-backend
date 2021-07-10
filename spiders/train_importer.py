@@ -126,16 +126,10 @@ def train_import(line_start=0):
                     if flag:  # 是新建，存经纬度
                         res = gd_address_to_jingwei_and_province_city(content[1] + '站')
                         if res is None:
-                            sta.jingdu, sta.weidu = 0, 0
-                        else:
-                            sta.jingdu, sta.weidu = res['jingdu'], res['weidu']
-                        if sta.jingdu == 0 and sta.weidu == 0:
                             res = gd_address_to_jingwei_and_province_city(content[1])
                             if res is None:
-                                sta.jingdu, sta.weidu = 0, 0
-                            else:
-                                sta.jingdu, sta.weidu = res['jingdu'], res['weidu']
-                        city_name = res['city']
+                                continue
+                        sta.jingdu, sta.weidu, city_name = res['jingdu'], res['weidu'], res['city']
                         mid_city, flag = City.objects.get_or_create(name_ch=city_name)
                         if flag:  # 数据库没有的新的国家，存名字
                             mid_city.country = country
