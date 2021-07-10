@@ -33,6 +33,7 @@ def dt_cmp(d1, d2) -> int:
 
 
 url = 'https://api.inews.qq.com/newsqa/v1/automation/foreign/daily/list?country='
+url_world = "https://api.inews.qq.com/newsqa/v1/automation/modules/list?modules=FAutoGlobalStatis"
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.25 '
                   'Safari/537.36 Core/1.70.3741.400 QQBrowser/10.5.3863.400 '
@@ -108,6 +109,25 @@ def epidemic_global_import(start_dt=None):
             "countries": countries
         })
         start_dt = dt_delta(start_dt, 1)
+
+    res = requests.get(url_world, headers=headers)
+    response_data = json.loads(res.text)["data"]["FAutoGlobalStatis"]
+    # "nowConfirm":27722322,"confirm":186625242,"heal":154877929,"dead":4024991,"nowConfirmAdd":67126,
+    # "confirmAdd":265520,"healAdd":194268,"deadAdd":4126,"lastUpdateTime":"2021-07-10 10:22:42"}}}
+    today = {
+        "update": response_data["lastUpdateTime"],
+        'new': {
+            "died": response_data["deadAdd"],
+            "cured": response_data["healAdd"],
+            "confirmed": response_data["confirmAdd"],
+        },
+        'total': {
+            "died": response_data["dead"],
+            "cured": response_data["heal"],
+            "confirmed": response_data["confirm"],
+        }
+    }
+    dataout.append(today)
 
     with open(os.path.join(IMPORTER_DATA_DIRNAME, 'global.json'), 'w', encoding='utf-8') as f:
         json.dump(dataout, f, ensure_ascii=False, indent=4)
