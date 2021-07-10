@@ -6,7 +6,7 @@ from flight.models import Flight, Airport
 from meta_config import IMPORTER_DATA_DIRNAME
 
 
-def flight_import():
+def flight_daily_import():
     Flight.objects.all().delete()
     with open(f'{IMPORTER_DATA_DIRNAME}/flights_data.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())

@@ -6,7 +6,7 @@ from flight.models import Airport
 from utils.cast import address_to_jingwei
 
 
-def city_and_airport_import():
+def flight_once_import():
     Airport.objects.all().delete()
     with open(f'spiders/flight_code_to_city.json', 'r+', encoding='utf-8') as f:
         context = json.loads(f.read())
