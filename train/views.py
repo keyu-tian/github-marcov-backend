@@ -234,7 +234,6 @@ class TravelSearch(View):
                 for a in train_query:
                     res['results'].append(get_train_dept_and_arri_info_res(a))
             flight_query = query_flight_info(key)
-            print(flight_query)
             if flight_query and not (len(flight_query) == 1 and flight_query[0] is None):
                 for a in flight_query:
                     res['results'].append(get_flight_dept_and_arri_info_res(a))
