@@ -53,7 +53,7 @@ urlpatterns = [
     path('travel/search', TravelSearch.as_view()),
     path('travel/train', TravelTrain.as_view()),
     path('travel/plane_info', TravelPlane.as_view()),
-    # path('travel/city', ?.as_view()), # todo
+    path('travel/city', TravelCity.as_view()),
     path('travel/country', CountryFlightInfo.as_view()),
     path('travel/policy', TravelPolicy.as_view()),
     

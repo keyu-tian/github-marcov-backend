@@ -57,59 +57,98 @@ def get_flight_info_by_code(code, date=datetime.now().strftime('%Y-%m-%d')):
         fail_num += 1
 
 
-def get_flight_info_by_city(name, date):
-    cities = City.objects.filter(name_ch=name)
-    planes = []
-    flights = []
-    if cities.count() == 0:
-        return []
-    for city in cities:
-        flights1 = city.start_flight.all()
-        for flight in flights1:
-            if flight.dept_time[:10] == date or flight.arri_time[:10] == date:
-                flights.append(flight)
-        flights2 = city.end_flight.all()
-        for flight in flights2:
-            if flight.dept_time[:10] == date or flight.arri_time[:10] == date:
-                flights.append(flight)
-    with open('flight/code_to_airport.json', 'r+', encoding='utf-8') as f:
-        code_to_airport = json.loads(f.read())
-    with open('flight/airport_to_jingwei.json', 'r+', encoding='utf-8') as f:
-        airport_to_jingwei = json.loads(f.read())
-    flights = list(set(flights))
-    for flight in flights:
-        start_city = flight.dept_city
-        if start_city is None:
-            start = {
-                'station_name': '未知',
-                'country_name': '未知',
-                'city_name': '未知',
-                'risk_level': '未知',
-                'pos': []
-            }
-        else:
-            start = {'station_name': code_to_airport.get(start_city.code, ''),
-                     'country_name': start_city.country.name_ch,
-                     'city_name': start_city.name_ch,
-                     'risk_level': get_city_risk_level(start_city.name_ch),
-                     'pos': airport_to_jingwei.get(code_to_airport.get(start_city.code, ''), [0, 0])}
-        end_city = flight.arri_city
-        if end_city is None:
-            end = {
-                'station_name': '未知',
-                'country_name': '未知',
-                'city_name': '未知',
-                'risk_level': '未知',
-                'pos': []
-            }
-        else:
-            end = {'station_name': code_to_airport.get(end_city.code, ''),
-                   'country_name': end_city.country.name_ch,
-                   'city_name': end_city.name_ch,
-                   'risk_level': get_city_risk_level(end_city.name_ch),
-                   'pos': airport_to_jingwei.get(code_to_airport.get(end_city.code, ''), [0, 0])}
-        planes.append({'number': flight.code, 'stations': [start, end]})
-    return planes
+# def get_flight_info_by_city(name, date):
+#     cities = City.objects.filter(name_ch=name)
+#     planes = []
+#     flights = []
+#     if cities.count() == 0:
+#         return []
+#     for city in cities:
+#         flights1 = city.start_flight.all()
+#         for flight in flights1:
+#             if flight.dept_time[:10] == date or flight.arri_time[:10] == date:
+#                 flights.append(flight)
+#         flights2 = city.end_flight.all()
+#         for flight in flights2:
+#             if flight.dept_time[:10] == date or flight.arri_time[:10] == date:
+#                 flights.append(flight)
+#     with open('flight/code_to_airport.json', 'r+', encoding='utf-8') as f:
+#         code_to_airport = json.loads(f.read())
+#     with open('flight/airport_to_jingwei.json', 'r+', encoding='utf-8') as f:
+#         airport_to_jingwei = json.loads(f.read())
+#     flights = list(set(flights))
+#     for flight in flights:
+#         start_city = flight.dept_city
+#         if start_city is None:
+#             start = {
+#                 'station_name': '未知',
+#                 'country_name': '未知',
+#                 'city_name': '未知',
+#                 'risk_level': '未知',
+#                 'pos': []
+#             }
+#         else:
+#             start = {'station_name': code_to_airport.get(start_city.code, ''),
+#                      'country_name': start_city.country.name_ch,
+#                      'city_name': start_city.name_ch,
+#                      'risk_level': get_city_risk_level(start_city.name_ch),
+#                      'pos': airport_to_jingwei.get(code_to_airport.get(start_city.code, ''), [0, 0])}
+#         end_city = flight.arri_city
+#         if end_city is None:
+#             end = {
+#                 'station_name': '未知',
+#                 'country_name': '未知',
+#                 'city_name': '未知',
+#                 'risk_level': '未知',
+#                 'pos': []
+#             }
+#         else:
+#             end = {'station_name': code_to_airport.get(end_city.code, ''),
+#                    'country_name': end_city.country.name_ch,
+#                    'city_name': end_city.name_ch,
+#                    'risk_level': get_city_risk_level(end_city.name_ch),
+#                    'pos': airport_to_jingwei.get(code_to_airport.get(end_city.code, ''), [0, 0])}
+#         planes.append({'number': flight.code, 'stations': [start, end]})
+#     return planes
+# def get_flight_info_by_city(dept_city, arri_city):
+#     flights = Flight.objects.filter(dept_city__name_ch=dept_city, arri_city__name_ch=arri_city)
+#     with open('flight/code_to_airport.json', 'r+', encoding='utf-8') as f:
+#         code_to_airport = json.loads(f.read())
+#     with open('flight/airport_to_jingwei.json', 'r+', encoding='utf-8') as f:
+#         airport_to_jingwei = json.loads(f.read())
+#     for flight in flights:
+#         start_city = flight.dept_city
+#         if start_city is None:
+#             start = {
+#                 'station_name': '未知',
+#                 'country_name': '未知',
+#                 'city_name': '未知',
+#                 'risk_level': '未知',
+#                 'pos': []
+#             }
+#         else:
+#             start = {'station_name': code_to_airport.get(start_city.code, ''),
+#                      'country_name': start_city.country.name_ch,
+#                      'city_name': start_city.name_ch,
+#                      'risk_level': get_city_risk_level(start_city.name_ch),
+#                      'pos': airport_to_jingwei.get(code_to_airport.get(start_city.code, ''), [0, 0])}
+#         end_city = flight.arri_city
+#         if end_city is None:
+#             end = {
+#                 'station_name': '未知',
+#                 'country_name': '未知',
+#                 'city_name': '未知',
+#                 'risk_level': '未知',
+#                 'pos': []
+#             }
+#         else:
+#             end = {'station_name': code_to_airport.get(end_city.code, ''),
+#                    'country_name': end_city.country.name_ch,
+#                    'city_name': end_city.name_ch,
+#                    'risk_level': get_city_risk_level(end_city.name_ch),
+#                    'pos': airport_to_jingwei.get(code_to_airport.get(end_city.code, ''), [0, 0])}
+#         planes.append({'number': flight.code, 'stations': [start, end]})
+#     return planes
 
 
 def query_flight_info(flight_num):
@@ -273,3 +312,62 @@ class TravelPlane(View):
             'msg': msg
         }
         return 0, stations, info, dept_time
+
+
+class TravelCity(View):
+    @JSR('status', 'flights')
+    def post(self, request):
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'dept_city', 'arri_city'}:
+            return 1, []
+        flights = Flight.objects.filter(dept_city__name_ch=kwargs['dept_city'], arri_city__name_ch=kwargs['arri_city'])
+        with open('flight/code_to_airport.json', 'r+', encoding='utf-8') as f:
+            code_to_airport = json.loads(f.read())
+        with open('flight/airport_to_jingwei.json', 'r+', encoding='utf-8') as f:
+            airport_to_jingwei = json.loads(f.read())
+        print(flights)
+        res = []
+        for flight in flights:
+            start_city = flight.dept_city
+            if start_city is None:
+                start = {
+                    'station_name': '未知',
+                    'country_name': '未知',
+                    'city_name': '未知',
+                    'risk_level': '未知',
+                    'pos': []
+                }
+            else:
+                start = {'station_name': code_to_airport.get(start_city.code, ''),
+                         'country_name': start_city.country.name_ch,
+                         'city_name': start_city.name_ch,
+                         'risk_level': get_city_risk_level(start_city.name_ch),
+                         'pos': airport_to_jingwei.get(code_to_airport.get(start_city.code, ''), [0, 0])}
+            end_city = flight.arri_city
+            if end_city is None:
+                end = {
+                    'station_name': '未知',
+                    'country_name': '未知',
+                    'city_name': '未知',
+                    'risk_level': '未知',
+                    'pos': []
+                }
+            else:
+                end = {'station_name': code_to_airport.get(end_city.code, ''),
+                       'country_name': end_city.country.name_ch,
+                       'city_name': end_city.name_ch,
+                       'risk_level': get_city_risk_level(end_city.name_ch),
+                       'pos': airport_to_jingwei.get(code_to_airport.get(end_city.code, ''), [0, 0])}
+            msg = ''
+            msg1 = Policy.objects.filter(city_name=start['city_name'])
+            msg2 = Policy.objects.filter(city_name=end['city_name'])
+            if msg1.count() != 0:
+                msg += msg1.first().out_policy + '\n'
+            if msg2.count() != 0:
+                msg += msg2.first().enter_policy
+            info = {
+                'level': min(start['risk_level'] + end['risk_level'], 5),
+                'msg': msg
+            }
+            res.append({'datetime': flight.dept_time, 'stations': [start, end], 'info': info})
+        return 0, res
