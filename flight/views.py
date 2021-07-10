@@ -123,7 +123,7 @@ def query_flight_info(flight_num):
 
 def get_flight_dept_and_arri_info_res(flight):
     # 传入flight对象，按交互文档travel/search格式返回dict
-    result = {'key': flight.code, 'is_train': 1}
+    result = {'key': flight.code, 'is_train': 0}
     start = {}
     end = {}
     start_city = flight.dept_city

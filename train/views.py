@@ -87,7 +87,7 @@ def get_train_dept_and_arri_info_res(train):
         'datetime': datetime.date.today().strftime("%Y-%m-%d ") + train.arri_time,
     },
     'key': train.name,
-    'is_train': 0,
+    'is_train': 1,
     }
     return res
 
