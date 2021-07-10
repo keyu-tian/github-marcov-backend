@@ -23,7 +23,10 @@ def cur_time():
 
 def address_to_jingwei(address) -> (float, float):
     ret = gd_address_to_jingwei_and_province_city(address)
-    return ret['jingdu'], ret['weidu']
+    if ret is None:
+        return None, None
+    else:
+        return ret['jingdu'], ret['weidu']
     
     # todo: 下面的代码可以考虑全部删除了
     # 'showLocation&&showLocation({"status":0,"result":{"location":{"lng":116.38548789747735,"lat":39.871280236128878},"precise":0,"confidence":50,"comprehension":0,"level":"火车站"}})'
@@ -65,8 +68,6 @@ def gd_address_to_jingwei_and_province_city(address):
     }
     '''
     # 推荐用高德！！比百度准好多！！查city还不用二次调用
-    assert isinstance(address, str), f'address={address} 不是字符串！'
-    
     ak = '7275224ca913b751868e4076eb8212d5'
     url = 'https://restapi.amap.com/v3/geocode/geo?key=' + ak + '&address=' + address
     try:
@@ -75,10 +76,15 @@ def gd_address_to_jingwei_and_province_city(address):
         return None
     js = json.loads(res.text)
     if 'geocodes' not in js.keys():
-        print(json.dumps(js) + f"address:{address}")
+        print(f"address={address}: 无法获取所在城市（json.dumps(js)=\n{json.dumps(js, indent=2)}）")
+        return None
+    if not isinstance(js['geocodes'][0]['city'], str):
+        print(f"address={address}: 无法获取所在城市（高德返回的js['geocodes'][0]['city']={js['geocodes'][0]['city']}）")
         return None
     if len(js['geocodes']) == 0:
+        print(f"address={address}: 无法获取所在城市（高德返回的js['geocodes']={js['geocodes']}）")
         return None
+    
     return {
         "jingdu": js['geocodes'][0]['location'].split(',')[0],
         "weidu": js['geocodes'][0]['location'].split(',')[1],
