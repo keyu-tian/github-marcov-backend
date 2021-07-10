@@ -10,6 +10,8 @@ import time
 import datetime
 from tqdm import tqdm
 
+from utils.download import download_from_url
+
 
 def dt_change_ymd(date):
     # 月-日-年 -> 年-月-日
@@ -50,7 +52,8 @@ begin = '2020-01-01'
 
 dataout = []
 
-data_vaccinations = pandas.read_csv(os.path.join(IMPORTER_DATA_DIRNAME, 'vaccinations.csv')).fillna(0)
+
+
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=100)
@@ -59,6 +62,12 @@ def requests_get(url, headers):
 
 
 def epidemic_global_import(start_dt=None):
+    vacc_file = os.path.join(IMPORTER_DATA_DIRNAME, 'vaccinations.csv')
+    if os.path.exists(vacc_file):
+        os.remove(vacc_file)
+    download_from_url('https://github.com/owid/covid-19-data/raw/master/public/data/vaccinations/vaccinations.csv', vacc_file)
+    data_vaccinations = pandas.read_csv(vacc_file).fillna(0)
+    
     requests.packages.urllib3.disable_warnings()
     if start_dt is None:
         start_dt = begin
