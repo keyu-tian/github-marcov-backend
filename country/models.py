@@ -1,5 +1,6 @@
 import json
 import re
+from typing import Optional
 
 from django.db import models
 
@@ -44,7 +45,7 @@ class Province(models.Model):
 class City(models.Model):
     @staticmethod
     def standardize_name(name):
-        info = locatable_cities.get(re.sub('市|直辖市|县|地区', '', name.strip()).strip(), None)
+        info = locatable_cities.get(re.sub('站|市|直辖市|县|地区', '', name.strip()).strip(), None)
         return None if info is None else info[3]
     
     @staticmethod

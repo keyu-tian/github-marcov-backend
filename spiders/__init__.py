@@ -13,8 +13,8 @@ def init_districts():
     from country.models import Country, City, Province
     
     Country.objects.all().delete()
-    City.objects.all().delete()
     Province.objects.all().delete()
+    City.objects.all().delete()
     
     Country.objects.bulk_create([
         Country(name_ch=name_ch, name_en=name_en)
@@ -29,13 +29,14 @@ def init_districts():
         for standard_province_name_ch in set(province_dict_ch.values())
     ], batch_size=BULK_CREATE_BATCH_SIZE)
 
+    # todo wz：在这里一次性导入全部国外城市和他们的经纬度。（似乎高德和百度都查不到国外城市！）
     kws = {}
     for _, (
         jingdu, weidu, district,
         standard_city_name_ch,
         not_standard_province_name_ch,
         not_standard_country_name_ch
-    ) in locatable_cities:
+    ) in locatable_cities.items():
         if standard_city_name_ch not in kws:
             kws[standard_city_name_ch] = dict(
                 name_ch=standard_city_name_ch,

@@ -9,9 +9,9 @@ def station_export():
     res = {}
     for a in Station.objects.all():
         if a.city and a.city.province and a.city.province.name_ch + '.' + a.city.name_ch in res.keys():
-            res[a.city.province.name_ch + '.' + a.city.name_ch].append(a.name_cn)
+            res[a.city.province.name_ch + '.' + a.city.name_ch].append(a.name_ch)
         else:
-            res[a.city.province.name_ch + '.' + a.city.name_ch] = [a.name_cn]
+            res[a.city.province.name_ch + '.' + a.city.name_ch] = [a.name_ch]
     province_json = {}
     for (key, value) in res.items():
         province = key.split('.')[0]

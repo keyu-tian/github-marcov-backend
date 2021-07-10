@@ -1,17 +1,17 @@
 from django.db import models
 
-DT_LENGTH = 64
+DT_LENGTH = 80
 
 
 class Station(models.Model):
-    name_cn = models.CharField(max_length=512, null=False)
+    name_ch = models.CharField(primary_key=True, unique=True, max_length=DT_LENGTH, db_index=True, null=False)
     jingdu = models.FloatField(blank=True, null=True)
     weidu = models.FloatField(blank=True, null=True)
     city = models.ForeignKey('country.City', on_delete=models.SET_NULL, null=True, blank=True)
 
 
 class Train(models.Model):
-    name = models.CharField(primary_key=True, unique=True, max_length=64, db_index=True, null=False)  # 火车号
+    name = models.CharField(primary_key=True, unique=True, max_length=DT_LENGTH, db_index=True, null=False)  # 火车号
     dept_date = models.CharField(max_length=DT_LENGTH, null=True, blank=True)
     dept_time = models.CharField(max_length=DT_LENGTH, null=True, blank=True)
     dept_city = models.ForeignKey('country.City', related_name='start_train', on_delete=models.SET_NULL, null=True, blank=True)

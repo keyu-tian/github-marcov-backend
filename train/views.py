@@ -1,50 +1,19 @@
 import datetime
 import json
-import re
-import time
 import math
 
-import requests
-from django.db.models import Q
 from django.views import View
 
-from country.models import *
 from flight.views import query_flight_info, get_flight_dept_and_arri_info_res
 from risk.views import get_city_risk_level
-from train.models import *
-from requests import Timeout
-
-from utils.cast import address_to_jingwei, gd_address_to_jingwei_and_province_city
+from train.models import Train, MidStation
 from utils.meta_wrapper import JSR
 
 DEFAULT_DATE = datetime.datetime.now()
 DEFAULT_DATE_STR = DEFAULT_DATE.strftime('%Y-%m-%d')
 
-# 以get开头的返回json，以query开头的返回queryset或对象
 
-def search_train_by_number(train_number='G99', date=DEFAULT_DATE_STR):
-    # 返回值None为查询错误或不是列车号，不支持模糊匹配
-    params = {
-        'method_name': 'buy',
-        'ex_track': '',
-        'q': train_number,
-        'date': date.replace('-', ''),
-        'format': 'json',
-        'cityname': 123456,
-        'ver': int(time.time()*1000),
-    }
-    url = 'http://train.qunar.com/qunar/checiInfo.jsp'
-    try:
-        response = requests.get(url=url, params=params, headers={'Content-Type': 'application/json'}, timeout=10)
-    except Timeout:
-        return None
-    result = json.loads(response.text)
-    if result == {'count': 0}:
-        return None
-    return result
-
-
-def get_train_info_res(train):
+def get_train_info_res(train: Train):
     res = {'stations': []}
     total_risk_level = 0
     count = train.schedule_station.count() + 2
@@ -52,7 +21,7 @@ def get_train_info_res(train):
     for a in MidStation.objects.filter(train=train):
         risk_level = get_city_risk_level(a.station.city.name_ch)
         res['stations'].append({
-            'station_name': a.station.name_cn,
+            'station_name': a.station.name_ch,
             'city_name': a.station.city.name_ch,
             'risk_level': risk_level,
             'pos': [a.station.jingdu, a.station.weidu],
@@ -72,125 +41,69 @@ def get_train_info_res(train):
     return res
 
 
-def get_train_dept_and_arri_info_res(train):
+def get_train_dept_and_arri_info_res(train: Train):
+    dt = datetime.datetime.strptime(train.interval, '%H小时%M分钟')
+    st_t = datetime.datetime.strptime(datetime.date.today().strftime('%Y-%m-%d ') + train.dept_time, '%Y-%m-%d %H:%M')
+    ed_t = st_t + datetime.timedelta(hours=dt.hour, minutes=dt.minute)
     res = {
-    'start': {
-        'station_name': train.dept_station.name_cn,
-        'city_name': train.dept_city.name_ch if train.dept_city else '未知',
-        'country_name': train.dept_city.country.name_ch if train.dept_city else '未知',
-        'risk': get_city_risk_level(train.dept_city),
-        'datetime': datetime.date.today().strftime("%Y-%m-%d ") + train.dept_time,
-    },
-    'end': {
-        'station_name': train.arri_station.name_cn,
-        'city_name': train.arri_city.name_ch if train.arri_city else '未知',
-        'country_name': train.arri_city.country.name_ch if train.arri_city else '未知',
-        'risk': get_city_risk_level(train.arri_city),
-        'datetime': datetime.date.today().strftime("%Y-%m-%d ") + train.arri_time,
-    },
-    'key': train.name,
-    'is_train': 1,
+        'start': {
+            'station_name': train.dept_station.name_ch,
+            'city_name': train.dept_city.name_ch,
+            'country_name': train.dept_city.country.name_ch,
+            'risk': get_city_risk_level(train.dept_city),
+            'datetime': st_t.strftime('%Y-%m-%d %H:%M'),
+        },
+        'end': {
+            'station_name': train.arri_station.name_ch,
+            'city_name': train.arri_city.name_ch,
+            'country_name': train.arri_city.country.name_ch,
+            'risk': get_city_risk_level(train.arri_city),
+            'datetime': ed_t.strftime('%Y-%m-%d %H:%M'),
+        },
+        'key': train.name,
+        'is_train': 1,
     }
     return res
 
 
-def query_train_info(train_number):
-    train = Train.objects.filter(name__icontains=train_number)
-    if train.exists():
-        return train
-    else:
-        result = search_train_by_number(train_number)
-        # todo wlt：删除这里；因为国家是一次性导入的，在这里不要再用get_or_create
-        country, flag = Country.objects.get_or_create(name_ch='中国', defaults={'name_en': 'Chinese'})
-        if result and not Train.objects.filter(name=train_number).exists():
-            dept_city_name = result.get('trainInfo').get(train_number).get('deptCity')
-            dept_sta_name = result.get('trainInfo').get(train_number).get('deptStation')
-            dept_time = result.get('trainInfo').get(train_number).get('deptTime')
-            dept_date = result.get('trainInfo').get(train_number).get('dptDate')
-            arri_city_name = result.get('trainInfo').get(train_number).get('arriCity')
-            arri_sta_name = result.get('trainInfo').get(train_number).get('arriStation')
-            arri_time = result.get('trainInfo').get(train_number).get('arriTime')
-            arri_date = result.get('trainInfo').get(train_number).get('arrDate')
-            # todo wlt：删除这里；因为城市是一次性导入的，在这里不要再用get_or_create
-            dept_city, flag = City.objects.get_or_create(name_ch=dept_city_name)
-            if flag:
-                dept_city.country = country
-                dept_city.save()
-            dept_sta, flag = Station.objects.get_or_create(name_cn=dept_sta_name)
-            if flag:  # 是新建，存经纬度
-                dept_sta.jingdu, dept_sta.weidu = address_to_jingwei(dept_sta_name + '站')
-                dept_sta.city = dept_city
-                dept_sta.save()
-            # todo wlt：删除这里；因为城市是一次性导入的，在这里不要再用get_or_create
-            arri_city, flag = City.objects.get_or_create(name_ch=arri_city_name)
-            if flag:
-                arri_city.country = country
-                arri_city.save()
-            arri_sta, flag = Station.objects.get_or_create(name_cn=arri_sta_name)
-            if flag:  # 是新建，存经纬度
-                arri_sta.jingdu, arri_sta.weidu = address_to_jingwei(arri_sta_name + '站')
-                arri_sta.city = arri_city
-                arri_sta.save()
-            train, flag = Train.objects.get_or_create(name=train_number, defaults={'dept_date': dept_date,
-                                                                           'dept_time': dept_time,
-                                                                           'arri_date': arri_date,
-                                                                           'arri_time': arri_time})
-            if flag:
-                train.interval = result.get('extInfo').get('allTime')
-                train.kilometer = result.get('extInfo').get('allMileage')
-                mid_list = result.get('trainScheduleBody')
-                for c in mid_list:
-                    content = c.get('content')
-                    sta, flag = Station.objects.get_or_create(name_cn=content[1])
-                    if flag:  # 是新建，存经纬度
-                        sta.jingdu, sta.weidu = address_to_jingwei(arri_sta_name + '站')
-                        sta.city = arri_city
-                        sta.save()
-                    MidStation.objects.create(index=mid_list.index(c) + 1, arri_date=content[2],
-                                              arri_time=content[3], station=sta, train=train)
-            train.save()
-            return [train]
-    return None
-
-
-def query_train_info_by_city(query_name):
-    # return: query_set(Train)
-    city = City.objects.filter(name_ch=query_name)
-    if city.exists():
-        city = city.get()
-    else:
-        city_name = gd_address_to_jingwei_and_province_city(query_name)['city']
-        city = City.objects.filter(name_ch=city_name)
-        if not city.exists():
-            return None
-        city = city.get()
-    station_set = Station.objects.filter(city=city)
-    train_set = Train.objects.filter(Q(schedule_station__city=city) | Q(dept_city=city) | Q(arri_city=city)).distinct()
-    for a in station_set:
-        query2 = a.start_train.all()
-        query2 = (query2 | a.end_train.all()).distinct()
-        train_set = (train_set | query2).distinct()
-    return train_set
-
-
-def get_train_info_by_city(city):
-    # /travel/city接口，trains部分数据
-    train_query_set = query_train_info_by_city(city)
-    if train_query_set.count() == 0:
-        return None
-    res = {'trains': []}
-    for a in train_query_set:
-        ap = {'stations': [], 'number': a.name}
-        mid_sta = a.schedule_station.all()
-        for b in mid_sta:
-            ap['stations'].append({
-                'station_name': b.name_cn,
-                'city_name': b.city.name_ch,
-                'risk_level': 0,    # todo: 查询城市的风险等级
-                'pos': [b.jingdu, b.weidu],
-            })
-        res['trains'].append(ap)
-    return res
+# def query_train_info_by_city(query_name):
+#     # return: query_set(Train)
+#     city = City.objects.filter(name_ch=query_name)
+#     if city.exists():
+#         city = city.get()
+#     else:
+#         city_name = gd_address_to_jingwei_and_province_city(query_name)['city']
+#         city = City.objects.filter(name_ch=city_name)
+#         if not city.exists():
+#             return None
+#         city = city.get()
+#     station_set = Station.objects.filter(city=city)
+#     train_set = Train.objects.filter(Q(schedule_station__city=city) | Q(dept_city=city) | Q(arri_city=city)).distinct()
+#     for a in station_set:
+#         query2 = a.start_train.all()
+#         query2 = (query2 | a.end_train.all()).distinct()
+#         train_set = (train_set | query2).distinct()
+#     return train_set
+#
+#
+# def get_train_info_by_city(city):
+#     # /travel/city接口，trains部分数据
+#     train_query_set = query_train_info_by_city(city)
+#     if train_query_set.count() == 0:
+#         return None
+#     res = {'trains': []}
+#     for a in train_query_set:
+#         ap = {'stations': [], 'number': a.name}
+#         mid_sta = a.schedule_station.all()
+#         for b in mid_sta:
+#             ap['stations'].append({
+#                 'station_name': b.name_ch,
+#                 'city_name': b.city.name_ch,
+#                 'risk_level': 0,  # todo: 查询城市的风险等级
+#                 'pos': [b.jingdu, b.weidu],
+#             })
+#         res['trains'].append(ap)
+#     return res
 
 
 class TravelTrain(View):
@@ -198,17 +111,14 @@ class TravelTrain(View):
     def post(self, request):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'number'}:
-            return 1,
-        try:
-            key = kwargs['number']
-        except:
-            return -1,
-
-        res = get_train_info_res(query_train_info(key)[0])
-        if res:
-            return 0, res['stations'], res['info']
-        else:
-            return 7,
+            return 1
+        key = kwargs['number'].upper()
+        
+        train = Train.objects.filter(name=key)
+        if train.count() == 0:
+            return 7
+        res = get_train_info_res(train.get())
+        return 0, res['stations'], res['info']
 
 
 class TravelSearch(View):
@@ -216,32 +126,24 @@ class TravelSearch(View):
     def post(self, request):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'key'}:
-            return 1,
-        try:
-            key = kwargs['key']
-        except:
-            return -1,
-
+            return 1
+        key = kwargs['key'].upper()
+        
         if len(key) < 3 and key not in {
             'G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'G8',
             'Z1', 'Z2', 'Z3', 'Z4', 'Z5', 'Z6', 'Z7', 'Z8', 'Z9',
             'T1', 'T2', 'T9',
             'K3', 'K5', 'K6'
         }:
-            return 3,
+            return 3
         
-        res = {'results': []}
-        key_list = key.split(' ')
-        for key in key_list:
-            train_query = query_train_info(key)
-            if train_query and not (len(train_query) == 1 and train_query[0] is None):
-                for a in train_query:
-                    res['results'].append(get_train_dept_and_arri_info_res(a))
-            flight_query = query_flight_info(key)
-            if flight_query and not (len(flight_query) == 1 and flight_query[0] is None):
-                for a in flight_query:
-                    res['results'].append(get_flight_dept_and_arri_info_res(a))
-        return 0, res['results']
+        res = []
+        for key in key.split(' '):
+            for a in Train.objects.filter(name__icontains=key):
+                res.append(get_train_dept_and_arri_info_res(a))
+            for a in query_flight_info(key):
+                res.append(get_flight_dept_and_arri_info_res(a))
+        return 0, {'results': res}
 
 
 # class TravelPolicy(View):

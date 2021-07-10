@@ -1,19 +1,18 @@
-import re
-
-from django.views import View
-from utils.meta_wrapper import JSR
-import json
-import requests
-from io import BytesIO
 import base64
-from flight.models import Flight, Airport
-from utils.cast import address_to_jingwei
-from risk.views import get_city_risk_level
-from bs4 import BeautifulSoup
-from selenium import webdriver
+import json
+import re
 from datetime import datetime
-from django.db.models import Q
+from io import BytesIO
+
+import requests
+from bs4 import BeautifulSoup
+from django.views import View
+
 from country.models import City, Policy
+from flight.models import Flight, Airport
+from risk.views import get_city_risk_level
+from utils.cast import address_to_jingwei
+from utils.meta_wrapper import JSR
 
 
 def get_num_by_image(url):
@@ -36,7 +35,6 @@ def get_num_by_image(url):
 
 def get_flight_info_by_code(code, date=datetime.now().strftime('%Y-%m-%d')):
     url = f'http://www.umetrip.com/mskyweb/fs/fc.do?flightNo={code}&date={date}&channel='
-    # print(res.text)
     fail_num = 0
     while True:
         if fail_num > 50:
@@ -165,6 +163,7 @@ def query_flight_info(flight_num):
 
 def get_flight_dept_and_arri_info_res(flight):
     # 传入flight对象，按交互文档travel/search格式返回dict
+    # todo wz: 王振写
     result = {'key': flight.code, 'is_train': 0}
     start = {}
     end = {}
@@ -264,12 +263,11 @@ class TravelPlane(View):
         if start_station['city_name']:
             start_station['risk_level'] = get_city_risk_level(start_station['city_name'])
             start_station['pos'] = airport_to_jingwei.get(start_station['station_name'], [0, 0])
-            city = City.objects.filter(name_ch__icontains=start_station['city_name'])
-            # print(city)
-            if city.count() == 0:
+            city = City.get_via_name(start_station['city_name'])
+            if city is None:
                 start_station['country_name'] = ''
             else:
-                start_station['country_name'] = city.first().country.name_ch
+                start_station['country_name'] = city.country.name_ch
         else:
             start_station['risk_level'] = 0
             start_station['pos'] = [0, 0]
@@ -281,12 +279,12 @@ class TravelPlane(View):
         if end_station['city_name']:
             end_station['risk_level'] = get_city_risk_level(end_station['city_name'])
             end_station['pos'] = airport_to_jingwei.get(end_station['station_name'], [0, 0])
-            city = City.objects.filter(name_ch__icontains=end_station['city_name'])
-            if city.count() == 0:
+            city = City.get_via_name(end_station['city_name'])
+            if city is None:
                 end_station['country_name'] = ''
             else:
                 # start_station['country_name'] = ''
-                end_station['country_name'] = city.first().country.name_ch
+                end_station['country_name'] = city.country.name_ch
         else:
             end_station['risk_level'] = 0
             end_station['pos'] = [0, 0]
@@ -301,7 +299,7 @@ class TravelPlane(View):
         if msg2.count() != 0:
             msg += msg2.first().enter_policy
         info = {
-            'level': min(start_station['risk_level']+end_station['risk_level'], 5),
+            'level': min(start_station['risk_level'] + end_station['risk_level'], 5),
             'msg': msg
         }
         return 0, stations, info, dept_time
