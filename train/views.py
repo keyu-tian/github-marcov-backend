@@ -75,12 +75,14 @@ def get_train_info_res(train):
 def get_train_dept_and_arri_info_res(train):
     res = {
     'start': {
+        'station_name': train.dept_station.name_cn,
         'city_name': train.dept_city.name_ch if train.dept_city else '未知',
         'country_name': train.dept_city.country if train.dept_city else '未知',
         'risk': get_city_risk_level(train.dept_city),
         'datetime': datetime.date.today().strftime("%Y-%m-%d ") + train.dept_time,
     },
     'end': {
+        'station_name': train.arri_station.name_cn,
         'city_name': train.arri_city.name_ch if train.arri_city else '未知',
         'country_name': train.arri_city.country if train.arri_city else '未知',
         'risk': get_city_risk_level(train.arri_city),
