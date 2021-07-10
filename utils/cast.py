@@ -38,8 +38,10 @@ def cur_time():
 
 def address_to_jingwei(address) -> (float, float):
     # 'showLocation&&showLocation({"status":0,"result":{"location":{"lng":116.38548789747735,"lat":39.871280236128878},"precise":0,"confidence":50,"comprehension":0,"level":"火车站"}})'
-    ak = '4PKHdx8ujI2T3R53ZvgC1ZOTWViHK8am'
-    ak = '0wem7DQG7HjCVpzKk5y8y3kGnhPmMFRk'
+    # ak = '4PKHdx8ujI2T3R53ZvgC1ZOTWViHK8am'   # ？的
+    # ak = '0wem7DQG7HjCVpzKk5y8y3kGnhPmMFRk'   # tky的
+    # ak = 'vnRXRCTGp9RMnO6xbuGU497wta2P1FFj'   # wlt的
+    ak = '11Z8uiP8kIz6AG0Vjiwzbc5f9Ii0cdHd'     # 网上找的
     url = 'http://api.map.baidu.com/geocoding/v3/?address=' + address + '&output=json&ak=' + ak \
           + '&callback=showLocation'
     try:
@@ -102,7 +104,10 @@ def jingwei_to_address(jingdu, weidu):
   }
 }
     '''
-    ak = "vnRXRCTGp9RMnO6xbuGU497wta2P1FFj"
+    # ak = '4PKHdx8ujI2T3R53ZvgC1ZOTWViHK8am'   # ？的
+    # ak = '0wem7DQG7HjCVpzKk5y8y3kGnhPmMFRk'   # tky的
+    # ak = 'vnRXRCTGp9RMnO6xbuGU497wta2P1FFj'   # wlt的
+    ak = '11Z8uiP8kIz6AG0Vjiwzbc5f9Ii0cdHd'     # 网上找的
     url = "http://api.map.baidu.com/reverse_geocoding/v3/?ak=" + ak \
         +'&output=json&coordtype=wgs84ll&language=zh-CN&location=' + str(weidu) + ',' + str(jingdu)
     try:
