@@ -311,9 +311,9 @@ class TravelCity(View):
     @JSR('status', 'flights')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
-        if kwargs.keys() != {'dept_city', 'arri_city'}:
+        if kwargs.keys() != {'dept_airport', 'arri_airport'}:
             return 1, []
-        flights = Flight.objects.filter(dept_airport__city__name_ch=kwargs['dept_city'], arri_airport__city__name_ch=kwargs['arri_city'])
+        flights = Flight.objects.filter(dept_airport__name=kwargs['dept_airport'], arri_airport__name=kwargs['arri_airport'])
         with open('flight/airport_to_jingwei.json', 'r+', encoding='utf-8') as f:
             airport_to_jingwei = json.loads(f.read())
         # print(flights)
