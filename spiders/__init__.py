@@ -11,7 +11,7 @@ def re_import(name, launch_spider, *args, **kwargs):
     exec(f'main(*args, **kwargs)')
 
 
-def misc_delete_and_import(re_import_train):
+def misc_delete_and_import(re_import_train=False):
     colorama.init(autoreset=True)
 
     re_import('risk', True)
