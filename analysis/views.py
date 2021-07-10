@@ -1,6 +1,6 @@
 from django.views import View
 
-from meta_config import IMPORTER_DATA_DIRNAME
+from meta_config import SPIDER_DATA_DIRNAME
 from utils.meta_wrapper import JSR
 from utils.dict_ch import province_dict_ch
 import datetime as dt
@@ -14,7 +14,7 @@ class DomesticAnalyze(View):
     @JSR('status', 'data')
     def get(self, request):
         try:
-            json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
+            json_path = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
             analysis = json.load(open(json_path, 'r', encoding='utf-8'))
         except:
             return 7
@@ -25,7 +25,7 @@ class DomesticTodayAnalyze(View):
     @JSR('status', 'data')
     def get(self, request):
         try:
-            json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
+            json_path = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
             analysis = json.load(open(json_path, 'r', encoding='utf-8'))
         except:
             return 7
@@ -37,7 +37,7 @@ class InternationalAnalyze(View):
     def get(self, request):
         # json_path = os.path.join('spiders_data', 'epidemic_domestic_data', 'province.json')
         try:
-            json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'global.json')
+            json_path = os.path.join(SPIDER_DATA_DIRNAME, 'global.json')
             analysis = json.load(open(json_path, 'r', encoding='utf-8'))
         except:
             return 7
@@ -49,7 +49,7 @@ class InternationalTodayAnalyze(View):
     def get(self, request):
         # json_path = os.path.join('spiders_data', 'epidemic_domestic_data', 'province.json')
         try:
-            json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'global.json')
+            json_path = os.path.join(SPIDER_DATA_DIRNAME, 'global.json')
             analysis = json.load(open(json_path, 'r', encoding='utf-8'))
         except:
             return 7
@@ -64,8 +64,8 @@ class SearchAnalyse(View):
             return 1, []
 
         try:
-            global_json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'global.json')
-            province_json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
+            global_json_path = os.path.join(SPIDER_DATA_DIRNAME, 'global.json')
+            province_json_path = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
         except:
             return 7
 
@@ -105,8 +105,8 @@ class CountryAnalyze(View):
             return 1, []
 
         try:
-            global_json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'global.json')
-            province_json_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
+            global_json_path = os.path.join(SPIDER_DATA_DIRNAME, 'global.json')
+            province_json_path = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
         except:
             return 7
 

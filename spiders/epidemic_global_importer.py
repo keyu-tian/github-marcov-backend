@@ -7,7 +7,7 @@ import requests
 from retrying import retry
 from tqdm import tqdm
 
-from meta_config import IMPORTER_DATA_DIRNAME
+from meta_config import SPIDER_DATA_DIRNAME
 from utils.country_dict import country_dict, re_country_vaacinations_dict
 from utils.download import download_from_url
 
@@ -58,7 +58,7 @@ def requests_get(url, headers):
 
 
 def epidemic_global_import(start_dt=None):
-    vacc_file = os.path.join(IMPORTER_DATA_DIRNAME, 'vaccinations.csv')
+    vacc_file = os.path.join(SPIDER_DATA_DIRNAME, 'vaccinations.csv')
     if os.path.exists(vacc_file):
         os.remove(vacc_file)
     download_from_url('https://github.com.cnpmjs.org/owid/covid-19-data/raw/master/public/data/vaccinations/vaccinations.csv', vacc_file)
@@ -176,7 +176,7 @@ def epidemic_global_import(start_dt=None):
     }
     dataout.append(today)
     
-    with open(os.path.join(IMPORTER_DATA_DIRNAME, 'global.json'), 'w', encoding='utf-8') as f:
+    with open(os.path.join(SPIDER_DATA_DIRNAME, 'global.json'), 'w', encoding='utf-8') as f:
         json.dump(dataout, f, ensure_ascii=False, indent=2)
 
 

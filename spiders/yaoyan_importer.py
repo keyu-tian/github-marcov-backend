@@ -3,14 +3,14 @@ import os
 
 from tqdm import tqdm
 
-from meta_config import IMPORTER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
+from meta_config import SPIDER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
 from news.models import Rumor
 
 
 def yaoyan_import(line_start=0):
     Rumor.objects.all().delete()
     
-    with open(os.path.join(IMPORTER_DATA_DIRNAME, 'yaoyan_spider_all', 'rumor.json'), 'r', encoding='utf-8') as file:
+    with open(os.path.join(SPIDER_DATA_DIRNAME, 'yaoyan_spider_all', 'rumor.json'), 'r', encoding='utf-8') as file:
         bar = tqdm(list(enumerate(file.readlines())), dynamic_ncols=True)
     objs = []
     for line, result in bar:

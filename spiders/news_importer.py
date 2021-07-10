@@ -3,7 +3,7 @@ from tqdm import tqdm
 
 from datetime import datetime
 
-from meta_config import IMPORTER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
+from meta_config import SPIDER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
 from news.models import News
 
 
@@ -11,7 +11,7 @@ def news_import(delete_old_data):
     if delete_old_data:
         News.objects.all().delete()
     
-    with open(f'{IMPORTER_DATA_DIRNAME}/news_data.json', 'r', encoding='utf-8') as f:
+    with open(f'{SPIDER_DATA_DIRNAME}/news_data.json', 'r', encoding='utf-8') as f:
         data = json.loads(f.read())
         bar = tqdm(list(enumerate(data)), dynamic_ncols=True)
     

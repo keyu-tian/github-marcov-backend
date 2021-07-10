@@ -3,12 +3,12 @@ import json
 from tqdm import tqdm
 
 from flight.models import Flight, Airport
-from meta_config import IMPORTER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
+from meta_config import SPIDER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
 
 
 def flight_daily_import():
     Flight.objects.all().delete()
-    with open(f'{IMPORTER_DATA_DIRNAME}/flights_data.json', 'r+', encoding='utf-8') as f:
+    with open(f'{SPIDER_DATA_DIRNAME}/flights_data.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
 
     objs = []

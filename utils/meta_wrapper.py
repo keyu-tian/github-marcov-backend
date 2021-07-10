@@ -11,7 +11,7 @@ from colorama import Fore
 from django.http import JsonResponse, HttpResponseForbidden
 
 import meta_config
-from meta_config import IMPORTER_DATA_DIRNAME
+from meta_config import SPIDER_DATA_DIRNAME
 
 
 def JSR(*keys): # 这里的 keys 是 @JSR(...) 里面填的 keys
@@ -79,7 +79,7 @@ def JSR(*keys): # 这里的 keys 是 @JSR(...) 里面填的 keys
                     else:
                         ret_str = pformat(ret_dict)
                         if len(ret_str) > 1500:
-                            too_long_fname = os.path.join(IMPORTER_DATA_DIRNAME, 'JSR.too.long')
+                            too_long_fname = os.path.join(SPIDER_DATA_DIRNAME, 'JSR.too.long')
                             if os.path.exists(too_long_fname):
                                 with open(too_long_fname, 'r') as fp:
                                     names = json.load(fp)

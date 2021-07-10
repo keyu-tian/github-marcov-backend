@@ -2,7 +2,7 @@ import pandas
 from tqdm import tqdm
 from datetime import datetime
 
-from meta_config import IMPORTER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
+from meta_config import SPIDER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
 from news.models import News
 
 
@@ -11,7 +11,7 @@ def dxy_news_import(delete_old_data):
         News.objects.all().delete()
     
     target_keys = ['pubDate', 'title', 'summary', 'infoSource', 'sourceUrl']
-    context: pandas.DataFrame = pandas.read_csv(f'{IMPORTER_DATA_DIRNAME}/DXYNews-3.csv').loc[:, target_keys]
+    context: pandas.DataFrame = pandas.read_csv(f'{SPIDER_DATA_DIRNAME}/DXYNews-3.csv').loc[:, target_keys]
     bar = tqdm(list(context.iterrows()), dynamic_ncols=True)
     
     objs = []

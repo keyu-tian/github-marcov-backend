@@ -8,7 +8,7 @@ from datetime import datetime
 
 from tqdm import tqdm
 
-from meta_config import IMPORTER_DATA_DIRNAME
+from meta_config import SPIDER_DATA_DIRNAME
 from utils.dict_ch import province_dict_ch, province_population, city_dict_ch
 from utils.download import download_from_url
 
@@ -25,10 +25,10 @@ def epidemic_domestic_import(date_begin='2020-01-22',
     begin = dt.date(int(date_begin[0]), int(date_begin[1]), int(date_begin[2]))
     end = dt.date(int(date_end[0]), int(date_end[1]), int(date_end[2]))
 
-    input_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')
-    area_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'area.json')
-    province_json_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
-    city_json_file_directory = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'provinces')
+    input_file = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')
+    area_file = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'area.json')
+    province_json_file = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
+    city_json_file_directory = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'provinces')
     if not os.path.exists(city_json_file_directory):
         os.makedirs(city_json_file_directory)
 

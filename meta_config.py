@@ -2,7 +2,6 @@ import re
 
 DEBUG = True
 
-IMPORTER_DATA_DIRNAME = 'spiders_data'
 SPIDER_DATA_DIRNAME = 'spiders_data'
 BULK_CREATE_BATCH_SIZE = 4096
 

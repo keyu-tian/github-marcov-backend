@@ -3,7 +3,7 @@ import re
 
 from tqdm import tqdm
 
-from meta_config import IMPORTER_DATA_DIRNAME
+from meta_config import SPIDER_DATA_DIRNAME
 from risk.models import RiskArea
 from utils.cast import address_to_jingwei
 
@@ -11,7 +11,7 @@ from utils.cast import address_to_jingwei
 def risk_import():
     RiskArea.objects.all().delete()
     
-    with open(f'{IMPORTER_DATA_DIRNAME}/risk_areas.json', 'r', encoding='utf-8') as f:
+    with open(f'{SPIDER_DATA_DIRNAME}/risk_areas.json', 'r', encoding='utf-8') as f:
         data = json.loads(f.read())
     
     for level_num, level_str in ((1, '中'), (2, '高')):

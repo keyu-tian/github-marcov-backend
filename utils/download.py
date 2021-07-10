@@ -3,7 +3,7 @@ import requests
 from tqdm import tqdm
 from retrying import retry
 
-from meta_config import IMPORTER_DATA_DIRNAME
+from meta_config import SPIDER_DATA_DIRNAME
 
 
 @retry(stop_max_attempt_number=5, wait_fixed=500)
@@ -11,7 +11,7 @@ def download_from_url(url, fpath):
     """
     :example:
     >>> url = 'https://github.com.cnpmjs.org/BlankerL/DXY-COVID-19-Data/releases/download/2021.07.06/DXYArea.csv'
-    >>> input_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')
+    >>> input_file = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')
     >>> download_from_url(url, input_file)
     """
     
