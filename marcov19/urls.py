@@ -54,7 +54,7 @@ urlpatterns = [
     path('travel/train', TravelTrain.as_view()),
     path('travel/plane_info', TravelPlane.as_view()),
     path('travel/city', TravelCity.as_view()),
-    path('travel/country', CountryFlightInfo.as_view()),
+    # path('travel/country', CountryFlightInfo.as_view()),
     path('travel/policy', TravelPolicy.as_view()),
     
     # ======== 五、新闻 ========

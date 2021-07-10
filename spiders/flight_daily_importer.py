@@ -1,9 +1,8 @@
-import argparse
 import datetime
 import json
 
 from country.models import City
-from flight.models import Flight
+from flight.models import Flight, Airport
 from meta_config import IMPORTER_DATA_DIRNAME
 
 
@@ -15,19 +14,19 @@ def flight_import(date=None):
         data = json.loads(f.read())
     
     for line in data:
-        dept_city = line['dept_city']
-        if City.objects.filter(code=dept_city).count() == 0:
-            dept_city = None
+        dept_airport = line['dept_city']
+        if Airport.objects.filter(airport_code=dept_airport).count() == 0:
+            dept_airport = None
         else:
-            dept_city = City.objects.filter(code=dept_city).get()
-        arri_city = line['arri_city']
-        if City.objects.filter(code=arri_city).count() == 0:
-            arri_city = None
+            dept_airport = Airport.objects.filter(airport_code=dept_airport).get()
+        arri_airport = line['arri_city']
+        if Airport.objects.filter(airport_code=arri_airport).count() == 0:
+            arri_airport = None
         else:
-            arri_city = City.objects.filter(code=arri_city).get()
-        if arri_city is None or dept_city is None:
+            arri_airport = Airport.objects.filter(airport_code=arri_airport).get()
+        if arri_airport is None or dept_airport is None:
             continue
-        kwargs = {'code': line['code'], 'dept_time': line['dept_time'], 'dept_city': dept_city, 'arri_time': line['arri_time'], 'arri_city': arri_city, 'condition': line['condition']}
+        kwargs = {'code': line['code'], 'dept_time': line['dept_time'], 'dept_airport': dept_airport, 'arri_time': line['arri_time'], 'arri_airport': arri_airport, 'condition': line['condition']}
         Flight.objects.create(**kwargs)
         # except:
         #     print('插入新闻数据错误')
