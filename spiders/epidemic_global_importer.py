@@ -3,6 +3,8 @@ import json
 import os
 
 import requests
+from retrying import retry
+from tqdm import tqdm
 
 from meta_config import IMPORTER_DATA_DIRNAME
 from utils.country_dict import country_dict
@@ -44,37 +46,44 @@ begin = '2020-02-10'
 dataout = []
 
 
+@retry(stop_max_attempt_number=10, wait_fixed=100)
+def requests_get(url, headers):
+    return requests.get(url, headers=headers, verify=False)
+
+
 def epidemic_global_import(start_dt=None):
+    requests.packages.urllib3.disable_warnings()
+    
     if start_dt is None:
         start_dt = begin
     tmp = []  # [{'date':'2020-03-22', 'country_info':{}}, {...}, ...]
 
     for country in country_dict.values():
         if country == "日本":
-            res = requests.get(url + "日本本土", headers=headers)
+            res = requests_get(url + "日本本土", headers=headers)
         elif country == "印度尼西亚, 印尼":
-            res = requests.get(url + "印度尼西亚", headers=headers)
+            res = requests_get(url + "印度尼西亚", headers=headers)
         elif country == "刚果":
-            res = requests.get(url + "刚果（布）", headers=headers)
+            res = requests_get(url + "刚果（布）", headers=headers)
         elif country == "刚果民主共和国":
-            res = requests.get(url + "刚果（金）", headers=headers)
+            res = requests_get(url + "刚果（金）", headers=headers)
         elif country == "中非":
-            res = requests.get(url + "中非共和国", headers=headers)
+            res = requests_get(url + "中非共和国", headers=headers)
         elif country == "孟加拉国":
-            res = requests.get(url + "孟加拉", headers=headers)
+            res = requests_get(url + "孟加拉", headers=headers)
         elif country == "波斯尼亚和黑塞哥维那":
-            res = requests.get(url + "波黑", headers=headers)
+            res = requests_get(url + "波黑", headers=headers)
         elif country == "多米尼加共和国":
-            res = requests.get(url + "多米尼加", headers=headers)
+            res = requests_get(url + "多米尼加", headers=headers)
         elif country == "马其顿":
-            res = requests.get(url + "北马其顿", headers=headers)
+            res = requests_get(url + "北马其顿", headers=headers)
         elif country == "列支敦士登":
-            res = requests.get(url + "列支敦士登公国", headers=headers)
+            res = requests_get(url + "列支敦士登公国", headers=headers)
         else:
-            res = requests.get(url + country, headers=headers)
+            res = requests_get(url + country, headers=headers)
         response_data = json.loads(res.text)['data']
         if response_data is None:
-            print(country)
+            print(f'[None] {country}')
         else:
             # 对于指定国家，遍历每个日期
             for (index, i) in enumerate(list(response_data)):
@@ -96,10 +105,14 @@ def epidemic_global_import(start_dt=None):
                 tmp.append({"date": date, "country_info": country_info})
 
     # 遍历每个时间直到当前
-    while start_dt <= datetime.datetime.now().strftime("%Y-%m-%d"):
-        print(start_dt)
-        # bar = tqdm(tmp)
-        # bar.set_description(start_dt)
+    days = (datetime.datetime.now().date() - datetime.datetime.strptime(start_dt, '%Y-%m-%d')).days + 1
+    bar = tqdm(
+        total=days, initial=0, dynamic_ncols=True,
+    )
+    while start_dt <= datetime.datetime.now().strftime('%Y-%m-%d'):
+        bar.set_description('[requesting]')
+        bar.update(1)
+        bar.set_postfix_str(start_dt)
         countries = []
         for i in tmp:
             if i["date"] == start_dt:
@@ -109,8 +122,9 @@ def epidemic_global_import(start_dt=None):
             "countries": countries
         })
         start_dt = dt_delta(start_dt, 1)
+    bar.close()
 
-    res = requests.get(url_world, headers=headers)
+    res = requests_get(url_world, headers=headers)
     response_data = json.loads(res.text)["data"]["FAutoGlobalStatis"]
     # "nowConfirm":27722322,"confirm":186625242,"heal":154877929,"dead":4024991,"nowConfirmAdd":67126,
     # "confirmAdd":265520,"healAdd":194268,"deadAdd":4126,"lastUpdateTime":"2021-07-10 10:22:42"}}}
@@ -135,4 +149,3 @@ def epidemic_global_import(start_dt=None):
 
 if __name__ == '__main__':
     epidemic_global_import()
-# print(res.text)
