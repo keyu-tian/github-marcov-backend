@@ -40,7 +40,7 @@ country_dict = {
     "Georgia": "格鲁吉亚",
     "Finland": "芬兰",
     "Greece": "希腊",
-    "Burundi": "蒲隆地",
+    "Burundi": "布隆迪",
     "Jamaica": "牙买加",
     "Mongolia": "蒙古",
     "Uganda": "乌干达",
@@ -170,7 +170,7 @@ country_dict = {
     "Maldives": "马尔代夫",
     "Israel": "以色列",
     "Dominican Republic": "多米尼加共和国",
-    "Guinea-Bissau": "几内亚比索",
+    "Guinea-Bissau": "几内亚比绍",
     "Germany": "德国",
     "Kuwait": "科威特",
     "Denmark": "丹麦",
@@ -179,6 +179,8 @@ country_dict = {
     "Myanmar": "缅甸",
     "Congo-Brazzaville": "刚果",
     "Congo-Kinshasa": "刚果民主共和国",
+    "Côte d'Ivoire": "科特迪瓦",
+    "Macedonia": "马其顿",
 }
 
 country_population = {'China': 1439323776, 'India': 1380004385, 'US': 331002651, 'Indonesia': 273523615,

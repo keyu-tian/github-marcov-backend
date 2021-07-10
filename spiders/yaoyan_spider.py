@@ -1,17 +1,14 @@
 import json
 import os
 
-from selenium import webdriver
-import argparse
-from xml.dom.minidom import parse
-import xml.dom.minidom
 import requests
+from tqdm import tqdm
 
 # 丁香医生辟谣爬取
 from meta_config import SPIDER_DATA_DIRNAME
 
 
-def spider(path):
+def main():
     '''
     {
     "code": "success",
@@ -28,27 +25,29 @@ def spider(path):
         },
         ]
     '''
+    path = os.path.join(SPIDER_DATA_DIRNAME, 'yaoyan_spider_all')
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    path = os.path.join(path, 'rumor.json')
+    if os.path.exists(path):
+        os.remove(path)
+    
     url = 'https://file1.dxycdn.com/2020/0130/454/3393874921745912507-115.json?t=27092733'
     response = requests.get(url, headers={'Content-Type': 'application/json'}, timeout=10)
     js = json.loads(response.text)
     if js['code'] == 'success':
         # with open(f'{SPIDER_DATA_DIRNAME}/rumor.json', 'a', encoding='utf-8') as fp:
-        if not os.path.exists(path):
-            os.makedirs(path)
-        with open(os.path.join(path, 'rumor.json'), 'a', encoding='utf-8') as fp:
-            for a in js['data']:
+        with open(path, 'a', encoding='utf-8') as fp:
+            bar = tqdm(list(enumerate(js['data'])))
+            for line, a in bar:
+                bar.set_description(f'[line{line}]')
                 fp.write(json.dumps({
                     'title': a['title'],
                     'summary': a['mainSummary'],
                     'body': a['body'],
                 }) + '\n')
-
-
-def main():
-    parser = argparse.ArgumentParser(description='Train-Spider')
-    parser.add_argument('--path', required=False, default=os.path.join(SPIDER_DATA_DIRNAME, 'yaoyan_spider_all'), type=str)
-    args = parser.parse_args()
-    spider(args.path)
+            bar.close()
 
 
 if __name__ == '__main__':

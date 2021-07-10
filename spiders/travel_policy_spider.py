@@ -12,22 +12,23 @@ import requests
 from meta_config import SPIDER_DATA_DIRNAME
 
 
-def get_input_options_by_json(path):
+def get_input_options():
     res = {}
-    if not os.path.exists(path):
-        os.makedirs(path)
-    with open(os.path.join(os.path.split(path)[0], 'travel_policy_cities.json'), 'r', encoding='utf-8') as jsonfile:
-        js = json.load(jsonfile)
+    with open(os.path.join('spiders', 'travel_policy_cities.json'), 'r', encoding='utf-8') as fp:
+        js = json.load(fp)
     for i in range(len(js['data'])):
         if js['data'][i]['province'] not in res.keys():
             res[js['data'][i]['province']] = []
         res[js['data'][i]['province']].append([js['data'][i]['city']])
-    # with open(os.path.join(path, 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
-    #     fp.write(json.dumps(res) + '\n')
     return res
 
 
-def spider(path, res):
+def main():
+    path = os.path.join(SPIDER_DATA_DIRNAME, 'travel_policy_spider_all')
+    if not os.path.exists(path):
+        os.makedirs(path)
+        
+    res = get_input_options()
     '''
     {"success":true,
     "code":0,
@@ -38,10 +39,14 @@ def spider(path, res):
     "city":"朝阳","param1":    {"success":false,"code":2,"msg":"没有查询的城市","data":null}
     '''
     output_json_fname = os.path.join(path, 'policy_by_city.json')
-    os.remove(output_json_fname)
+    if os.path.exists(output_json_fname):
+        os.remove(output_json_fname)
     
     url = 'http://wx.wind.com.cn/alert/traffic/getPolicy?city='
-    for i in tqdm(range(len(list(res.keys()))), dynamic_ncols=True):
+
+    bar = tqdm(range(len(list(res.keys()))), dynamic_ncols=True)
+    for i in bar:
+        bar.set_description(f'[line{i}]')
         city_list = res.get(list(res.keys())[i])
         for j in range(len(city_list)):
             get_url = url + city_list[j][0]
@@ -55,15 +60,7 @@ def spider(path, res):
                         'enter_policy': js['data']['enterPolicy'],
                         'out_policy': js['data']['outPolicy'],
                     }) + '\n')
-
-
-def main():
-    parser = argparse.ArgumentParser(description='Train-Spider')
-    parser.add_argument('--path', required=False, default=os.path.join(SPIDER_DATA_DIRNAME, 'travel_policy_spider_all'), type=str)
-    args = parser.parse_args()
-    res = get_input_options_by_json(args.path)
-    print(res)
-    spider(args.path, res)
+    bar.close()
 
 
 if __name__ == '__main__':

@@ -6,16 +6,18 @@ import os
 import re
 from datetime import datetime
 
+from tqdm import tqdm
+
 from meta_config import IMPORTER_DATA_DIRNAME
 from utils.dict_ch import province_dict_ch, province_population, city_dict_ch
-from epidemic.models import HistoryEpidemicData
+from utils.download import download_from_url
 
 delta = dt.timedelta(days=1)
 
 
 # from spiders.epidemic_domestic_importer import epidemic_domestic_import
-def epidemic_domestic_import(to_database=False, date_begin='2020-01-22',
-                             date_end=datetime.strftime(dt.date(2021, 7, 8) - delta, '%Y-%m-%d')):
+def epidemic_domestic_import(date_begin='2020-01-22',
+                             date_end=datetime.strftime(datetime.today() - delta, '%Y-%m-%d')):
     # 正式版本参数中应为datetime.today()
 
     date_begin = date_begin.split('-')
@@ -24,26 +26,19 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22',
     end = dt.date(int(date_end[0]), int(date_end[1]), int(date_end[2]))
 
     input_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')
-    csv_download_path = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'DXYArea.csv')
     area_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'area.json')
     province_json_file = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
     city_json_file_directory = os.path.join(IMPORTER_DATA_DIRNAME, 'epidemic_domestic_data', 'provinces')
-    out_title = [
-        'country_ch', 'province_ch', 'city_ch', 'province_total_died', 'province_total_cured',
-        'province_total_confirmed', 'province_new_died', 'province_new_cured', 'province_new_confirmed',
-        'city_total_died', 'city_total_cured', 'city_total_confirmed', 'city_new_died', 'city_new_cured',
-        'city_new_confirmed'
-    ]
+    if not os.path.exists(city_json_file_directory):
+        os.makedirs(city_json_file_directory)
 
-    print('loading...')
     # TODO: 获取当天数据
-    '''
     try:
-        os.system('wget https://github.com/BlankerL/DXY-COVID-19-Data/releases/download/%s/DXYArea.csv --no-check-certificate -o ' % (dt.datetime.strftime(dt.date.today(), '%Y.%m.%d')) + csv_download_path)
+        os.remove(input_file)
     except:
-        print('更新数据失败')
-        return
-    '''
+        pass
+    url = 'https://github.com.cnpmjs.org/BlankerL/DXY-COVID-19-Data/releases/download/%s/DXYArea.csv' % datetime.strftime(datetime.today(), '%Y.%m.%d')
+    download_from_url(url, input_file)
 
     f = open(input_file, "r", encoding='utf-8')
     title = f.readline()[:-1].split(',')
@@ -93,15 +88,19 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22',
         last[city]['city_total_cured'] = 0
         last[city]['city_total_confirmed'] = 0
 
-    print('extracting...')
     d = begin
     analysis = []
     idx = 0
     while all_data[idx]['updateTime'] != (d + delta).strftime('%Y-%m-%d'):
         idx += 1
+    bar = tqdm(
+        total=(end-begin).days + 1, initial=0, dynamic_ncols=True,
+    )
     while d <= end:
+        bar.set_description('[extracting]')
+        bar.update(1)
         nd = d.strftime('%Y-%m-%d')
-        print(nd)
+        bar.set_postfix_str(nd)
         daily_info[nd] = {}
         for city in last.keys():
             daily_info[nd][city] = {}
@@ -163,28 +162,29 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22',
             last[city]['city_total_cured'] = max(daily_info[nd][city]['city_total_cured'], 0)
             last[city]['city_total_confirmed'] = max(daily_info[nd][city]['city_total_confirmed'], 0)
 
-        if to_database:
-            objs = []
-            for it in daily_info[nd].items():
-                dic = {'date': nd}
-                for k in out_title:
-                    dic[k] = it[1][k]
-                objs.append(HistoryEpidemicData(**dic))
-            HistoryEpidemicData.objects.bulk_create(objs)
         d += delta
-    d = begin
+    bar.close()
+
+    # TODO: 在此更新最新一天的数据，数据源为akshare的丁香园接口，可以考虑写新importer更新当天最新数据
+    # TODO: 发现akshare不行，丁香园就是不靠谱，考虑采用腾讯api
+    # TODO: 现有最新数据7.8，今天7.10可以用akshare获取7.9数据，再使用腾讯api回去10号以及之后的最新数据
 
     # Build jsons
-    print('building jsons...')
     city_back_to_front = {}
     for v, k in city_dict_ch.items():
         city_back_to_front[k] = v
     provinces = {}
     for p in province_dict_ch.values():
         provinces[p] = {}
+    d = begin
+    bar = tqdm(
+        total=(end-begin).days + 1, initial=0, dynamic_ncols=True,
+    )
     while d <= end:
+        bar.set_description('[jsoning]')
+        bar.update(1)
         nd = d.strftime('%Y-%m-%d')
-        print(nd)
+        bar.set_postfix_str(nd)
         daily_analysis = {'date': nd, 'provinces': []}
         for province_front, province in province_dict_ch.items():
             pd = {'name': province_front}
@@ -220,8 +220,14 @@ def epidemic_domestic_import(to_database=False, date_begin='2020-01-22',
 
         analysis.append(daily_analysis)
         d += delta
+    bar.close()
+    
     json.dump(analysis, open(province_json_file, 'w'), ensure_ascii=False)
     for province_front, province in province_dict_ch.items():
-        print('Building %s.json' % province)
         json.dump(provinces[province], open(os.path.join(city_json_file_directory, '%s.json' % province), 'w'),
-                  ensure_ascii=False)
+                  ensure_ascii=False, indent=2)
+
+
+if __name__ == '__main__':
+    epidemic_domestic_import()
+

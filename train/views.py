@@ -239,18 +239,18 @@ class TravelSearch(View):
         return 0, res
 
 
-class TravelPolicy(View):
-    @JSR('status', 'enter_policy', 'out_policy')
-    def post(self, request):
-        kwargs: dict = json.loads(request.body)
-        if kwargs.keys() != {'city'}:
-            return 1,
-        city_str = kwargs['city']
-        # 获取该地所属区
-        jingdu, weidu = address_to_jingwei(city_str)
-        city_name = jingwei_to_address(jingdu, weidu)['result']['addressComponent']['city']
-        # enter_policy = get_travel_enter_policy_msg(city_name)
-        # out_policy = get_travel_enter_policy_msg(city_name)
-        # if enter_policy == '':
-        #     # 获取省会
-        #     city_name = jingwei_to_address(jingdu, weidu)['result']['addressComponent']['province']
+# class TravelPolicy(View):
+#     @JSR('status', 'enter_policy', 'out_policy')
+#     def post(self, request):
+#         kwargs: dict = json.loads(request.body)
+#         if kwargs.keys() != {'city'}:
+#             return 1,
+#         city_str = kwargs['city']
+#         # 获取该地所属区
+#         jingdu, weidu = address_to_jingwei(city_str)
+#         city_name = jingwei_to_address(jingdu, weidu)['result']['addressComponent']['city']
+#         # enter_policy = get_travel_enter_policy_msg(city_name)
+#         # out_policy = get_travel_enter_policy_msg(city_name)
+#         # if enter_policy == '':
+#         #     # 获取省会
+#         #     city_name = jingwei_to_address(jingdu, weidu)['result']['addressComponent']['province']
