@@ -1,6 +1,7 @@
 import functools
 import json
 import time
+import os
 from datetime import datetime
 from pprint import pformat
 
@@ -8,6 +9,7 @@ from colorama import Fore
 from django.http import JsonResponse, HttpResponseForbidden
 
 import meta_config
+from meta_config import IMPORTER_DATA_DIRNAME
 
 
 def JSR(*keys): # 这里的 keys 是 @JSR(...) 里面填的 keys
@@ -58,10 +60,29 @@ def JSR(*keys): # 这里的 keys 是 @JSR(...) 里面填的 keys
                     cur_dt = datetime.now()
                     dt_str = cur_dt.strftime("%H:%M:%S.") + f'{float(cur_dt.strftime("0.%f")):.2f}'[-2:]
                     # 【关键】给正常返回的请求打印一下
-                    if func_name in ['analysis.CountryAnalyze.POST', 'analysis.DomesticAnalyze.GET', 'analysis.InternationalAnalyze.GET', 'analysis.SearchAnalyse.POST', 'news.WeeklyNews.POST']:
-                        ret_str = str(dict(status=ret_dict.get('status', 0)))
+                    if func_name in {
+                        'analysis.DomesticAnalyze.GET', 'analysis.DomesticTodayAnalyze.GET',
+                        'analysis.InternationalAnalyze.GET', 'analysis.InternationalTodayAnalyze.GET',
+                        'analysis.CountryAnalyze.POST', 'analysis.SearchAnalyse.POST',
+                        'news.WeeklyNews.POST',
+                    }:
+                        ret_str = Fore.WHITE + '(TOO LONG) '
+                        ret_str += Fore.GREEN + str(dict(status=ret_dict.get('status', 0)))
                     else:
                         ret_str = pformat(ret_dict)
+                        if len(ret_str) > 1500:
+                            too_long_fname = os.path.join(IMPORTER_DATA_DIRNAME, 'JSR.too.long')
+                            if os.path.exists(too_long_fname):
+                                with open(too_long_fname, 'r') as fp:
+                                    names = json.load(fp)
+                            else:
+                                names = []
+                            with open(too_long_fname, 'w') as fp:
+                                names.append(func_name)
+                                json.dump(sorted(list(set(names))), fp, indent=2, ensure_ascii=False)
+                            
+                            ret_str = Fore.WHITE + '(TOO LONG) '
+                            ret_str += Fore.GREEN + str(dict(status=ret_dict.get('status', 0)))
                     
                     print(c + f'[{func_name}] input: {inputs}\n ret: {ret_str}, time: {time_cost:.2f}s, at [{dt_str}]', flush=True)
                 if ret_dict.get('status', 0) == 403:

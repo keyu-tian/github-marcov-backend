@@ -23,18 +23,20 @@ class WeeklyNews(View):
         if kwargs.keys() != {'date'}:
             return 1, '', [], []
         res_china, res_global = [], []
+        today_date = datetime.now().date()
+        
         if kwargs['date'] == '':
-            end_date = datetime.now().date()
+            for dis in range(7):
+                cur_date = today_date - timedelta(days=dis)
+                WeeklyNews.res_append(News.objects.filter(publish_time=cur_date), res_china, res_global)
         else:
             try:
-                end_date = datetime.strptime(kwargs['date'], '%Y-%m-%d').date()
+                someday_date = datetime.strptime(kwargs['date'].split('T')[0], '%Y-%m-%d').date()
+                WeeklyNews.res_append(News.objects.filter(publish_time=someday_date), res_china, res_global)
             except:
-                return 7, '', [], []
-        for dis in range(7):
-            now = end_date - timedelta(days=dis)
-            WeeklyNews.res_append(News.objects.filter(publish_time=now), res_china, res_global)
+                return 2, '', [], []
         
-        return 0, end_date.strftime('%Y-%m-%d'), res_china, res_global
+        return 0, today_date.strftime('%Y-%m-%d'), res_china, res_global
     
     @staticmethod
     def res_append(query, res_china, res_global):

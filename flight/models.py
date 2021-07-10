@@ -1,13 +1,17 @@
 from django.db import models
+from country.models import City
 
 
-# Create your models here.
+class Airport(models.Model):
+    name = models.CharField(verbose_name='机场名', max_length=255)
+    airport_code = models.CharField(verbose_name='机场代码', max_length=255)
+    city = models.ForeignKey(to=City, on_delete=models.SET_NULL, related_name='city_airport_set', blank=True, null=True)
+
+
 class Flight(models.Model):
-
     code = models.CharField(verbose_name='班次号', max_length=255)
     dept_time = models.CharField(verbose_name='出发时间', max_length=255, default='')
-    dept_city = models.ForeignKey('country.City', related_name='start_flight', on_delete=models.SET_NULL, null=True, blank=True)
+    dept_airport = models.ForeignKey(to=Airport, related_name='start_flight', on_delete=models.SET_NULL, null=True, blank=True)
     arri_time = models.CharField(verbose_name='到达时间', max_length=255, default='')
-    arri_city = models.ForeignKey('country.City', related_name='end_flight', on_delete=models.SET_NULL, null=True, blank=True)
+    arri_airport = models.ForeignKey(to=Airport, related_name='end_flight', on_delete=models.SET_NULL, null=True, blank=True)
     condition = models.CharField(verbose_name='航班状态', max_length=255, default='')
-
