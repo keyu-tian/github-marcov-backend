@@ -84,7 +84,7 @@ def gd_address_to_jingwei_and_province_city(address):
         return None
     js = json.loads(res.text)
     if 'geocodes' not in js.keys():
-        print(js)
+        print(json.dumps(js) + f"address:{address}")
         return None
     if len(js['geocodes']) == 0:
         return None
