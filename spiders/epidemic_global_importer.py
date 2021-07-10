@@ -61,7 +61,7 @@ def epidemic_global_import(start_dt=None):
     vacc_file = os.path.join(IMPORTER_DATA_DIRNAME, 'vaccinations.csv')
     if os.path.exists(vacc_file):
         os.remove(vacc_file)
-    download_from_url('https://github.com/owid/covid-19-data/raw/master/public/data/vaccinations/vaccinations.csv', vacc_file)
+    download_from_url('https://github.com.cnpmjs.org/owid/covid-19-data/raw/master/public/data/vaccinations/vaccinations.csv', vacc_file)
     data_vaccinations = pandas.read_csv(vacc_file).fillna(0)
     
     requests.packages.urllib3.disable_warnings()
