@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from datetime import datetime
 from django.db.models import Q
-from country.models import Country, City
+from country.models import Country, City, Policy
 
 
 def get_num_by_image(url):
@@ -261,13 +261,15 @@ class TravelPlane(View):
             end_station['country_name'] = ''
         stations.append(start_station)
         stations.append(end_station)
-        # msg = Policy.objects.filter(city_name=state_data.city_ch)
-        # if msg.count() == 0:
-        #     msg = '未知'
-        # else:
-        #     msg = msg.first().enter_policy+'\n'+msg.first().out_policy
+        msg = ''
+        msg1 = Policy.objects.filter(city_name=start_station['city_name'])
+        msg2 = Policy.objects.filter(city_name=end_station['city_name'])
+        if msg1.count() != 0:
+            msg += msg1.first().out_policy
+        if msg2.count() != 0:
+            msg += msg2.first().enter_policy
         info = {
             'level': min(start_station['risk_level']+end_station['risk_level'], 5),
-            'msg': '未知'
+            'msg': msg
         }
         return 0, stations, info, dept_time
