@@ -78,11 +78,11 @@ def gd_address_to_jingwei_and_province_city(address):
     if 'geocodes' not in js.keys():
         print(f"address={address}: 无法获取所在城市（json.dumps(js)=\n{json.dumps(js, indent=2)}）")
         return None
-    if not isinstance(js['geocodes'][0]['city'], str):
-        print(f"address={address}: 无法获取所在城市（高德返回的js['geocodes'][0]['city']={js['geocodes'][0]['city']}）")
-        return None
     if len(js['geocodes']) == 0:
         print(f"address={address}: 无法获取所在城市（高德返回的js['geocodes']={js['geocodes']}）")
+        return None
+    if not isinstance(js['geocodes'][0]['city'], str):
+        print(f"address={address}: 无法获取所在城市（高德返回的js['geocodes'][0]['city']={js['geocodes'][0]['city']}）")
         return None
     
     return {
