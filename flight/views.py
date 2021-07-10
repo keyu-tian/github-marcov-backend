@@ -177,7 +177,7 @@ def get_flight_dept_and_arri_info_res(flight):
     end['station_name'] = flight.arri_airport.name if flight.arri_airport else '未知'
     end['city_name'] = end_city.name_ch if end_city else '未知'
     end['country_name'] = end_city.country.name_ch if end_city and end_city.country else '未知'
-    end['risk'] = address_to_jingwei(end_city['city_name']) if end_city else 0
+    end['risk'] = address_to_jingwei(end['city_name']) if end_city else 0
     end['datetime'] = flight.arri_time
     result['start'] = start
     result['end'] = end
