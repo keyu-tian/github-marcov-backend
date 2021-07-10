@@ -6,7 +6,7 @@ from retrying import retry
 from meta_config import IMPORTER_DATA_DIRNAME
 
 
-@retry(delay=1, tries=4, backoff=2)
+@retry(stop_max_attempt_number=5, wait_fixed=500)
 def download_from_url(url, fpath):
     """
     :example:
