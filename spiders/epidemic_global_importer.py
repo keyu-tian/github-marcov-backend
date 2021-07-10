@@ -10,7 +10,7 @@ from tqdm import tqdm
 from meta_config import SPIDER_DATA_DIRNAME
 from utils.country_dict import country_dict, re_country_vaacinations_dict
 from utils.download import download_from_url
-
+from spiders.epidemic_China_total_importer import epidemic_China_total_import
 
 def dt_change_ymd(date):
     # 月-日-年 -> 年-月-日
@@ -58,12 +58,13 @@ def requests_get(url, headers):
 
 
 def epidemic_global_import(start_dt=None):
+    print(os.getcwd())
     vacc_file = os.path.join(SPIDER_DATA_DIRNAME, 'vaccinations.csv')
     if os.path.exists(vacc_file):
         os.remove(vacc_file)
     download_from_url('https://github.com.cnpmjs.org/owid/covid-19-data/raw/master/public/data/vaccinations/vaccinations.csv', vacc_file)
     data_vaccinations = pandas.read_csv(vacc_file).fillna(0)
-    
+
     requests.packages.urllib3.disable_warnings()
     if start_dt is None:
         start_dt = begin
@@ -124,26 +125,36 @@ def epidemic_global_import(start_dt=None):
                         total_vaccinated = \
                             last_total_vaccinated + new_vaccinated if new_vaccinated != "未知" else total_vaccinated
                         last_total_vaccinated = total_vaccinated
-                
-                country_info = {
-                    "name": country,
-                    "population": 0,  # todo
-                    "new": {
-                        "died": 0 if index == 0 else max(i["dead"] - response_data[index - 1]["dead"], 0),
-                        "cured": 0 if index == 0 else max(i["heal"] - response_data[index - 1]["heal"], 0),
-                        "confirmed": i['confirm_add'],
-                        "vaccinated": new_vaccinated
-                    },
-                    "total": {
-                        "died": i["dead"],
-                        "cured": i["heal"],
-                        "confirmed": i["confirm"],
-                        "vaccinated": total_vaccinated
-                    }}
+                if country == "中国":
+                    China_info = epidemic_China_total_import(date)
+                    country_info = {
+                        "name": country,
+                        "population": 0,  # todo
+                        "new": China_info["new"],
+                        "total": China_info["total"]
+                    }
+                    country_info["new"]["vaccinated"] = new_vaccinated
+                    country_info["total"]["vaccinated"] = total_vaccinated
+                else:
+                    country_info = {
+                        "name": country,
+                        "population": 0,  # todo
+                        "new": {
+                            "died": 0 if index == 0 else max(i["dead"] - response_data[index - 1]["dead"], 0),
+                            "cured": 0 if index == 0 else max(i["heal"] - response_data[index - 1]["heal"], 0),
+                            "confirmed": i['confirm_add'],
+                            "vaccinated": new_vaccinated
+                        },
+                        "total": {
+                            "died": i["dead"],
+                            "cured": i["heal"],
+                            "confirmed": i["confirm"],
+                            "vaccinated": total_vaccinated
+                        }}
                 tmp.append({"date": date, "country_info": country_info})
-    
+
     # 遍历每个时间直到当前
-    days = (datetime.datetime.now().date() - datetime.datetime.strptime(start_dt, '%Y-%m-%d')).days + 1
+    days = (datetime.datetime.now().date() - datetime.datetime.strptime(start_dt, '%Y-%m-%d').date()).days + 1
     bar = tqdm(
         total=days, initial=0, dynamic_ncols=True,
     )
@@ -161,7 +172,7 @@ def epidemic_global_import(start_dt=None):
         })
         start_dt = dt_delta(start_dt, 1)
     bar.close()
-    
+
     res = requests_get(url_world, headers=headers)
     response_data = json.loads(res.text)["data"]["FAutoGlobalStatis"]
     # "nowConfirm":27722322,"confirm":186625242,"heal":154877929,"dead":4024991,"nowConfirmAdd":67126,
@@ -180,7 +191,7 @@ def epidemic_global_import(start_dt=None):
         }
     }
     dataout.append(today)
-    
+
     with open(os.path.join(SPIDER_DATA_DIRNAME, 'global.json'), 'w', encoding='utf-8') as f:
         json.dump(dataout, f, ensure_ascii=False, indent=2)
 
