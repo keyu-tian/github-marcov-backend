@@ -84,7 +84,7 @@ class SearchAnalyse(View):
                         })
         else:
             global_analysis = json.load(open(global_json_path, 'r', encoding='utf-8'))
-            for d in global_analysis:
+            for d in global_analysis[:-1]:
                 for c in d['countries']:
                     if c['name'] == kwargs['name']:
                         daily_data.append({
@@ -124,7 +124,7 @@ class CountryAnalyze(View):
                         })
         else:
             global_analysis = json.load(open(global_json_path, 'r', encoding='utf-8'))
-            for d in global_analysis:
+            for d in global_analysis[:-1]:
                 for c in d['countries']:
                     if c['name'] == kwargs['name']:
                         daily_data.append({
