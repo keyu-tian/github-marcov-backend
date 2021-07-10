@@ -60,6 +60,10 @@ def train_import(line_start=0):
                                                                            'arri_date': arri_date,
                                                                            'arri_time': arri_time})
             if flag:
+                train.dept_station = dept_sta
+                train.arri_station = arri_sta
+                train.dept_city = dept_city
+                train.arri_city = arri_city
                 train.interval = result.get('extInfo').get('allTime')
                 train.kilometer = result.get('extInfo').get('allMileage')
                 mid_list = result.get('trainScheduleBody')
