@@ -45,7 +45,12 @@ def address_to_jingwei(address) -> (float, float):
         res = requests.get(url=url)
     except:
         return None, None
-    js = json.loads(re.findall(r'showLocation&&showLocation\((.+)\)', res.text)[0])
+    js_list = re.findall(r'showLocation&&showLocation\((.+)\)', res.text)
+    if len(js_list):
+        js = json.loads(js_list[0])
+    else:
+        print(res.text)
+        return 0, 0
     if int(js['status']) == 0:
         jingdu = float(js['result']['location']['lng'])
         weidu = float(js['result']['location']['lat'])
