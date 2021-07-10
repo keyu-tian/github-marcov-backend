@@ -59,9 +59,15 @@ def get_train_info_res(train):
         })
         total_risk_level += float(risk_level) / count
     total_risk_level += float(get_city_risk_level(train.dept_city)) / count
+    if math.ceil(total_risk_level) >= 4:
+        msg = '当前线路存在较大疫情风险，请谨慎考虑出行。'
+    elif math.ceil(total_risk_level) >= 1:
+        msg = '当前线路存在疫情风险，请做好防护，谨慎出行。'
+    else:
+        msg = '当前线路无疫情风险，请放心出行。'
     res['info'] = {
         'level': math.ceil(total_risk_level) if math.ceil(total_risk_level) <= 5 else 5,
-        'msg': '贴心话贴心话',  # todo：贴心话
+        'msg': msg,
     }
     return res
 
