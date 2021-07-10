@@ -1,4 +1,5 @@
 import json
+from collections import defaultdict
 
 from tqdm import tqdm
 
@@ -11,6 +12,7 @@ def flight_daily_import():
     with open(f'{SPIDER_DATA_DIRNAME}/flights_data.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
 
+    imported = defaultdict(bool)
     objs = []
     bar = tqdm(list(enumerate(data)), dynamic_ncols=True)
     for line, item in bar:
@@ -29,8 +31,10 @@ def flight_daily_import():
             arri_airport = Airport.objects.filter(airport_code=arri_airport).get()
         if arri_airport is None or dept_airport is None:
             continue
-        kwargs = {'code': item['code'], 'dept_time': item['dept_time'], 'dept_airport': dept_airport, 'arri_time': item['arri_time'], 'arri_airport': arri_airport, 'condition': item['condition']}
-        objs.append(Flight(**kwargs))
+        if not imported[item['code']]:
+            imported[item['code']] = True
+            kwargs = {'code': item['code'], 'dept_time': item['dept_time'], 'dept_airport': dept_airport, 'arri_time': item['arri_time'], 'arri_airport': arri_airport, 'condition': item['condition']}
+            objs.append(Flight(**kwargs))
     bar.close()
     
     Flight.objects.bulk_create(objs, BULK_CREATE_BATCH_SIZE)
