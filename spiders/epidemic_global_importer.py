@@ -52,7 +52,7 @@ begin = '2020-01-01'
 dataout = []
 
 
-@retry(stop_max_attempt_number=10, wait_fixed=100)
+@retry(stop_max_attempt_number=10, wait_random_min=500, wait_random_max=5000)
 def requests_get(url, headers):
     return requests.get(url, headers=headers)
 
