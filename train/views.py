@@ -144,7 +144,7 @@ class TravelSearch(View):
                 res.append(get_train_dept_and_arri_info_res(a))
             for a in Flight.objects.filter(code__icontains=key):
                 res.append(get_flight_dept_and_arri_info_res(a))
-        return 0, {'results': res}
+        return 0, res
 
 
 # class TravelPolicy(View):
