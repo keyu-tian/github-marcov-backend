@@ -1,7 +1,16 @@
 import json
 import os
 import re
+import marcov19.settings
+from django.conf import settings
 
+from utils.dict_ch import city_dict_ch
+
+settings.configure(DEBUG=True, default_settings=marcov19.settings)
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
+import django
+django.setup()
 from tqdm import tqdm
 
 from country.models import Country, City
@@ -84,12 +93,18 @@ def train_import(line_start=0):
                     sta, flag = Station.objects.get_or_create(name_cn=content[1])
                     if flag:  # 是新建，存经纬度
                         sta.jingdu, sta.weidu = address_to_jingwei(content[1] + '站')
+                        if sta.jingdu == 0 and sta.weidu == 0:
+                            sta.jingdu, sta.weidu = address_to_jingwei(content[1])
                         js = jingwei_to_address(sta.jingdu, sta.weidu)
-                        city_name = re.findall(r'(.*)市', js['result']['addressComponent']['city'])
-                        if len(city_name):
-                            city_name = city_name[0]
+                        if js['result']['addressComponent']['city'] in city_dict_ch.keys():
+                            city_name = city_dict_ch[js['result']['addressComponent']['city']]
                         else:
-                            city_name = js['result']['addressComponent']['city']
+                            print(f"city_dict_ch表中无{js['result']['addressComponent']['city']}映射")
+                            city_name = re.findall(r'(.*)市', js['result']['addressComponent']['city'])
+                            if len(city_name):
+                                city_name = city_name[0]
+                            else:
+                                city_name = js['result']['addressComponent']['city']
                         mid_city, flag = City.objects.get_or_create(name_ch=city_name)
                         if flag:  # 数据库没有的新的国家，存名字
                             mid_city.country = country
@@ -105,3 +120,6 @@ def train_import(line_start=0):
         else:
             bar.set_postfix_str(f'failed!')
     MidStation.objects.bulk_create(objs, batch_size=BULK_CREATE_BATCH_SIZE)
+
+if __name__ == '__main__':
+    train_import()
