@@ -97,8 +97,8 @@ def epidemic_domestic_import(date_begin='2020-01-22',
         total=(end-begin).days + 1, initial=0, dynamic_ncols=True,
     )
     while d <= end:
-        bar.update(1)
         bar.set_description('[extracting]')
+        bar.update(1)
         nd = d.strftime('%Y-%m-%d')
         bar.set_postfix_str(nd)
         daily_info[nd] = {}
@@ -182,6 +182,7 @@ def epidemic_domestic_import(date_begin='2020-01-22',
     )
     while d <= end:
         bar.set_description('[jsoning]')
+        bar.update(1)
         nd = d.strftime('%Y-%m-%d')
         bar.set_postfix_str(nd)
         daily_analysis = {'date': nd, 'provinces': []}
@@ -224,7 +225,7 @@ def epidemic_domestic_import(date_begin='2020-01-22',
     json.dump(analysis, open(province_json_file, 'w'), ensure_ascii=False)
     for province_front, province in province_dict_ch.items():
         json.dump(provinces[province], open(os.path.join(city_json_file_directory, '%s.json' % province), 'w'),
-                  ensure_ascii=False)
+                  ensure_ascii=False, indent=2)
 
 
 if __name__ == '__main__':
