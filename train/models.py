@@ -11,7 +11,7 @@ class Station(models.Model):
 
 
 class Train(models.Model):
-    name = models.CharField(max_length=64, null=False)  # 火车号
+    name = models.CharField(primary_key=True, unique=True, max_length=64, db_index=True, null=False)  # 火车号
     dept_date = models.CharField(max_length=DT_LENGTH, null=True, blank=True)
     dept_time = models.CharField(max_length=DT_LENGTH, null=True, blank=True)
     dept_city = models.ForeignKey('country.City', related_name='start_train', on_delete=models.SET_NULL, null=True, blank=True)

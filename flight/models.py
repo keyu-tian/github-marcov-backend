@@ -9,7 +9,7 @@ class Airport(models.Model):
 
 
 class Flight(models.Model):
-    code = models.CharField(verbose_name='班次号', max_length=255)
+    code = models.CharField(primary_key=True, unique=True, max_length=64, db_index=True, null=False)
     dept_time = models.CharField(verbose_name='出发时间', max_length=255, default='')
     dept_airport = models.ForeignKey(to=Airport, related_name='start_flight', on_delete=models.SET_NULL, null=True, blank=True)
     arri_time = models.CharField(verbose_name='到达时间', max_length=255, default='')
