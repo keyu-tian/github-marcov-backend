@@ -1,15 +1,14 @@
+import datetime
+import json
 import os
 
 import pandas
 import requests
-import json
 from retrying import retry
-from utils.country_dict import country_dict, re_country_vaacinations_dict
-from meta_config import IMPORTER_DATA_DIRNAME
-import time
-import datetime
 from tqdm import tqdm
 
+from meta_config import IMPORTER_DATA_DIRNAME
+from utils.country_dict import country_dict, re_country_vaacinations_dict
 from utils.download import download_from_url
 
 
@@ -51,9 +50,6 @@ headers = {
 begin = '2020-01-01'
 
 dataout = []
-
-
-
 
 
 @retry(stop_max_attempt_number=10, wait_fixed=100)
@@ -128,7 +124,7 @@ def epidemic_global_import(start_dt=None):
                         total_vaccinated = \
                             last_total_vaccinated + new_vaccinated if new_vaccinated != "未知" else total_vaccinated
                         last_total_vaccinated = total_vaccinated
-
+                
                 country_info = {
                     "name": country,
                     "population": 0,  # todo
@@ -145,7 +141,7 @@ def epidemic_global_import(start_dt=None):
                         "vaccinated": total_vaccinated
                     }}
                 tmp.append({"date": date, "country_info": country_info})
-
+    
     # 遍历每个时间直到当前
     while start_dt <= datetime.datetime.now().strftime("%Y-%m-%d"):
         print(start_dt)
@@ -160,7 +156,7 @@ def epidemic_global_import(start_dt=None):
             "countries": countries
         })
         start_dt = dt_delta(start_dt, 1)
-
+    
     res = requests.get(url_world, headers=headers)
     response_data = json.loads(res.text)["data"]["FAutoGlobalStatis"]
     # "nowConfirm":27722322,"confirm":186625242,"heal":154877929,"dead":4024991,"nowConfirmAdd":67126,
@@ -179,7 +175,7 @@ def epidemic_global_import(start_dt=None):
         }
     }
     dataout.append(today)
-
+    
     with open(os.path.join(IMPORTER_DATA_DIRNAME, 'global.json'), 'w', encoding='utf-8') as f:
         json.dump(dataout, f, ensure_ascii=False, indent=2)
 
