@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.views.generic import TemplateView
 from django.views.static import serve
 from django.urls import path, re_path
+
+from country.views import TravelPolicy
 from train.views import *
 from flight.views import *
 from risk.views import *
@@ -53,7 +55,7 @@ urlpatterns = [
     path('travel/plane', TravelPlane.as_view()),
     # path('travel/city', ?.as_view()), # todo
     path('travel/country', CountryFlightInfo.as_view()),
-    # path('travel/policy', ?.as_view()), # todo
+    path('travel/policy', TravelPolicy.as_view()),
     
     # ======== 五、新闻 ========
     path('news/weekly', WeeklyNews.as_view()),
