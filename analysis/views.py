@@ -33,7 +33,7 @@ class DomesticTodayAnalyze(View):
 
 
 class InternationalAnalyze(View):
-    @JSR('status', 'data')
+    @JSR('status', 'data', 'today')
     def get(self, request):
         # json_path = os.path.join('spiders_data', 'epidemic_domestic_data', 'province.json')
         try:
@@ -41,11 +41,11 @@ class InternationalAnalyze(View):
             analysis = json.load(open(json_path, 'r', encoding='utf-8'))
         except:
             return 7
-        return 0, analysis
+        return 0, analysis[:-1], analysis[-1]
 
 
 class InternationalTodayAnalyze(View):
-    @JSR('status', 'data')
+    @JSR('status', 'data', 'today')
     def get(self, request):
         # json_path = os.path.join('spiders_data', 'epidemic_domestic_data', 'province.json')
         try:
@@ -53,7 +53,7 @@ class InternationalTodayAnalyze(View):
             analysis = json.load(open(json_path, 'r', encoding='utf-8'))
         except:
             return 7
-        return 0, [analysis[-1]]
+        return 0, [analysis[-2]], analysis[-1]
 
 
 class SearchAnalyse(View):
