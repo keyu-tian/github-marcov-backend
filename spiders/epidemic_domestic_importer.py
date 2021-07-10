@@ -94,9 +94,9 @@ def epidemic_domestic_import(date_begin='2020-01-22',
     while all_data[idx]['updateTime'] != (d + delta).strftime('%Y-%m-%d'):
         idx += 1
     bar = tqdm(
-        total=(end-begin).days + 1, initial=0, dynamic_ncols=True,
+        total=(end-begin).days, initial=0, dynamic_ncols=True,
     )
-    while d <= end:
+    while d < end:
         bar.set_description('[extracting]')
         bar.update(1)
         nd = d.strftime('%Y-%m-%d')
@@ -178,9 +178,9 @@ def epidemic_domestic_import(date_begin='2020-01-22',
         provinces[p] = {}
     d = begin
     bar = tqdm(
-        total=(end-begin).days + 1, initial=0, dynamic_ncols=True,
+        total=(end-begin).days, initial=0, dynamic_ncols=True,
     )
-    while d <= end:
+    while d < end:
         bar.set_description('[jsoning]')
         bar.update(1)
         nd = d.strftime('%Y-%m-%d')
