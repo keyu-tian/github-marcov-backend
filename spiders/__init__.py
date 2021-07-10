@@ -12,7 +12,7 @@ def re_import(name, launch_spider, *args, **kwargs):
 
 
 def init_import(re_import_train):
-    print(colorama.Fore.WHITE + '=> `init_import` finished.')
+    print(colorama.Fore.WHITE + '=> `init_import` started ...')
     
     from country.models import Country, City, Province
     colorama.init(autoreset=True)
@@ -41,7 +41,7 @@ def init_import(re_import_train):
     
 
 def daily_import():
-    print(colorama.Fore.WHITE + '=> `daily_import` finished.')
+    print(colorama.Fore.WHITE + '=> `daily_import` started ...')
     
     re_import('flight_daily', False)
     # todo:

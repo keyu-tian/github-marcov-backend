@@ -1,16 +1,16 @@
 import json
 import os
-import re
-import marcov19.settings
-from django.conf import settings
 
-from utils.dict_ch import city_dict_ch
+# from django.conf import settings
+#
+# import marcov19.settings
+#
+# settings.configure(DEBUG=True, default_settings=marcov19.settings)
+# import os
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
+# import django
+# django.setup()
 
-settings.configure(DEBUG=True, default_settings=marcov19.settings)
-import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'marcov19.settings')
-import django
-django.setup()
 from tqdm import tqdm
 
 from country.models import Country, City, Province
