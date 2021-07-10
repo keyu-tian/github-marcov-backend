@@ -249,15 +249,14 @@ class TravelPlane(View):
             airport_to_jingwei = json.loads(f.read())
         code, condition, dept_airport, arri_airport, dept_time, arri_time = get_flight_info_by_code(kwargs['number'])
         if code == '':
-            return 1, [], {}, []
+            return 2, [], {}, []
         stations = []
-        print(dept_airport, arri_airport)
+        # print(dept_airport, arri_airport)
         try:
-            dept_airport = Airport.objects.get(airport_code=dept_airport)
-            arri_airport = Airport.objects.get(airport_code=arri_airport)
+            dept_airport = Airport.objects.filter(airport_code=dept_airport)[0]
+            arri_airport = Airport.objects.filter(airport_code=arri_airport)[0]
         except:
-            print('你的城市表不全啊 giegie')
-            return 1, [], {}, []
+            return 3, [], {}, []
         start_station = {
             'station_name': dept_airport.name,
             'city_name': dept_airport.city.name_ch,
@@ -266,7 +265,7 @@ class TravelPlane(View):
             start_station['risk_level'] = get_city_risk_level(start_station['city_name'])
             start_station['pos'] = airport_to_jingwei.get(start_station['station_name'], [0, 0])
             city = City.objects.filter(name_ch__icontains=start_station['city_name'])
-            print(city)
+            # print(city)
             if city.count() == 0:
                 start_station['country_name'] = ''
             else:
