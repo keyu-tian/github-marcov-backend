@@ -21,6 +21,7 @@ def init_import(re_import_train=False):
     re_import('travel_policy', True, line_start=0)
     if re_import_train:
         re_import('train', False, line_start=0)
+    re_import('epidemic_domestic', False)
 
     print(colorama.Fore.GREEN + '=> finished.')
     
