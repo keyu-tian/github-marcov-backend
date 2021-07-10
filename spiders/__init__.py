@@ -12,6 +12,8 @@ def re_import(name, launch_spider, *args, **kwargs):
 
 
 def init_import(re_import_train):
+    print(colorama.Fore.WHITE + '=> `init_import` finished.')
+    
     from country.models import Country, City, Province
     colorama.init(autoreset=True)
 
@@ -33,13 +35,17 @@ def init_import(re_import_train):
     re_import('flight_once', False)                     # 不launch是因为 flight_once 的 spider 太慢（超过2h），而且需要 chromedrive.exe
 
     print('')
-    print(colorama.Fore.WHITE + '=> finished.')
+    print(colorama.Fore.WHITE + '=> `init_import` finished.')
+    
+    daily_import()
     
 
 def daily_import():
+    print(colorama.Fore.WHITE + '=> `daily_import` finished.')
+    
     re_import('flight_daily', False)
     # todo:
     # re_import('epidemic_domestic_daily', False)
 
     print('')
-    print(colorama.Fore.WHITE + '=> finished.')
+    print(colorama.Fore.WHITE + '=> `daily_import` finished.')
