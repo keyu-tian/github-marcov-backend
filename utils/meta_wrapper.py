@@ -51,7 +51,6 @@ def JSR(*keys): # 这里的 keys 是 @JSR(...) 里面填的 keys
                     + Fore.MAGENTA + f': {e}, {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n input: {inputs}, time: {time_cost:.2f}s'
                 )
                 print(err_str, file=sys.stdout, flush=True)
-                logging.error(err_str)
                 time.sleep(0.05)
                 # traceback.print_exc()
                 raise e
