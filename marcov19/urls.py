@@ -30,16 +30,16 @@ from analysis.views import *
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='index.html'), name='index'),
-    
+
     # ======== 一、全局 ========
     path('time', TimeInfo.as_view()),
-    
+
     # ======== 二、地图分析 ========
     path('map/province', MapProvince.as_view()),
     path('map/province_dt', MapProvinceDt.as_view()),
     path('map/oversea', MapOversea.as_view()),
     path('map/oversea_dt', MapOverseaDt.as_view()),
-    
+
     # ======== 三、数据分析 ========
     path('data/international_analyze', InternationalAnalyze.as_view()),
     path('data/today/international_analyze', InternationalTodayAnalyze.as_view()),
@@ -47,7 +47,7 @@ urlpatterns = [
     path('data/today/domestic_analyze', DomesticTodayAnalyze.as_view()),
     path('data/search', SearchAnalyse.as_view()),
     path('data/country_analyze', CountryAnalyze.as_view()),
-    
+
     # ======== 四、出行 ========
     path('travel/risk_area', RiskAreaList.as_view(), name='risk_area'),
     path('travel/search', TravelSearch.as_view()),
@@ -56,13 +56,13 @@ urlpatterns = [
     # path('travel/city', ?.as_view()), # todo
     path('travel/country', CountryFlightInfo.as_view()),
     path('travel/policy', TravelPolicy.as_view()),
-    
+
     # ======== 五、新闻 ========
     path('news/weekly', WeeklyNews.as_view()),
-    
+
     # ======== 六、小知识 ========
-    # todo：小知识
-    
+    path('rumor/list', RumorList.as_view()),
+
 
     # ======== 七、用户系统 ========
     path('account/login', Login.as_view()),
@@ -76,10 +76,10 @@ urlpatterns = [
     path('user_info', UserInfo.as_view()),
     path('identity', Identity.as_view()),
     path('upload_pic', UploadPic.as_view()),
-    
+
     # ======== 八、论坛 ========
     # todo：论坛
-    
+
 
     url(r'^', TemplateView.as_view(template_name='index.html')),
     re_path(r'^upload(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}, name='media')

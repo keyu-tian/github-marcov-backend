@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from django.views import View
 
-from news.models import News
+from news.models import News, Rumor
 from utils.meta_wrapper import JSR
 
 
@@ -53,3 +53,16 @@ class WeeklyNews(View):
                 'media_name': a.media,
                 'img_url': a.img if a.img else '',
             })
+
+
+class RumorList(View):
+    @JSR('status', 'data')
+    def post(self, request):
+        res = []
+        for a in Rumor.objects.all():
+            res.append({
+                'title': a.title,
+                'summary': a.summary,
+                'body': a.body,
+            })
+        return 0, res
