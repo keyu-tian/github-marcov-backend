@@ -13,7 +13,7 @@ def re_import(name, launch_spider, *args, **kwargs):
     exec(f'main(*args, **kwargs)')
 
 
-def init_import(re_import_train=False):
+def init_import(re_import_train):
     colorama.init(autoreset=True)
 
     Country.objects.all().delete()
