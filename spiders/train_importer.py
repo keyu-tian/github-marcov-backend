@@ -13,10 +13,10 @@ import django
 django.setup()
 from tqdm import tqdm
 
-from country.models import Country, City
+from country.models import Country, City, Province
 from meta_config import IMPORTER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
 from train.models import Train, Station, MidStation
-from utils.cast import address_to_jingwei, jingwei_to_address
+from utils.cast import address_to_jingwei, jingwei_to_address, gd_address_to_jingwei_and_province_city
 day_ch = ['第未知天', '第一天', '第二天', '第三天', '第四天', '第五天', '第六天', '第七天', '第八天', '第九天', '第十天', '终到站']
 
 
@@ -57,22 +57,54 @@ def train_import(line_start=0):
             bar.set_postfix_str(f'{dept_city_name} => {arri_city_name}')
             
             dept_city, flag = City.objects.get_or_create(name_ch=dept_city_name)
-            if flag:  # 数据库没有的新的国家，存名字
+            if flag:  # 数据库没有的新的city，存名字
                 dept_city.country = country
+                res = gd_address_to_jingwei_and_province_city(dept_city_name)
+                if res is None:
+                    dept_city.jingdu, dept_city.weidu = 0, 0
+                    province_name = '未知'
+                else:
+                    dept_city.jingdu, dept_city.weidu = res['jingdu'], res['weidu']
+                    province_name = res['province']
+                dept_province, flag = Province.objects.get_or_create(name_ch=province_name)
+                if flag:
+                    dept_province.country = country
+                    dept_province.save()
+                dept_city.province = dept_province
                 dept_city.save()
             dept_sta, flag = Station.objects.get_or_create(name_cn=dept_sta_name)
             if flag:  # 数据库没有的新的火车站，存经纬度
-                dept_sta.jingdu, dept_sta.weidu = address_to_jingwei(dept_sta_name + '站')
+                res = gd_address_to_jingwei_and_province_city(dept_sta_name + '站')
+                if res is None:
+                    dept_sta.jingdu, dept_sta.weidu = 0, 0
+                else:
+                    dept_sta.jingdu, dept_sta.weidu = res['jingdu'], res['weidu']
                 dept_sta.city = dept_city
                 dept_sta.save()
             
             arri_city, flag = City.objects.get_or_create(name_ch=arri_city_name)
             if flag:  # 数据库没有的新的国家，存名字
                 arri_city.country = country
+                res = gd_address_to_jingwei_and_province_city(arri_city_name)
+                if res is None:
+                    arri_city.jingdu, arri_city.weidu = 0, 0
+                    province_name = '未知'
+                else:
+                    arri_city.jingdu, arri_city.weidu = res['jingdu'], res['weidu']
+                    province_name = res['province']
+                arri_province, flag = Province.objects.get_or_create(name_ch=province_name)
+                if flag:
+                    arri_province.country = country
+                    arri_province.save()
+                arri_city.province = arri_province
                 arri_city.save()
             arri_sta, flag = Station.objects.get_or_create(name_cn=arri_sta_name)
             if flag:  # 数据库没有的新的火车站，存经纬度
-                arri_sta.jingdu, arri_sta.weidu = address_to_jingwei(arri_sta_name + '站')
+                res = gd_address_to_jingwei_and_province_city(arri_sta_name + '站')
+                if res is None:
+                    arri_sta.jingdu, arri_sta.weidu = 0, 0
+                else:
+                    arri_sta.jingdu, arri_sta.weidu = res['jingdu'], res['weidu']
                 arri_sta.city = arri_city
                 arri_sta.save()
             train, flag = Train.objects.get_or_create(name=name, defaults={'dept_date': dept_date,
@@ -92,14 +124,22 @@ def train_import(line_start=0):
                     content = c.get('content')
                     sta, flag = Station.objects.get_or_create(name_cn=content[1])
                     if flag:  # 是新建，存经纬度
-                        sta.jingdu, sta.weidu = address_to_jingwei(content[1] + '站')
+                        res = gd_address_to_jingwei_and_province_city(content[1] + '站')
+                        if res is None:
+                            sta.jingdu, sta.weidu = 0, 0
+                        else:
+                            sta.jingdu, sta.weidu = res['jingdu'], res['weidu']
                         if sta.jingdu == 0 and sta.weidu == 0:
-                            sta.jingdu, sta.weidu = address_to_jingwei(content[1])
+                            res = gd_address_to_jingwei_and_province_city(content[1])
+                            if res is None:
+                                sta.jingdu, sta.weidu = 0, 0
+                            else:
+                                sta.jingdu, sta.weidu = res['jingdu'], res['weidu']
                         js = jingwei_to_address(sta.jingdu, sta.weidu)
                         if js['result']['addressComponent']['city'] in city_dict_ch.keys():
                             city_name = city_dict_ch[js['result']['addressComponent']['city']]
                         else:
-                            print(f"city_dict_ch表中无{js['result']['addressComponent']['city']}映射")
+                            # print(f"city_dict_ch表中无{js['result']['addressComponent']['city']}映射")
                             city_name = re.findall(r'(.*)市', js['result']['addressComponent']['city'])
                             if len(city_name):
                                 city_name = city_name[0]
@@ -108,6 +148,18 @@ def train_import(line_start=0):
                         mid_city, flag = City.objects.get_or_create(name_ch=city_name)
                         if flag:  # 数据库没有的新的国家，存名字
                             mid_city.country = country
+                            res = gd_address_to_jingwei_and_province_city(city_name)
+                            if res is None:
+                                mid_city.jingdu, mid_city.weidu = 0, 0
+                                province_name = '未知'
+                            else:
+                                mid_city.jingdu, mid_city.weidu = res['jingdu'], res['weidu']
+                                province_name = res['province']
+                            mid_province, flag = Province.objects.get_or_create(name_ch=province_name)
+                            if flag:
+                                mid_province.country = country
+                                mid_province.save()
+                            mid_city.province = mid_province
                             mid_city.save()
                         sta.city = mid_city
                         sta.save()
