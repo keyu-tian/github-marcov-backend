@@ -1,10 +1,7 @@
 import time
 
-from coverage.annotate import os
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.by import By
+import os
 from selenium import webdriver
-from selenium.webdriver.support.wait import WebDriverWait
 
 
 def spider(path):
