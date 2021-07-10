@@ -58,7 +58,6 @@ def requests_get(url, headers):
 
 
 def epidemic_global_import(start_dt=None):
-    print(os.getcwd())
     vacc_file = os.path.join(SPIDER_DATA_DIRNAME, 'vaccinations.csv')
     if os.path.exists(vacc_file):
         os.remove(vacc_file)

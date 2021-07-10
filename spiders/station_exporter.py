@@ -27,4 +27,4 @@ def station_export():
             'cities': value,
         })
     with open(os.path.join(SPIDER_DATA_DIRNAME, 'stations.json'), 'w', encoding='utf-8') as fp:
-        fp.write(json.dumps(write_json))
+        fp.write(json.dumps(write_json, indent=2, ensure_ascii=False))

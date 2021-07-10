@@ -181,7 +181,7 @@ def epidemic_domestic_import(date_begin='2020-01-22',
         total=(end-begin).days, initial=0, dynamic_ncols=True,
     )
     while d < end:
-        bar.set_description('[jsoning]')
+        bar.set_description('[jsonfying]')
         bar.update(1)
         nd = d.strftime('%Y-%m-%d')
         bar.set_postfix_str(nd)
