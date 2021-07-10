@@ -497,10 +497,16 @@ def epidemic_domestic_daily_importer():
                     'confirmed': yesterday_provinces_data[province]['total']['confirmed'],
                 }
             })
-    provinces.append({
-        'date': today_str,
-        'provinces': today_data
-    })
+    find = False
+    for idx in range(len(provinces)):
+        if provinces[idx]['date'] == today_str:
+            provinces[idx]['provinces'] = today_data
+            find = True
+    if not find:
+        provinces.append({
+            'date': today_str,
+            'provinces': today_data
+        })
     json.dump(provinces, open(provinces_json, 'w'), ensure_ascii=False)
 
     # 更新城市数据
