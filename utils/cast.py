@@ -55,21 +55,21 @@ def address_to_jingwei(address) -> (float, float):
     return jingdu, weidu
 
 
-def gd_address_to_jingwei_and_province_city(address):
-    for x in [
-        address + '',
-        address + '站',
-        address + '市',
-        address + '县',
-        address + '区',
-    ]:
-        ret = __gd_address_to_jingwei_and_province_city(x)
-        if ret is not None:
-            return ret
-    return None
+# def gd_address_to_jingwei_and_province_city(address):
+#     for x in [
+#         address + '',
+#         address + '站',
+#         address + '市',
+#         address + '县',
+#         address + '区',
+#     ]:
+#         ret = __gd_address_to_jingwei_and_province_city(x)
+#         if ret is not None:
+#             return ret
+#     return None
     
 
-def __gd_address_to_jingwei_and_province_city(address):
+def gd_address_to_jingwei_and_province_city(address):
     '''
     return: res = {
         "jingdu": ,
@@ -102,10 +102,10 @@ def __gd_address_to_jingwei_and_province_city(address):
     return {
         "jingdu": js['geocodes'][0]['location'].split(',')[0],
         "weidu": js['geocodes'][0]['location'].split(',')[1],
-        "country": js['geocodes'][0]['country'],
-        "province": js['geocodes'][0]['province'],
-        "city": js['geocodes'][0]['city'],
         "district": js['geocodes'][0]['district'],
+        "city": js['geocodes'][0]['city'],
+        "province": js['geocodes'][0]['province'],
+        "country": js['geocodes'][0]['country'],
         "citycode": js['geocodes'][0]['citycode'] if 'citycode' in js['geocodes'][0].keys() else '',
     }
 
