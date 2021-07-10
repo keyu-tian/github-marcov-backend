@@ -4,7 +4,7 @@ import datetime as dt
 import json
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from tqdm import tqdm
 
@@ -37,7 +37,7 @@ def epidemic_domestic_import(date_begin='2020-01-22',
         os.remove(input_file)
     except:
         pass
-    url = 'https://github.com.cnpmjs.org/BlankerL/DXY-COVID-19-Data/releases/download/%s/DXYArea.csv' % datetime.strftime(datetime.today(), '%Y.%m.%d')
+    url = 'https://github.com.cnpmjs.org/BlankerL/DXY-COVID-19-Data/releases/download/%s/DXYArea.csv' % datetime.strftime(datetime.today() - timedelta(hours=12), '%Y.%m.%d')
     download_from_url(url, input_file)
 
     f = open(input_file, "r", encoding='utf-8')

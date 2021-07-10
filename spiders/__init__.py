@@ -18,7 +18,7 @@ def init_districts():
     
     Country.objects.bulk_create([
         Country(name_ch=name_ch, name_en=name_en)
-        for name_en, name_ch in country_dict
+        for name_en, name_ch in country_dict.items()
     ], batch_size=BULK_CREATE_BATCH_SIZE)
     
     Province.objects.bulk_create([
@@ -46,7 +46,7 @@ def init_districts():
             )
     City.objects.bulk_create([
         City(**kw)
-        for kw in kws
+        for kw in kws.values()
     ], batch_size=BULK_CREATE_BATCH_SIZE)
     
     print('')

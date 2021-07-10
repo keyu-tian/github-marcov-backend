@@ -6,7 +6,7 @@ from retrying import retry
 from meta_config import SPIDER_DATA_DIRNAME
 
 
-@retry(stop_max_attempt_number=5, wait_fixed=500)
+@retry(stop_max_attempt_number=5, wait_random_min=100, wait_random_max=1000)
 def download_from_url(url, fpath):
     """
     :example:
