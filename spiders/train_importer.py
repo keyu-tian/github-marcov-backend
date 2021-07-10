@@ -69,7 +69,7 @@ def train_import(line_start=0):
             )
             
             mid_list = result['trainScheduleBody']
-            mid_list.sort(key=cmp)
+            mid_list.sort(key=lambda ci: ci['content'][-4])
             mid_list = list(filter(lambda ci: City.get_via_name(ci['content'][1]) is not None, mid_list))
             for index, c in enumerate(mid_list):
                 content = c['content']
