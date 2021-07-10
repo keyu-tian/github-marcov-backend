@@ -63,6 +63,42 @@ def address_to_jingwei(address) -> (float, float):
     return jingdu, weidu
 
 
+def gd_address_to_jingwei_and_province_city(address):
+    '''
+    return: res = {
+        "jingdu": ,
+        "weidu": ,
+        "country": ,
+        "province": ,
+        "city": ,
+        "district": ,
+        "citycode": ,
+    }
+    '''
+    # 推荐用高德！！比百度准好多！！查city还不用二次调用
+    ak = '7275224ca913b751868e4076eb8212d5'
+    url = 'https://restapi.amap.com/v3/geocode/geo?key=' + ak + '&address=' + address
+    try:
+        res = requests.get(url=url)
+    except:
+        return None
+    js = json.loads(res.text)
+    if 'geocodes' not in js.keys():
+        print(js)
+        return None
+    if len(js['geocodes']) == 0:
+        return None
+    return {
+        "jingdu": js['geocodes'][0]['location'].split(',')[0],
+        "weidu": js['geocodes'][0]['location'].split(',')[1],
+        "country": js['geocodes'][0]['country'],
+        "province": js['geocodes'][0]['province'],
+        "city": js['geocodes'][0]['city'],
+        "district": js['geocodes'][0]['district'],
+        "citycode": js['geocodes'][0]['citycode'] if 'citycode' in js['geocodes'][0].keys() else '',
+    }
+
+
 def jingwei_to_address(jingdu, weidu):
     '''
     res = jingwei_to_address(jingdu, weidu)
