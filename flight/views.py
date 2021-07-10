@@ -150,17 +150,6 @@ def get_flight_info_by_code(code, date=datetime.now().strftime('%Y-%m-%d')):
 #     return planes
 
 
-def query_flight_info(flight_num):
-    # 查询航班号，如果查询到，就直接返回Flight对象，如果没查到，就返回none
-    flights = Flight.objects.filter(code__icontains=flight_num)
-    if flights.count() == 0:
-        return [None]
-    result = []
-    for flight in flights:
-        result.append(flight)
-    return result
-
-
 def get_flight_dept_and_arri_info_res(flight):
     # 传入flight对象，按交互文档travel/search格式返回dict
     # todo wz: 王振写

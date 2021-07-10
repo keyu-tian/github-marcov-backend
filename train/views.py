@@ -4,7 +4,8 @@ import math
 
 from django.views import View
 
-from flight.views import query_flight_info, get_flight_dept_and_arri_info_res
+from flight.models import Flight
+from flight.views import get_flight_dept_and_arri_info_res
 from risk.views import get_city_risk_level
 from train.models import Train, MidStation
 from utils.meta_wrapper import JSR
@@ -141,7 +142,7 @@ class TravelSearch(View):
         for key in key.split(' '):
             for a in Train.objects.filter(name__icontains=key):
                 res.append(get_train_dept_and_arri_info_res(a))
-            for a in query_flight_info(key):
+            for a in Flight.objects.filter(code__icontains=key):
                 res.append(get_flight_dept_and_arri_info_res(a))
         return 0, {'results': res}
 
