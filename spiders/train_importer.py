@@ -21,6 +21,7 @@ def cmp(item):
 
 def train_import(line_start=0):
     MidStation.objects.all().delete()
+    Station.objects.all().delete()
     Train.objects.all().delete()
     
     with open(os.path.join(SPIDER_DATA_DIRNAME, 'train_spider_all', '火车班次json数据.json'), 'r', encoding='utf-8') as file:
