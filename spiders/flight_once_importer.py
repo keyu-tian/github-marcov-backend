@@ -7,6 +7,7 @@ from utils.cast import address_to_jingwei
 
 
 def city_and_airport_import():
+    Airport.objects.all().delete()
     with open(f'spiders/flight_code_to_city.json', 'r+', encoding='utf-8') as f:
         context = json.loads(f.read())
         code_to_city = context[0]
@@ -15,14 +16,14 @@ def city_and_airport_import():
         code_to_airport = json.loads(f.read())
     for country in list(set(city_to_country.values())):
         Country.objects.get_or_create(name_ch=country)
-    Country.objects.update_or_create(name_ch='中国')
+    Country.objects.get_or_create(name_ch='中国')
     cities = []
     for code, city in code_to_city.items():
         if city in cities:
             continue
         cities.append(city)
         jingdu, weidu = address_to_jingwei(city)
-        City.objects.update_or_create(name_ch=city, name_en='', jingdu=jingdu, weidu=weidu, country=Country.objects.filter(name_ch=city_to_country.get(city, '中国')).get())
+        City.objects.get_or_create(name_ch=city, name_en='', jingdu=jingdu, weidu=weidu, country=Country.objects.filter(name_ch=city_to_country.get(city, '中国')).get())
     for c in code_to_city.keys():
         city = City.objects.get(name_ch=code_to_city[c])
-        Airport.objects.update_or_create(name=code_to_airport[c], airport_code=c, city=city)
+        Airport.objects.get_or_create(name=code_to_airport[c], airport_code=c, city=city)

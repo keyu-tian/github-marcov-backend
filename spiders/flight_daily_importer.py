@@ -6,13 +6,11 @@ from flight.models import Flight, Airport
 from meta_config import IMPORTER_DATA_DIRNAME
 
 
-def flight_import(date=None):
-    if date is None:
-        date = datetime.datetime.now().strftime('%Y-%m-%d')
-
-    with open(f'{IMPORTER_DATA_DIRNAME}/flights_data/flights_data{date}.json', 'r+', encoding='utf-8') as f:
+def flight_import():
+    Flight.objects.all().delete()
+    with open(f'{IMPORTER_DATA_DIRNAME}/flights_data.json', 'r+', encoding='utf-8') as f:
         data = json.loads(f.read())
-    
+
     for line in data:
         dept_airport = line['dept_city']
         if Airport.objects.filter(airport_code=dept_airport).count() == 0:
