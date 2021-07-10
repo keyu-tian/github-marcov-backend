@@ -1,7 +1,5 @@
 import colorama
 
-from country.models import Country, City, Province
-
 
 def re_import(name, launch_spider, *args, **kwargs):
     if launch_spider:
@@ -14,6 +12,7 @@ def re_import(name, launch_spider, *args, **kwargs):
 
 
 def init_import(re_import_train):
+    from country.models import Country, City, Province
     colorama.init(autoreset=True)
 
     Country.objects.all().delete()
