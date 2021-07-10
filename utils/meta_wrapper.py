@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 from pprint import pformat
 
+import sys
 from colorama import Fore
 from django.http import JsonResponse, HttpResponseForbidden
 
@@ -44,8 +45,13 @@ def JSR(*keys): # 这里的 keys 是 @JSR(...) 里面填的 keys
                 time_cost = time.time() - prev_time
                 time.sleep(0.1)
                 # 【关键】这个请求出错了，打印
-                print(Fore.MAGENTA + f'[{func_name}] ====![ FATAL ERR ]!==== ' + Fore.WHITE + type(e).__name__ + Fore.MAGENTA + f': {e}, {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}'
-                                     f'\n input: {inputs}, time: {time_cost:.2f}s', flush=True)
+                err_str = (
+                    Fore.MAGENTA + f'[{func_name}] ====![ FATAL ERR ]!==== '
+                    + Fore.WHITE + type(e).__name__
+                    + Fore.MAGENTA + f': {e}, {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\n input: {inputs}, time: {time_cost:.2f}s'
+                )
+                print(err_str, file=sys.stdout, flush=True)
+                print(err_str, file=sys.stderr, flush=True)
                 time.sleep(0.1)
                 # traceback.print_exc()
                 raise e
