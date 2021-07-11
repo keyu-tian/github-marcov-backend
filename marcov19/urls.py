@@ -51,18 +51,19 @@ urlpatterns = [
     # ======== 四、出行 ========
     path('travel/risk_area', RiskAreaList.as_view(), name='risk_area'),
     path('travel/search', TravelSearch.as_view()),
-    path('travel/train_info', TravelTrain.as_view()),
+    path('travel/train_info', TravelTrainInfo.as_view()),
     path('travel/plane_info', TravelPlane.as_view()),
-    path('travel/city', TravelCity.as_view()),
+    path('travel/city/plane', TravelCity.as_view()),
     # path('travel/country', CountryFlightInfo.as_view()),
     path('travel/policy', TravelPolicy.as_view()),
+    path('travel/city/train', TravelCityTrain.as_view()),
 
     # ======== 五、新闻 ========
     path('news/weekly', WeeklyNews.as_view()),
 
     # ======== 六、小知识 ========
     path('rumor/list', RumorList.as_view()),
-
+    path('tips/list', KnowledgeList.as_view()),
 
     # ======== 七、用户系统 ========
     path('account/login', Login.as_view()),

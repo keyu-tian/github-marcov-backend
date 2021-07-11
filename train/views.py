@@ -2,12 +2,13 @@ import datetime
 import json
 import math
 
+from django.db.models import Q
 from django.views import View
 
 from flight.models import Flight
 from flight.views import get_flight_dept_and_arri_info_res
 from risk.views import get_city_risk_level
-from train.models import Train, MidStation
+from train.models import Train, MidStation, Station
 from utils.meta_wrapper import JSR
 
 DEFAULT_DATE = datetime.datetime.now()
@@ -18,17 +19,17 @@ def get_train_info_res(train: Train):
     res = {'stations': []}
     total_risk_level = 0
     count = train.schedule_station.count() + 2
-    total_risk_level += float(get_city_risk_level(train.dept_city)) / count
+    total_risk_level += float(get_city_risk_level(train.dept_station.city_name)) / count
     for a in MidStation.objects.filter(train=train):
-        risk_level = get_city_risk_level(a.station.city.name_ch)
+        risk_level = get_city_risk_level(a.station.city_name)
         res['stations'].append({
             'station_name': a.station.name_ch,
-            'city_name': a.station.city.name_ch,
+            'city_name': a.station.city_name,
             'risk_level': risk_level,
             'pos': [a.station.jingdu, a.station.weidu],
         })
         total_risk_level += float(risk_level) / count
-    total_risk_level += float(get_city_risk_level(train.dept_city)) / count
+    total_risk_level += float(get_city_risk_level(train.dept_station.city_name)) / count
     if math.ceil(total_risk_level) >= 4:
         msg = '当前线路存在较大疫情风险，请谨慎考虑出行。'
     elif math.ceil(total_risk_level) >= 1:
@@ -49,16 +50,16 @@ def get_train_dept_and_arri_info_res(train: Train):
     res = {
         'start': {
             'station_name': train.dept_station.name_ch,
-            'city_name': train.dept_city.name_ch,
-            'country_name': train.dept_city.country.name_ch,
-            'risk': get_city_risk_level(train.dept_city),
+            'city_name': train.dept_station.city_name,
+            'country_name': "中国",
+            'risk': get_city_risk_level(train.dept_station.city_name),
             'datetime': st_t.strftime('%Y-%m-%d %H:%M'),
         },
         'end': {
             'station_name': train.arri_station.name_ch,
-            'city_name': train.arri_city.name_ch,
-            'country_name': train.arri_city.country.name_ch,
-            'risk': get_city_risk_level(train.arri_city),
+            'city_name': train.arri_station.city_name,
+            'country_name': "中国",
+            'risk': get_city_risk_level(train.arri_station.city_name),
             'datetime': ed_t.strftime('%Y-%m-%d %H:%M'),
         },
         'key': train.name,
@@ -107,7 +108,7 @@ def get_train_dept_and_arri_info_res(train: Train):
 #     return res
 
 
-class TravelTrain(View):
+class TravelTrainInfo(View):
     @JSR('status', 'stations', 'info')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
@@ -147,18 +148,23 @@ class TravelSearch(View):
         return 0, res
 
 
-# class TravelPolicy(View):
-#     @JSR('status', 'enter_policy', 'out_policy')
-#     def post(self, request):
-#         kwargs: dict = json.loads(request.body)
-#         if kwargs.keys() != {'city'}:
-#             return 1,
-#         city_str = kwargs['city']
-#         # 获取该地所属区
-#         jingdu, weidu = address_to_jingwei(city_str)
-#         city_name = jingwei_to_address(jingdu, weidu)['result']['addressComponent']['city']
-#         # enter_policy = get_travel_enter_policy_msg(city_name)
-#         # out_policy = get_travel_enter_policy_msg(city_name)
-#         # if enter_policy == '':
-#         #     # 获取省会
-#         #     city_name = jingwei_to_address(jingdu, weidu)['result']['addressComponent']['province']
+class TravelCityTrain(View):
+    @JSR('status', 'trains')
+    def post(self, request):
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'start', 'end'}:
+            return 1, []
+        try:
+            start_sta = Station.objects.get(name_ch=kwargs['start'])
+            end_sta = Station.objects.get(name_ch=kwargs['end'])
+        except:
+            return 3
+
+        train_res = []
+        train_set = Train.objects.filter(Q(schedule_station__in=[start_sta])).filter(Q(schedule_station__in=[end_sta]))
+        for a in train_set:
+            start_sta_index = MidStation.objects.get(train=a, station=start_sta).index
+            end_sta_index = MidStation.objects.get(train=a, station=start_sta).index
+            if start_sta_index < end_sta_index:
+                train_res.append(get_train_dept_and_arri_info_res(a))
+        return 0, train_res
