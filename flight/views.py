@@ -60,16 +60,16 @@ def get_flight_dept_and_arri_info_res(flight):
     # 传入flight对象，按交互文档travel/search格式返回dict
     start = {
         'station_name': flight.dept_airport.airport_name,
-        'city_name': flight.dept_airport.city,
+        'city_name': flight.dept_airport.city_name,
         'country_name': flight.dept_airport.country_name,
-        'risk': address_to_jingwei(flight.dept_airport.city),
+        'risk': get_city_risk_level(flight.dept_airport.city_name),
         'datetime': flight.dept_time
     }
     end = {
         'station_name': flight.arri_airport.airport_name,
         'city_name': flight.arri_airport.city_name,
         'country_name': flight.arri_airport.country_name,
-        'risk': address_to_jingwei(flight.arri_airport.city_name),
+        'risk': get_city_risk_level(flight.arri_airport.city_name),
         'datetime': flight.arri_time
     }
     result = {
