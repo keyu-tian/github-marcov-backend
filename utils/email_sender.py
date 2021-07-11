@@ -139,7 +139,7 @@ def send_code(acc, email_type, storage=True):
     <br>
     
     <br>
-    <i>%s --  DiaDoc </i>
+    <i>%s --  MarCov </i>
     <br>
     
     <br>
