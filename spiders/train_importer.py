@@ -150,7 +150,7 @@ def train_import(line_start=0):
                         sta.city_name = city_name
                         sta.save()
 
-                    MidStation.objects.create(index=int(content[2]), arri_date='',
+                    MidStation.objects.create(index=mid_list.index(c) + 1, arri_date='',
                         arri_time=content[3], station=sta, train=train)
                     # objs.append(MidStation(
                     #     index=int(content[2]), arri_date='',
