@@ -17,7 +17,7 @@ delta = dt.timedelta(days=1)
 
 # from spiders.epidemic_domestic_importer import epidemic_domestic_import
 def epidemic_domestic_import(date_begin='2020-01-22',
-                             date_end=datetime.strftime(datetime.today() - delta, '%Y-%m-%d')):
+                             date_end='2021-07-09'):
     # 正式版本参数中应为datetime.today()
 
     date_begin = date_begin.split('-')
@@ -33,12 +33,14 @@ def epidemic_domestic_import(date_begin='2020-01-22',
         os.makedirs(city_json_file_directory)
 
     # TODO: 获取当天数据
+    """
     try:
         os.remove(input_file)
     except:
         pass
     url = 'https://github.com.cnpmjs.org/BlankerL/DXY-COVID-19-Data/releases/download/%s/DXYArea.csv' % datetime.strftime(datetime.today() - timedelta(hours=12), '%Y.%m.%d')
     download_from_url(url, input_file)
+    """
 
     f = open(input_file, "r", encoding='utf-8')
     title = f.readline()[:-1].split(',')
@@ -65,10 +67,13 @@ def epidemic_domestic_import(date_begin='2020-01-22',
             single_data['cityName'] += '-' + single_data['provinceName']
         if single_data['cityName'] == '':
             single_data['cityName'] = single_data['provinceName']
+        t = single_data['updateTime'].split(' ')[1]
         single_data['updateTime'] = datetime.strptime(
             single_data['updateTime'].split(' ')[0].replace('/', '-'), '%Y-%m-%d')
-        single_data['updateTime'] = datetime.strftime(
-            single_data['updateTime'], '%Y-%m-%d')
+        if t <= '12:00:00':
+            single_data['updateTime'] = datetime.strftime(single_data['updateTime'] - delta, '%Y-%m-%d')
+        else:
+            single_data['updateTime'] = datetime.strftime(single_data['updateTime'], '%Y-%m-%d')
         all_data.append(single_data)
 
         if single_data['provinceName'] not in cities_in_province.keys():
@@ -94,9 +99,9 @@ def epidemic_domestic_import(date_begin='2020-01-22',
     while all_data[idx]['updateTime'] != (d + delta).strftime('%Y-%m-%d'):
         idx += 1
     bar = tqdm(
-        total=(end-begin).days, initial=0, dynamic_ncols=True,
+        total=(end-begin).days + 1, initial=0, dynamic_ncols=True,
     )
-    while d < end:
+    while d <= end:
         bar.set_description('[extracting]')
         bar.update(1)
         nd = d.strftime('%Y-%m-%d')
@@ -120,7 +125,7 @@ def epidemic_domestic_import(date_begin='2020-01-22',
             daily_info[nd][city]['city_new_cured'] = 0
             daily_info[nd][city]['city_new_confirmed'] = 0
 
-        while idx < len(all_data) and all_data[idx]['updateTime'] == (d + delta).strftime('%Y-%m-%d'):
+        while idx < len(all_data) and all_data[idx]['updateTime'] == d.strftime('%Y-%m-%d'):
             for city in last.keys():
                 if all_data[idx]['provinceName'] == last[city]['provinceName']:
                     daily_info[nd][city]['province_new_died'] = max(
@@ -178,9 +183,9 @@ def epidemic_domestic_import(date_begin='2020-01-22',
         provinces[p] = {}
     d = begin
     bar = tqdm(
-        total=(end-begin).days, initial=0, dynamic_ncols=True,
+        total=(end-begin).days + 1, initial=0, dynamic_ncols=True,
     )
-    while d < end:
+    while d <= end:
         bar.set_description('[jsonfying]')
         bar.update(1)
         nd = d.strftime('%Y-%m-%d')

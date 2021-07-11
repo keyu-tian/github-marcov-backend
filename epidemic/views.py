@@ -28,7 +28,6 @@ class MapProvince(View):
             return 1
 
         try:
-            print(os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json'))
             domestic_data_list = json.load(open(
                 os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json'),
                 'r', encoding='utf-8'
@@ -75,7 +74,6 @@ class MapTodayProvince(View):
             return 1
 
         try:
-            print(os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json'))
             domestic_data_list = json.load(open(
                 os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json'),
                 'r', encoding='utf-8'
@@ -107,6 +105,7 @@ class MapTodayProvince(View):
 
         try:
             infos = []
+            '''
             for it in cities_data:
                 city = it['name']
                 msg = Policy.objects.filter(city_name=city)
@@ -114,17 +113,85 @@ class MapTodayProvince(View):
                     msg = f'进入{city}管控政策：{msg.first().enter_policy}\n离开{city}管控政策：{msg.first().out_policy}'
                     info = {'level': get_city_risk_level(city), 'msg': msg}
                     infos.append(info)
+                
                 news_list = News.objects.filter(Q(title__icontains=city) |
                                                 Q(context__icontains=city))
                 for news in news_list:
                     info = {'level': get_city_risk_level(city), 'msg': news.title + '：' + news.context}
                     infos.append(info)
             infos = list_dict_duplicate_removal(infos)
+            '''
         except:
             return 7
 
         return 0, date, province_data_ret, cities_data, infos
 
+
+class MapCity(View):
+    @JSR('status', 'data')
+    def get(self, request):
+        try:
+            province = str(request.GET.get('province'))
+            city = str(request.GET.get('city'))
+        except:
+            return 1
+
+        try:
+            province_data = json.load(open(
+                os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'provinces', '%s.json' % province_dict_ch[province]),
+                'r', encoding='utf-8'
+            ))
+        except:
+            return 7
+
+        data = []
+        for date, cities in province_data.items():
+            for city_data in cities:
+                if city_data['name'] == city:
+                    data.append({
+                        'date': date,
+                        'city': {
+                            'new': city_data['new'],
+                            'total': city_data['total'],
+                        }
+                    })
+                    break
+
+        return 0, data
+
+
+class MapTodayCity(View):
+    @JSR('status', 'date', 'city', 'districts')
+    def get(self, request):
+        try:
+            province = str(request.GET.get('province'))
+            city = str(request.GET.get('city'))
+        except:
+            return 1
+
+        try:
+            domestic_data_list = json.load(open(
+                os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json'),
+                'r', encoding='utf-8'
+            ))
+            province_data = json.load(open(
+                os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'provinces', '%s.json' % province_dict_ch[province]),
+                'r', encoding='utf-8'
+            ))
+        except:
+            return 7
+
+        city_ret = {}
+        date = domestic_data_list[-1]['date']
+        for city_data in province_data[date]:
+            if city_data['name'] == city:
+                city_ret = {
+                    'new': city_data['new'],
+                    'total': city_data['total'],
+                }
+                break
+
+        return 0, date, city_ret, []
 
 
 class MapProvince_WZ(View):
