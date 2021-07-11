@@ -1,11 +1,13 @@
 from django.db import models
-from country.models import City
 
 
 class Airport(models.Model):
-    name = models.CharField(verbose_name='机场名', max_length=255)
+    airport_name = models.CharField(verbose_name='机场名', max_length=255)
     airport_code = models.CharField(verbose_name='机场代码', max_length=255)
-    city = models.ForeignKey(to=City, on_delete=models.SET_NULL, related_name='city_airport_set', blank=True, null=True)
+    city_name = models.CharField(verbose_name='城市名', max_length=255, blank=True, null=True)
+    country_name = models.CharField(verbose_name='国家名', max_length=255, blank=True, null=True)
+    jingdu = models.FloatField(verbose_name='经度', blank=True, null=True)
+    weidu = models.FloatField(verbose_name='纬度', blank=True, null=True)
 
 
 class Flight(models.Model):
