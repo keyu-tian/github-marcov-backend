@@ -3,7 +3,7 @@ from functools import reduce
 from django.db.models import Q
 from django.views import View
 from utils.meta_wrapper import JSR
-from utils.dict_ch import city_dict_ch, province_dict_ch
+from utils.dict_ch import city_dict_ch, province_dict_ch, district_dict
 from utils.country_dict import country_dict
 from risk.views import get_city_risk_level
 from epidemic.models import HistoryEpidemicData
@@ -190,8 +190,15 @@ class MapTodayCity(View):
                     'total': city_data['total'],
                 }
                 break
+        districts = []
+        districts_list = district_dict[province][city]
+        for district in districts_list:
+            districts.append({
+                'name': district,
+                'level': get_city_risk_level(district)
+            })
 
-        return 0, date, city_ret, []
+        return 0, date, city_ret, districts
 
 
 class MapProvince_WZ(View):
