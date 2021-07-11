@@ -63,7 +63,7 @@ def train_import(line_start=0):
 
             dept_sta, flag = Station.objects.get_or_create(name_ch=dept_sta_name)
             if flag:  # 数据库没有的新的火车站，存经纬度
-                res = gd_address_to_jingwei_and_province_city(dept_sta_name + '站')
+                res = gd_address_to_jingwei_and_province_city(dept_sta_name + '火车站')
                 if res is None:
                     dept_sta.jingdu, dept_sta.weidu = 0, 0
                     res = gd_address_to_jingwei_and_province_city(dept_sta_name)
@@ -88,7 +88,7 @@ def train_import(line_start=0):
 
             arri_sta, flag = Station.objects.get_or_create(name_ch=arri_sta_name)
             if flag:  # 数据库没有的新的火车站，存经纬度
-                res = gd_address_to_jingwei_and_province_city(arri_sta_name + '站')
+                res = gd_address_to_jingwei_and_province_city(arri_sta_name + '火车站')
                 if res is None:
                     arri_sta.jingdu, arri_sta.weidu = 0, 0
                     res = gd_address_to_jingwei_and_province_city(arri_sta_name)
@@ -127,7 +127,7 @@ def train_import(line_start=0):
                     content = c.get('content')
                     sta, flag = Station.objects.get_or_create(name_ch=content[1])
                     if flag:  # 是新建，存经纬度
-                        res = gd_address_to_jingwei_and_province_city(content[1] + '站')
+                        res = gd_address_to_jingwei_and_province_city(content[1] + '火车站')
                         if res is None:
                             sta.jingdu, sta.weidu = 0, 0
                             res = gd_address_to_jingwei_and_province_city(content[1])
