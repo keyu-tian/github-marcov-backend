@@ -4,7 +4,7 @@ DT_LENGTH = 80
 
 
 class Station(models.Model):
-    name_ch = models.CharField(primary_key=True, unique=True, max_length=DT_LENGTH, db_index=True, null=False)
+    name_ch = models.CharField(primary_key=True, unique=True, max_length=DT_LENGTH, db_index=True, null=False, default='未知')
     jingdu = models.FloatField(blank=True, null=True)
     weidu = models.FloatField(blank=True, null=True)
     city = models.ForeignKey('country.City', on_delete=models.SET_NULL, null=True, blank=True)
