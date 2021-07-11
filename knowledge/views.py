@@ -6,7 +6,7 @@ from utils.meta_wrapper import JSR
 
 class KnowledgeList(View):
     @JSR('status', 'data')
-    def post(self, request):
+    def get(self, request):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'start'}:
             return 1, []
