@@ -65,7 +65,7 @@ def epidemic_global_import(start_dt=None):
         os.remove(vacc_file)
     download_from_url('https://github.com.cnpmjs.org/owid/covid-19-data/raw/master/public/data/vaccinations/vaccinations.csv', vacc_file)
     data_vaccinations = pandas.read_csv(vacc_file).fillna(0)
-    
+
     requests.packages.urllib3.disable_warnings()
     if start_dt is None:
         start_dt = begin
@@ -95,24 +95,17 @@ def epidemic_global_import(start_dt=None):
             response_data = requests_get(url + "列支敦士登公国", headers=headers)
         else:
             response_data = requests_get(url + country, headers=headers)
-        if response_data is None:
+        if response_data is None and country != "中国":
             print(f'[None] {country}')
-        else:
-            # 对于指定国家，遍历每个日期
+        elif country == "中国":
+            date = start_dt
             last_total_vaccinated = 0
-            for (index, i) in enumerate(list(response_data)):
-                date = dt_change_line(i["y"] + "." + i["date"], s=".")  # yyyy-mm-dd
-                # 获取疫苗接种情况
-                country_vacc = re_country_vaacinations_dict.get(country)
-                if country == "中国":
-                    data_vacc = data_vaccinations[(data_vaccinations['date'] == date) &
-                                                  ((data_vaccinations['location'] == 'China') |
-                                                   (data_vaccinations['location'] == 'Hong Kong') |
-                                                   (data_vaccinations['location'] == 'Taiwan') |
-                                                   (data_vaccinations['location'] == 'Macao'))]
-                else:
-                    data_vacc = data_vaccinations[(data_vaccinations['date'] == date) &
-                                                  (data_vaccinations['location'] == country_vacc)]
+            while date <= datetime.datetime.now().strftime("%Y-%m-%d"):
+                data_vacc = data_vaccinations[(data_vaccinations['date'] == date) &
+                                              ((data_vaccinations['location'] == 'China') |
+                                               (data_vaccinations['location'] == 'Hong Kong') |
+                                               (data_vaccinations['location'] == 'Taiwan') |
+                                               (data_vaccinations['location'] == 'Macao'))]
                 if data_vacc.empty:
                     new_vaccinated = "未知"
                     total_vaccinated = "未知"
@@ -125,34 +118,58 @@ def epidemic_global_import(start_dt=None):
                         total_vaccinated = \
                             last_total_vaccinated + new_vaccinated if new_vaccinated != "未知" else total_vaccinated
                         last_total_vaccinated = total_vaccinated
-                if country == "中国":
-                    China_info = epidemic_China_total_import(date)
-                    country_info = {
-                        "name": country,
-                        "population": 0,  # todo
-                        "new": China_info["new"],
-                        "total": China_info["total"]
-                    }
-                    country_info["new"]["vaccinated"] = new_vaccinated
-                    country_info["total"]["vaccinated"] = total_vaccinated
-                else:
-                    country_info = {
-                        "name": country,
-                        "population": 0,  # todo
-                        "new": {
-                            "died": 0 if index == 0 else max(i["dead"] - response_data[index - 1]["dead"], 0),
-                            "cured": 0 if index == 0 else max(i["heal"] - response_data[index - 1]["heal"], 0),
-                            "confirmed": i['confirm_add'],
-                            "vaccinated": new_vaccinated
-                        },
-                        "total": {
-                            "died": i["dead"],
-                            "cured": i["heal"],
-                            "confirmed": i["confirm"],
-                            "vaccinated": total_vaccinated
-                        }}
+                China_info = epidemic_China_total_import(date)
+                if China_info is None:
+                    date = dt_delta(date, 1)
+                    continue
+                country_info = {
+                    "name": country,
+                    "population": 0,  # todo
+                    "new": China_info["new"],
+                    "total": China_info["total"]
+                }
+                country_info["new"]["vaccinated"] = new_vaccinated
+                country_info["total"]["vaccinated"] = total_vaccinated
                 tmp.append({"date": date, "country_info": country_info})
-    
+                date = dt_delta(date, 1)
+        else:
+            # 对于指定国家，遍历每个日期
+            last_total_vaccinated = 0
+            for (index, i) in enumerate(list(response_data)):
+                date = dt_change_line(i["y"] + "." + i["date"], s=".")  # yyyy-mm-dd
+                # 获取疫苗接种情况
+                country_vacc = re_country_vaacinations_dict.get(country)
+                data_vacc = data_vaccinations[(data_vaccinations['date'] == date) &
+                                              (data_vaccinations['location'] == country_vacc)]
+                if data_vacc.empty:
+                    new_vaccinated = "未知"
+                    total_vaccinated = "未知"
+                else:
+                    new_vaccinated = \
+                        int(sum(data_vacc["daily_vaccinations"])) if int(
+                            sum(data_vacc["daily_vaccinations"])) != 0 else "未知"
+                    total_vaccinated = int(sum(data_vacc["total_vaccinations"]))
+                    if total_vaccinated == 0:
+                        total_vaccinated = \
+                            last_total_vaccinated + new_vaccinated if new_vaccinated != "未知" else total_vaccinated
+                        last_total_vaccinated = total_vaccinated
+                country_info = {
+                    "name": country,
+                    "population": 0,  # todo
+                    "new": {
+                        "died": 0 if index == 0 else max(i["dead"] - response_data[index - 1]["dead"], 0),
+                        "cured": 0 if index == 0 else max(i["heal"] - response_data[index - 1]["heal"], 0),
+                        "confirmed": i['confirm_add'],
+                        "vaccinated": new_vaccinated
+                    },
+                    "total": {
+                        "died": i["dead"],
+                        "cured": i["heal"],
+                        "confirmed": i["confirm"],
+                        "vaccinated": total_vaccinated
+                    }}
+                tmp.append({"date": date, "country_info": country_info})
+
     # 遍历每个时间直到当前
     days = (datetime.datetime.now().date() - datetime.datetime.strptime(start_dt, '%Y-%m-%d').date()).days + 1
     bar = tqdm(
@@ -190,7 +207,7 @@ def epidemic_global_import(start_dt=None):
         }
     }
     dataout.append(today)
-    
+
     with open(os.path.join(SPIDER_DATA_DIRNAME, 'global.json'), 'w', encoding='utf-8') as f:
         json.dump(dataout, f, ensure_ascii=False, indent=2)
 

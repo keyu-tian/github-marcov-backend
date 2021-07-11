@@ -300,7 +300,7 @@ class TravelPlane(View):
 
 
 class TravelCity(View):
-    @JSR('status', 'flights')
+    @JSR('status', 'planes')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'start', 'end'}:
@@ -309,7 +309,7 @@ class TravelCity(View):
         with open('flight/airport_to_jingwei.json', 'r+', encoding='utf-8') as f:
             airport_to_jingwei = json.loads(f.read())
         # print(flights)
-        res = []
+        plane_res = []
         for flight in flights:
             start_city = flight.dept_airport.city
             if start_city is None:
@@ -352,5 +352,7 @@ class TravelCity(View):
                 'level': min(start['risk_level'] + end['risk_level'], 5),
                 'msg': msg
             }
-            res.append({'datetime': flight.dept_time, 'stations': [start, end], 'info': info})
-        return 0, res
+            # todo:msg要改
+            plane_res.append({'datetime': flight.dept_time, 'stations': [start, end], 'info': info})
+
+        return 0, plane_res
