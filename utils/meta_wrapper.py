@@ -70,8 +70,8 @@ def JSR(*keys): # 这里的 keys 是 @JSR(...) 里面填的 keys
                         'analysis.InternationalAnalyze.GET', 'analysis.InternationalTodayAnalyze.GET',
                         'analysis.CountryAnalyze.POST', 'analysis.SearchAnalyse.POST',
                         'news.WeeklyNews.POST',
-                        'flight.TravelPlane.POST',
-                        'train.TravelSearch.POST',
+                        # 'flight.TravelPlane.POST',
+                        # 'train.TravelSearch.POST',
                         # 'train.TravelTrain.POST'
                     }:
                         ret_str = Fore.WHITE + '(TOO LONG) '
