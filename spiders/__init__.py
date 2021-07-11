@@ -26,7 +26,7 @@ def init_import(re_import_train):
     re_import('travel_policy', True, line_start=0)
     if re_import_train:
         re_import('train', False, line_start=0)         # 不launch是因为 train 的 spider 太慢（超过6h）
-    re_import('epidemic_domestic', False)               # 不launch是因为 epidemic_domestic 没有 spider，只有 importer
+    # re_import('epidemic_domestic', False)             # 基本弃用，不launch是因为 epidemic_domestic 没有 spider，只有 importer
     re_import('epidemic_global', False)                 # 不launch是因为 epidemic_global 没有 spider，只有 importer
     re_import('flight_once', False)                     # 不launch是因为 flight_once 的 spider 太慢（超过2h），而且需要 chromedrive.exe
 
@@ -37,8 +37,6 @@ def init_import(re_import_train):
 def daily_import():
     re_import('flight_daily', False)
     re_import('epidemic_domestic_daily', False)
-    # todo:
-    # re_import('epidemic_domestic_daily', False)
 
     print('')
     print(colorama.Fore.WHITE + '=> finished.')
