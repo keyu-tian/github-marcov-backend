@@ -26,8 +26,7 @@ def epidemic_China_total_import(date):
         if it['date'] == date:
             data = it
     if not data:
-        print('日期不存在')
-        return None
+        return None  # shit
     for it in data['provinces']:
         China_data['total']['died'] += it['total']['died']
         China_data['total']['cured'] += it['total']['cured']
