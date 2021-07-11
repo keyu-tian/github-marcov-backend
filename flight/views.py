@@ -133,22 +133,18 @@ class TravelCity(View):
         flights = Flight.objects.filter(dept_airport__airport_name=kwargs['start'], arri_airport__airport_name=kwargs['end'])
         plane_res = []
         for flight in flights:
+            is_cancel = flight.condition == "取消"
             start = {'station_name': flight.dept_airport.airport_name,
                      'country_name': flight.dept_airport.country_name,
                      'city_name': flight.dept_airport.city_name,
-                     'risk_level': get_city_risk_level(flight.dept_airport.city_name),
-                     'pos': [flight.dept_airport.jingdu, flight.dept_airport.weidu]}
+                     'risk': get_city_risk_level(flight.dept_airport.city_name) if not is_cancel else -1,
+                     'datetime': flight.dept_time}
 
             end = {'station_name': flight.arri_airport.airport_name,
                    'country_name': flight.arri_airport.country_name,
                    'city_name': flight.arri_airport.city_name,
-                   'risk_level': get_city_risk_level(flight.arri_airport.city_name),
-                   'pos': [flight.arri_airport.jingdu, flight.arri_airport.weidu]}
-
-            info = {
-                'level': min(start['risk_level'] + end['risk_level'], 5),
-                'msg': '航班状态: ' + flight.condition
-            }
-            plane_res.append({'number': flight.code, 'datetime': flight.dept_time, 'stations': [start, end], 'info': info})
+                   'risk': get_city_risk_level(flight.arri_airport.city_name) if not is_cancel else -1,
+                   'datetime': flight.arri_time}
+            plane_res.append({'key': flight.code, 'start': start, 'end': end})
 
         return 0, plane_res
