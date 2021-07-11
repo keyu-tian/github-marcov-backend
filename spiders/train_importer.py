@@ -37,10 +37,20 @@ def train_import(line_start=0):
     MidStation.objects.all().delete()
     Train.objects.all().delete()
 
+    with open(os.path.join(SPIDER_DATA_DIRNAME, 'train_spider_all', '火车班次json数据_xc.json'), 'r',
+              encoding='utf-8') as file:
+        bar = tqdm(list(enumerate(file.readlines())), dynamic_ncols=True)
+    __train_import(bar, line_start, 1)
+
     with open(os.path.join(SPIDER_DATA_DIRNAME, 'train_spider_all', '火车班次json数据.json'), 'r',
               encoding='utf-8') as file:
         bar = tqdm(list(enumerate(file.readlines())), dynamic_ncols=True)
-    objs = []
+    __train_import(bar, line_start, 2)
+
+
+
+def __train_import(bar, line_start=0, src=1):
+    # objs = []
     for line, result in bar:
         bar.set_description(f'[line{line}]')
         if line < line_start:
@@ -121,7 +131,9 @@ def train_import(line_start=0):
                 train.interval = result.get('extInfo').get('allTime')
                 train.kilometer = result.get('extInfo').get('allMileage')
                 mid_list = result.get('trainScheduleBody')
-                mid_list.sort(key=lambda ci: float(str(ci['content'][-4]).strip('公里').strip()))
+                if src == 2:
+                    # 去哪儿网的数据要排序，携程的不用
+                    mid_list.sort(key=lambda ci: float(str(ci['content'][-4]).strip('公里').strip()))
                 for c in mid_list:
                     content = c.get('content')
                     sta, flag = Station.objects.get_or_create(name_ch=content[1])
@@ -149,14 +161,20 @@ def train_import(line_start=0):
                         sta.province_name = province_name
                         sta.city_name = city_name
                         sta.save()
-
-                    MidStation.objects.create(index=mid_list.index(c) + 1, arri_date='',
+                    if src == 1:
+                        index = int(content[2])
+                    else:
+                        index = mid_list.index(c) + 1
+                    MidStation.objects.create(index=index, arri_date='',
                         arri_time=content[3], station=sta, train=train)
                     # objs.append(MidStation(
                     #     index=int(content[2]), arri_date='',
                     #     arri_time=content[3], station=sta, train=train
                     # ))
                 train.save()
+            else:
+                with open(os.path.join(SPIDER_DATA_DIRNAME, 'train_spider_all', 'train_data_double_in_xc_qn.json'), 'a', encoding='utf-8') as file:
+                    file.write(name + '\n')
         else:
             bar.set_postfix_str(f'failed!')
     # MidStation.objects.bulk_create(objs, batch_size=BULK_CREATE_BATCH_SIZE)
