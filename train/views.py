@@ -44,7 +44,10 @@ def get_train_info_res(train: Train):
 
 
 def get_train_dept_and_arri_info_res(train: Train):
-    hours, minutes = map(int, train.interval.strip('分钟').split('小时'))
+    try:
+        hours, minutes = map(int, train.interval.strip('分钟').split('小时'))
+    except:
+        hours, minutes = 0, 0
     st_t = datetime.datetime.strptime(datetime.date.today().strftime('%Y-%m-%d ') + train.dept_time, '%Y-%m-%d %H:%M')
     ed_t = st_t + datetime.timedelta(hours=hours, minutes=minutes)
     res = {
