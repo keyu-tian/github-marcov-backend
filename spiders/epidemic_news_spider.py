@@ -25,8 +25,11 @@ def spider(path):
         ul_child_list_a = ul_child_list1[i].find_elements_by_xpath('./div[4]/div[1]/div[2]/a')[0]
         ul_child_list_a_content = ul_child_list_a.text
         ul_child_list_a_href = ul_child_list_a.get_attribute('href')
-        with open(os.path.join(path, 'epidemic_news.json'), 'a', encoding='utf-8') as fp:
-            fp.write(f'{{"date": "{ul_child_list_datetime_str}", "content": "{ul_child_list_a_content}", "src": "{ul_child_list_a_href}"}}\n')
+        with open(os.path.join(path, 'epidemic_news.json'), 'r+', encoding='utf-8') as f:
+            old = f.read()
+            f.seek(0)
+            f.write(f'{{"date": "{ul_child_list_datetime_str}", "content": "{ul_child_list_a_content}", "src": "{ul_child_list_a_href}"}}\n')
+            f.write(old)
 
     js = 'var q=document.documentElement.scrollTop=15000'
     driver.execute_script(js)
