@@ -60,7 +60,7 @@ def JSR(*keys): # 这里的 keys 是 @JSR(...) 里面填的 keys
                 [values.append('') for _ in range(len(keys) - len(values))]                 # 这个是在给没填的返回值位置自动填充空字符串作为返回值
                 ret_dict = dict(zip(keys, values))      # 打包成返回值
                 
-                if meta_config.DEBUG:
+                if meta_config.DEBUG and func_name not in {'user.UserInfo.GET'}:
                     c = Fore.RED if ret_dict.get('status', 0) else Fore.GREEN
                     cur_dt = datetime.now()
                     dt_str = cur_dt.strftime("%H:%M:%S.") + f'{float(cur_dt.strftime("0.%f")):.2f}'[-2:]
