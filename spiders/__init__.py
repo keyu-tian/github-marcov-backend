@@ -18,7 +18,7 @@ def init_import(re_import_train):
     Country.objects.all().delete()
     City.objects.all().delete()
     Province.objects.all().delete()
-    
+
     re_import('risk', True)
     re_import('news', True, delete_old_data=True)
     re_import('dxy_news', False, delete_old_data=False) # 不launch是因为 dxy_news 没有 spider，只有 importer
@@ -36,6 +36,7 @@ def init_import(re_import_train):
 
 def daily_import():
     re_import('flight_daily', False)
+    re_import('epidemic_domestic_daily', False)
     # todo:
     # re_import('epidemic_domestic_daily', False)
 

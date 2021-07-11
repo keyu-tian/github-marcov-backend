@@ -410,10 +410,11 @@ city_new_to_old = {
 }
 
 
-def epidemic_domestic_daily_importer():
+def epidemic_domestic_daily_import():
 
     # 获取数据
     # daily_data = json.load(open(os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', '2021-07-09.json'), 'r', encoding='utf-8'))
+    # r = open(os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', '2021-07-09.json')).read()
     print('[loading]')
     r = requests.get('https://view.inews.qq.com/g2/getOnsInfo?name=disease_h5')
     daily_data = json.loads(r.text.replace('\\', '').replace('"{', '{').replace('}"', '}'))
@@ -441,6 +442,8 @@ def epidemic_domestic_daily_importer():
     time_delta = dt.timedelta(days=1)
     today_str = dt.datetime.strftime(today_date, '%Y-%m-%d')
     yesterday_str = dt.datetime.strftime(today_date - time_delta, '%Y-%m-%d')
+    # today_str = '2021-07-10'
+    # yesterday_str = '2021-07-09'
 
     # 更新省数据
     # for province in province_dict_ch.keys():
@@ -566,7 +569,7 @@ def epidemic_domestic_daily_importer():
 
 
 if __name__ == '__main__':
-    epidemic_domestic_daily_importer()
+    epidemic_domestic_daily_import()
 
 '''
 # print(province_data[0])
