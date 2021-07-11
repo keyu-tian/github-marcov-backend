@@ -27,6 +27,7 @@ from news.views import *
 from epidemic.views import *
 from analysis.views import *
 from knowledge.views import *
+from forum.views import *
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='index.html'), name='index'),
@@ -82,8 +83,12 @@ urlpatterns = [
     path('upload_pic', UploadPic.as_view()),
 
     # ======== 八、论坛 ========
-    # todo：论坛
-
+    path('forum/list', ForumList.as_view()),
+    path('forum/question', ForumQuestion.as_view()),
+    path('forum/publish', ForumPublish.as_view()),
+    path('forum/reply', ForumReply.as_view()),
+    path('forum/edit', ForumEdit.as_view()),
+    path('forum/delete', ForumDelete.as_view()),
 
     url(r'^', TemplateView.as_view(template_name='index.html')),
     re_path(r'^upload(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}, name='media')
