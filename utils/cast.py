@@ -56,21 +56,24 @@ def address_to_jingwei(address) -> (float, float):
 
 
 def gd_address_to_jingwei_and_province_city(address):
+    # todo：在这个list里填必须加”火车站“的
     if address in ['白洋淀站']:
         ret = __gd_address_to_jingwei_and_province_city(address[:-1] + "火车站")
         if ret is not None:
             return ret
-    for x in [
-        address + '',
-        re.findall(r'(.*)站*', address)[0] + '火车站',
-        address + '站',
-        # address + '市',
-        # address + '县',
-        # address + '区',
-    ]:
-        ret = __gd_address_to_jingwei_and_province_city(x)
-        if ret is not None:
-            return ret
+    # todo: 在这个list里填百度查的准的
+    if address not in ['兴安北站']:
+        for x in [
+            address + '',
+            re.findall(r'(.*)站*', address)[0] + '火车站',
+            address + '站',
+            # address + '市',
+            # address + '县',
+            # address + '区',
+        ]:
+            ret = __gd_address_to_jingwei_and_province_city(x)
+            if ret is not None:
+                return ret
     jingdu, weidu = address_to_jingwei(address)
     if jingdu == 0 and weidu == 0:
         return None
