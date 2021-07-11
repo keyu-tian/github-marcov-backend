@@ -11,7 +11,7 @@ from knowledge.models import Knowledge
 from meta_config import SPIDER_DATA_DIRNAME
 
 
-def small_knowledge_import():
+def small_knowledge_import(line_start=0):
     Knowledge.objects.all().delete()
     with open(os.path.join(SPIDER_DATA_DIRNAME, 'small_knowledge.json'), 'r', encoding='utf-8') as file:
         js = json.load(file)
