@@ -67,7 +67,7 @@ def init_import():
 
     print('\n' + colorama.Fore.WHITE + '=> `init_import` started ...')
 
-    init_districts()
+    # init_districts()
 
     re_import('risk', True)
     re_import('news', True, delete_old_data=True)
