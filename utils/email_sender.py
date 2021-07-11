@@ -97,7 +97,7 @@ def rand_sent() -> str:
 def send_code(acc, email_type, storage=True):
     # 发信方的信息：发信邮箱，QQ 邮箱授权码
     from_addr = 'marcov19@163.com'
-    password = 'BKCKOJBCGYPB19'
+    password = 'LXZZOAHUTTYIBZBP'
 
     # 收信方邮箱
     to_addr = acc
