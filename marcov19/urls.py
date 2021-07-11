@@ -26,6 +26,7 @@ from user.views import *
 from news.views import *
 from epidemic.views import *
 from analysis.views import *
+from knowledge.views import *
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='index.html'), name='index'),
