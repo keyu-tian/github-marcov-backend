@@ -17,7 +17,6 @@ def train_spider_new():
         bar.set_description(f'[line{line}], reslut{result.strip()}')
         get_url = url + result.strip()
         res = requests.get(get_url)
-        time.sleep(0.1)
         tree = etree.HTML(res.content.decode("utf-8"))
         if len(tree.xpath('//*[@id="ctl00_MainContentPlaceHolder_pnlResult"]/div[2]/table[1]/tbody/tr/td[1]')) == 0:
             continue
@@ -26,11 +25,9 @@ def train_spider_new():
                 result.strip(): {
                     "arriTime": tree.xpath('//*[@id="ctl00_MainContentPlaceHolder_pnlResult"]/div[2]/table[1]/tbody/tr/td[5]')[0].text.strip(),
                     "code": result.strip(),
-                    "deptCity": tree.xpath('//*[@id="startStationName"]')[0].text.strip(),
                     "deptTime": tree.xpath('//*[@id="ctl00_MainContentPlaceHolder_pnlResult"]/div[2]/table[1]/tbody/tr/td[4]')[0].text.strip(),
-                    "arriCity": "",
                     "arriStation": tree.xpath('//*[@id="ctl00_MainContentPlaceHolder_pnlResult"]/div[2]/table[1]/tbody/tr/td[3]')[0].text.strip(),
-                    "deptStation": "",
+                    "deptStation": tree.xpath('//*[@id="startStationName"]')[0].text.strip(),
                     "interval": tree.xpath('//*[@id="ctl00_MainContentPlaceHolder_pnlResult"]/div[2]/table[1]/tbody/tr/td[6]')[0].text.strip(),
                 }
             },
