@@ -152,24 +152,28 @@ def get_flight_info_by_code(code, date=datetime.now().strftime('%Y-%m-%d')):
 
 def get_flight_dept_and_arri_info_res(flight):
     # 传入flight对象，按交互文档travel/search格式返回dict
-    # todo wz: 王振写
-    result = {'key': flight.code, 'is_train': 0}
-    start = {}
-    end = {}
     start_city = flight.dept_airport.city
     end_city = flight.arri_airport.city
-    start['station_name'] = flight.dept_airport.name if flight.dept_airport else '未知'
-    start['city_name'] = start_city.name_ch if start_city else '未知'
-    start['country_name'] = start_city.country.name_ch if start_city and start_city.country else '未知'
-    start['risk'] = address_to_jingwei(start['city_name']) if start_city else (0, 0)
-    start['datetime'] = flight.dept_time
-    end['station_name'] = flight.arri_airport.name if flight.arri_airport else '未知'
-    end['city_name'] = end_city.name_ch if end_city else '未知'
-    end['country_name'] = end_city.country.name_ch if end_city and end_city.country else '未知'
-    end['risk'] = address_to_jingwei(end['city_name']) if end_city else (0, 0)
-    end['datetime'] = flight.arri_time
-    result['start'] = start
-    result['end'] = end
+    start = {
+        'station_name': flight.dept_airport.name,
+        'city_name': start_city.name_ch,
+        'country_name': start_city.country.name_ch,
+        'risk': address_to_jingwei(start_city.name_ch),
+        'datetime': flight.dept_time
+    }
+    end = {
+        'station_name': flight.arri_airport.name,
+        'city_name': end_city.name_ch,
+        'country_name': end_city.country.name_ch,
+        'risk': address_to_jingwei(end_city.name_ch),
+        'datetime': flight.arri_time
+    }
+    result = {
+        'key': flight.code,
+        'is_train': 0,
+        'start': start,
+        'end': end
+    }
     return result
 
 
@@ -235,16 +239,17 @@ class TravelPlane(View):
             return 1, [], {}, []
         with open('flight/airport_to_jingwei.json', 'r+', encoding='utf-8') as f:
             airport_to_jingwei = json.loads(f.read())
-        code, condition, dept_airport, arri_airport, dept_time, arri_time = get_flight_info_by_code(kwargs['number'])
+        # code, condition, dept_airport, arri_airport, dept_time, arri_time = get_flight_info_by_code(kwargs['number'])
+        code = kwargs['number']
+        flight = Flight.objects.filter(code=code).first()
+        condition = flight.condition
+        dept_airport = flight.dept_airport
+        arri_airport = flight.arri_airport
+        dept_time = flight.dept_time
+        arri_time = flight.arri_time
         if code == '':
             return 2, [], {}, []
         stations = []
-        # print(dept_airport, arri_airport)
-        try:
-            dept_airport = Airport.objects.filter(airport_code=dept_airport)[0]
-            arri_airport = Airport.objects.filter(airport_code=arri_airport)[0]
-        except:
-            return 3, [], {}, []
         start_station = {
             'station_name': dept_airport.name,
             'city_name': dept_airport.city.name_ch,
@@ -298,9 +303,9 @@ class TravelCity(View):
     @JSR('status', 'flights')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
-        if kwargs.keys() != {'dept_airport', 'arri_airport'}:
+        if kwargs.keys() != {'start', 'end'}:
             return 1, []
-        flights = Flight.objects.filter(dept_airport__name=kwargs['dept_airport'], arri_airport__name=kwargs['arri_airport'])
+        flights = Flight.objects.filter(dept_airport__name=kwargs['start'], arri_airport__name=kwargs['end'])
         with open('flight/airport_to_jingwei.json', 'r+', encoding='utf-8') as f:
             airport_to_jingwei = json.loads(f.read())
         # print(flights)
