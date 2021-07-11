@@ -7,11 +7,8 @@ from utils.meta_wrapper import JSR
 class KnowledgeList(View):
     @JSR('status', 'data')
     def get(self, request):
-        kwargs: dict = json.loads(request.body)
-        if kwargs.keys() != {'start'}:
-            return 1, []
         try:
-            start = int(kwargs['start'])
+            start = int(request.GET.get('start'))
         except:
             return 1
         res_set = Knowledge.objects.all()[start: start + 12]
