@@ -92,7 +92,6 @@ class SearchAnalyse(View):
                             'total_died': c['total']['died'],
                             'total_cured': c['total']['cured'],
                             'total_confirmed': c['total']['confirmed'],
-                            'total_vaccinated': c['total']['vaccinated']
                         }
                         if c['total']['vaccinated'] != "未知":
                             info['total_vaccinated'] = c['total']['vaccinated']
