@@ -95,18 +95,19 @@ class TravelPlane(View):
         dept_airport = flight.dept_airport
         arri_airport = flight.arri_airport
         dept_time = flight.dept_time
+        is_cancel = condition == "取消"
         start_station = {
             'station_name': dept_airport.airport_name,
             'city_name': dept_airport.city_name,
             'country_name': dept_airport.country_name,
-            'risk_level': get_city_risk_level(dept_airport.city_name),
+            'risk_level': get_city_risk_level(dept_airport.city_name) if not is_cancel else -1,
             'pos': [dept_airport.jingdu, dept_airport.weidu]
         }
         end_station = {
             'station_name': arri_airport.airport_name,
             'city_name': arri_airport.city_name,
             'country_name': arri_airport.country_name,
-            'risk_level': get_city_risk_level(arri_airport.city_name),
+            'risk_level': get_city_risk_level(arri_airport.city_name) if not is_cancel else -1,
             'pos': [arri_airport.jingdu, arri_airport.weidu]
         }
         stations = [start_station, end_station]
