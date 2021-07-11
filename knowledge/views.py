@@ -21,4 +21,4 @@ class KnowledgeList(View):
             'summary': a.body,
             'source': a.source,
         }for a in res_set]
-        return res
+        return 0, res

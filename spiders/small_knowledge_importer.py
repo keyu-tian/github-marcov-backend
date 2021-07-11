@@ -21,4 +21,4 @@ def small_knowledge_import(line_start=0):
 
 
 # if __name__ == '__main__':
-#     small_knowledge_importer()
+#     small_knowledge_import()
