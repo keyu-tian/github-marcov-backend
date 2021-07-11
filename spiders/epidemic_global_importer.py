@@ -117,7 +117,7 @@ def epidemic_global_import(start_dt=None):
                     if total_vaccinated == 0:
                         total_vaccinated = \
                             last_total_vaccinated + new_vaccinated if new_vaccinated != "未知" else total_vaccinated
-                        last_total_vaccinated = total_vaccinated
+                    last_total_vaccinated = total_vaccinated
                 China_info = epidemic_China_total_import(date)
                 if China_info is None:
                     date = dt_delta(date, 1)
@@ -152,7 +152,7 @@ def epidemic_global_import(start_dt=None):
                     if total_vaccinated == 0:
                         total_vaccinated = \
                             last_total_vaccinated + new_vaccinated if new_vaccinated != "未知" else total_vaccinated
-                        last_total_vaccinated = total_vaccinated
+                    last_total_vaccinated = total_vaccinated
                 country_info = {
                     "name": country,
                     "population": 0,  # todo
