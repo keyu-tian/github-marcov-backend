@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 
 from django.views import View
 
-from knowledge.models import Knowledge
 from news.models import News, Rumor
 from utils.meta_wrapper import JSR
 
@@ -14,7 +13,7 @@ class WeeklyNews(View):
         '东南亚', '日本', '东京', '韩', '首尔', '朝鲜', '泰', '老挝', '缅甸', '柬埔寨',
         '印度', '印尼', '新加坡', '马来西亚', '印度尼西亚',
         '英格兰', '英国', '伦敦', '法国', '巴黎', '戛纳', '德国', '意大利',
-        '瑞士', '希腊', '以色列', '土耳其',
+        '瑞士', '希腊', '比利时', '以色列', '土耳其', '阿富汗', '阿拉伯',
         '美国', '全美', '北美', '澳',
         '智利', '巴西', '南美',
         '俄罗斯',
