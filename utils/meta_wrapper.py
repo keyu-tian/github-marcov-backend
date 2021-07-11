@@ -72,13 +72,13 @@ def JSR(*keys): # 这里的 keys 是 @JSR(...) 里面填的 keys
                         'news.WeeklyNews.POST',
                         'flight.TravelPlane.POST',
                         'train.TravelSearch.POST',
-                        'train.TravelTrain.POST'
+                        # 'train.TravelTrain.POST'
                     }:
                         ret_str = Fore.WHITE + '(TOO LONG) '
                         ret_str += Fore.GREEN + str(dict(status=ret_dict.get('status', 0)))
                     else:
                         ret_str = pformat(ret_dict)
-                        if len(ret_str) > 1500:
+                        if len(ret_str) > 2500:
                             too_long_fname = os.path.join(SPIDER_DATA_DIRNAME, 'JSR.too.long')
                             if os.path.exists(too_long_fname):
                                 with open(too_long_fname, 'r') as fp:
