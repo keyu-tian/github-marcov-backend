@@ -66,7 +66,7 @@ def gd_address_to_jingwei_and_province_city(address):
         for x in [
             address + '',
             re.findall(r'(.*?)站?$', address)[0] + '火车站',
-            address + '站',
+            re.findall(r'(.*?)站?$', address)[0],
             # address + '市',
             # address + '县',
             # address + '区',
