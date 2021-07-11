@@ -80,19 +80,23 @@ class SearchAnalyse(View):
                             'date': d['date'],
                             'total_died': c['total']['died'],
                             'total_cured': c['total']['cured'],
-                            'total_confirmed': c['total']['confirmed']
+                            'total_confirmed': c['total']['confirmed'],
                         })
         else:
             global_analysis = json.load(open(global_json_path, 'r', encoding='utf-8'))
             for d in global_analysis[:-1]:
                 for c in d['countries']:
                     if c['name'] == kwargs['name']:
-                        daily_data.append({
+                        info = {
                             'date': d['date'],
                             'total_died': c['total']['died'],
                             'total_cured': c['total']['cured'],
-                            'total_confirmed': c['total']['confirmed']
-                        })
+                            'total_confirmed': c['total']['confirmed'],
+                            'total_vaccinated': c['total']['vaccinated']
+                        }
+                        if c['total']['vaccinated'] != "未知":
+                            info['total_vaccinated'] = c['total']['vaccinated']
+                        daily_data.append(info)
 
         return 0, population, daily_data
 
