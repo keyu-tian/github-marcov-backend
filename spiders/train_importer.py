@@ -83,11 +83,11 @@ def __train_import(bar, line_start=0, src=1):
                     else:
                         dept_sta.jingdu, dept_sta.weidu = res['jingdu'], res['weidu']
                         city_name = res['city']
-                        province_name = res['province']
+                        province_name = res['province'] if res['province'] else res['district']
                 else:
                     dept_sta.jingdu, dept_sta.weidu = res['jingdu'], res['weidu']
                     city_name = res['city']
-                    province_name = res['province']
+                    province_name = res['province'] if res['province'] else res['district']
                 dept_city_name_standar = City.standardize_name(city_name)
                 if dept_city_name_standar is not None:
                     city_name = dept_city_name_standar
@@ -108,11 +108,11 @@ def __train_import(bar, line_start=0, src=1):
                     else:
                         arri_sta.jingdu, arri_sta.weidu = res['jingdu'], res['weidu']
                         city_name = res['city']
-                        province_name = res['province']
+                        province_name = res['province'] if res['province'] else res['district']
                 else:
                     arri_sta.jingdu, arri_sta.weidu = res['jingdu'], res['weidu']
                     city_name = res['city']
-                    province_name = res['province']
+                    province_name = res['province'] if res['province'] else res['district']
                 arri_city_name_standar = City.standardize_name(city_name)
                 if arri_city_name_standar is not None:
                     city_name = arri_city_name_standar
@@ -149,11 +149,11 @@ def __train_import(bar, line_start=0, src=1):
                             else:
                                 sta.jingdu, sta.weidu = res['jingdu'], res['weidu']
                                 city_name = res['city']
-                                province_name = res['province']
+                                province_name = res['province'] if res['province'] else res['district']
                         else:
                             sta.jingdu, sta.weidu = res['jingdu'], res['weidu']
                             city_name = res['city']
-                            province_name = res['province']
+                            province_name = res['province'] if res['province'] else res['district']
 
                         mid_city_name_standar = City.standardize_name(city_name)
                         if mid_city_name_standar is not None:
