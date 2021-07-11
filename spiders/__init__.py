@@ -80,6 +80,7 @@ def init_import():
     # re_import('epidemic_domestic', False)               # 不launch是因为 epidemic_domestic 没有 spider，只有 importer
     re_import('epidemic_global', False)  # 不launch是因为 epidemic_global 没有 spider，只有 importer
     re_import('flight_once', False)  # 不launch是因为 flight_once 的 spider 太慢（超过2h），而且需要 chromedrive.exe
+    re_import('small_knowledge', False, line_start=0)   # 小知识没有spider，只有importer
 
     print('\n' + colorama.Fore.WHITE + '=> `init_import` finished.')
 
