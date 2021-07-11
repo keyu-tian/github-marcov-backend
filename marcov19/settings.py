@@ -615,6 +615,7 @@ INSTALLED_APPS = [
     'epidemic',
     'analysis',
     'knowledge',
+    'forum'
 ]
 
 MIDDLEWARE = [
