@@ -1,11 +1,11 @@
 import colorama
 
 from meta_config import BULK_CREATE_BATCH_SIZE
+from utils.cast import cur_time
 
 
 def init_districts():
-    print('')
-    print(colorama.Fore.WHITE + '=> `init_districts` started ...')
+    print('\n' + colorama.Fore.WHITE + '=> `init_districts` started ...')
     
     from utils.country_dict import country_dict
     from utils.dict_ch import province_dict_ch
@@ -49,16 +49,15 @@ def init_districts():
         for kw in kws.values()
     ], batch_size=BULK_CREATE_BATCH_SIZE)
     
-    print('')
-    print(colorama.Fore.WHITE + '=> `init_districts` finished.')
+    print('\n' + colorama.Fore.WHITE + '=> `init_districts` finished.')
     
 
 def re_import(name, launch_spider, *args, **kwargs):
     if launch_spider:
-        print(colorama.Fore.CYAN + f'\n[{name}_spider]:')
+        print(colorama.Fore.CYAN + f'\n[{cur_time()}][{name}_spider]:')
         exec(f'from spiders.{name}_spider import main')
         exec(f'main()')
-    print(colorama.Fore.CYAN + f'\n[{name}_importer]:')
+    print(colorama.Fore.CYAN + f'\n[{cur_time()}][{name}_importer]:')
     exec(f'from spiders.{name}_importer import {name}_import as main')
     exec(f'main(*args, **kwargs)')
 
@@ -66,8 +65,7 @@ def re_import(name, launch_spider, *args, **kwargs):
 def init_import():
     colorama.init(autoreset=True)
     
-    print('')
-    print(colorama.Fore.WHITE + '=> `init_import` started ...')
+    print('\n' + colorama.Fore.WHITE + '=> `init_import` started ...')
     
     init_districts()
     
@@ -83,19 +81,16 @@ def init_import():
     re_import('epidemic_global', False)                 # 不launch是因为 epidemic_global 没有 spider，只有 importer
     re_import('flight_once', False)                     # 不launch是因为 flight_once 的 spider 太慢（超过2h），而且需要 chromedrive.exe
 
-    print('')
-    print(colorama.Fore.WHITE + '=> `init_import` finished.')
+    print('\n' + colorama.Fore.WHITE + '=> `init_import` finished.')
     
     daily_import()
     
 
 def daily_import():
-    print('')
-    print(colorama.Fore.WHITE + '=> `daily_import` started ...')
+    print('\n' + colorama.Fore.WHITE + '=> `daily_import` started ...')
     
     re_import('flight_daily', False)
     # todo:
     # re_import('epidemic_domestic_daily', False)
 
-    print('')
-    print(colorama.Fore.WHITE + '=> `daily_import` finished.')
+    print('\n' + colorama.Fore.WHITE + '=> `daily_import` finished.')
