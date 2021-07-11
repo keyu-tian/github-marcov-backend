@@ -7,18 +7,23 @@ class Station(models.Model):
     name_ch = models.CharField(primary_key=True, unique=True, max_length=DT_LENGTH, db_index=True, null=False, default='未知')
     jingdu = models.FloatField(blank=True, null=True)
     weidu = models.FloatField(blank=True, null=True)
-    city = models.ForeignKey('country.City', on_delete=models.SET_NULL, null=True, blank=True)
+    # city废了
+    # city = models.ForeignKey('country.City', on_delete=models.SET_NULL, null=True, blank=True)
+    city_name = models.CharField(max_length=128, default="未知")
+    province_name = models.CharField(max_length=128, default="未知")
 
 
 class Train(models.Model):
     name = models.CharField(primary_key=True, unique=True, max_length=DT_LENGTH, db_index=True, null=False)  # 火车号
     dept_date = models.CharField(max_length=DT_LENGTH, null=True, blank=True)
     dept_time = models.CharField(max_length=DT_LENGTH, null=True, blank=True)
-    dept_city = models.ForeignKey('country.City', related_name='start_train', on_delete=models.SET_NULL, null=True, blank=True)
+    # dept_city = models.ForeignKey('country.City', related_name='start_train', on_delete=models.SET_NULL, null=True, blank=True)
+    # dept_city_name = models.CharField(max_length=128, default="未知")
     dept_station = models.ForeignKey('train.Station', related_name='start_train', on_delete=models.SET_NULL, null=True, blank=True)
     arri_date = models.CharField(max_length=DT_LENGTH, null=True, blank=True)
     arri_time = models.CharField(max_length=DT_LENGTH, null=True, blank=True)
-    arri_city = models.ForeignKey('country.City', related_name='end_train', on_delete=models.SET_NULL, null=True, blank=True)
+    # arri_city = models.ForeignKey('country.City', related_name='end_train', on_delete=models.SET_NULL, null=True, blank=True)
+    # arri_city_name = models.CharField(max_length=128, default="未知")
     arri_station = models.ForeignKey('train.Station', related_name='end_train', on_delete=models.SET_NULL, null=True, blank=True)
     interval = models.CharField(max_length=DT_LENGTH, blank=True)
     kilometer = models.CharField(max_length=256, blank=True, null=True)
