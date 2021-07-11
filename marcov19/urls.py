@@ -35,6 +35,7 @@ urlpatterns = [
 
     # ======== 二、地图分析 ========
     path('map/province', MapProvince.as_view()),
+    path('map/today/province', MapTodayProvince.as_view()),
     path('map/province_dt', MapProvinceDt.as_view()),
     path('map/oversea', MapOversea.as_view()),
     path('map/oversea_dt', MapOverseaDt.as_view()),
