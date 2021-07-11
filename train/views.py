@@ -164,10 +164,10 @@ class TravelCityTrain(View):
             return 3
 
         train_res = []
-        train_set = Train.objects.filter(Q(schedule_station__in=[start_sta])).filter(Q(schedule_station__in=[end_sta]))
+        train_set = Train.objects.filter(Q(schedule_station__in=[end_sta])).filter(Q(schedule_station__in=[start_sta]))
         for a in train_set:
             start_sta_index = MidStation.objects.get(train=a, station=start_sta).index
-            end_sta_index = MidStation.objects.get(train=a, station=start_sta).index
+            end_sta_index = MidStation.objects.get(train=a, station=end_sta).index
             if start_sta_index < end_sta_index:
                 train_res.append(get_train_dept_and_arri_info_res(a))
         return 0, train_res
