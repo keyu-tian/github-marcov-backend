@@ -31,7 +31,12 @@ class Country(models.Model):
 class Province(models.Model):
     @staticmethod
     def standardize_name(name):
-        return province_dict_ch.get(re.sub('市|直辖市|省|地区', '', name.strip()).strip(), None)
+        p_name = re.sub('市|直辖市|省|地区', '', name.strip()).strip()
+        if p_name in province_dict_ch:
+            return province_dict_ch[p_name]
+        if p_name in province_dict_ch.values():
+            return p_name
+        return None
     
     @staticmethod
     def get_via_name(not_standard_name):
