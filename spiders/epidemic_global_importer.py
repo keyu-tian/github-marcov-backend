@@ -139,13 +139,6 @@ def epidemic_global_import(start_dt=None):
                 date = dt_change_line(i["y"] + "." + i["date"], s=".")  # yyyy-mm-dd
                 # 获取疫苗接种情况
                 country_vacc = re_country_vaacinations_dict.get(country)
-                # if country == "中国":
-                #     data_vacc = data_vaccinations[(data_vaccinations['date'] == date) &
-                #                                   ((data_vaccinations['location'] == 'China') |
-                #                                    (data_vaccinations['location'] == 'Hong Kong') |
-                #                                    (data_vaccinations['location'] == 'Taiwan') |
-                #                                    (data_vaccinations['location'] == 'Macao'))]
-                # else:
                 data_vacc = data_vaccinations[(data_vaccinations['date'] == date) &
                                               (data_vaccinations['location'] == country_vacc)]
                 if data_vacc.empty:
@@ -160,17 +153,6 @@ def epidemic_global_import(start_dt=None):
                         total_vaccinated = \
                             last_total_vaccinated + new_vaccinated if new_vaccinated != "未知" else total_vaccinated
                         last_total_vaccinated = total_vaccinated
-                # if country == "中国":
-                #     China_info = epidemic_China_total_import(date)
-                #     country_info = {
-                #         "name": country,
-                #         "population": 0,  # todo
-                #         "new": China_info["new"],
-                #         "total": China_info["total"]
-                #     }
-                #     country_info["new"]["vaccinated"] = new_vaccinated
-                #     country_info["total"]["vaccinated"] = total_vaccinated
-                # else:
                 country_info = {
                     "name": country,
                     "population": 0,  # todo
