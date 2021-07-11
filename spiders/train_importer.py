@@ -23,14 +23,13 @@ from utils.cast import gd_address_to_jingwei_and_province_city
 day_ch = ['第未知天', '第一天', '第二天', '第三天', '第四天', '第五天', '第六天', '第七天', '第八天', '第九天', '第十天', '终到站']
 
 
-def cmp(a):
-    a_content = a.get('content')
-    # if a_content[3] == '起点站':
-    #     return '0'
-    # if a_content[4] == '终到站':
-    #     return '9999999'
-    # a_index = day_ch.index(a_content[2])
-    return a_content[2]
+def cmp(item):
+    _, mid_sta_name, day, st_t, ed_t, dt, dist, _, _, _ = item['content']
+    if st_t == '起点站':
+        return '000'
+    if ed_t == '终到站':
+        return '999'
+    return f'{day_ch.index(day):03d}' + st_t
 
 
 def train_import(line_start=0):
@@ -63,7 +62,7 @@ def train_import(line_start=0):
 
             dept_sta, flag = Station.objects.get_or_create(name_ch=dept_sta_name)
             if flag:  # 数据库没有的新的火车站，存经纬度
-                res = gd_address_to_jingwei_and_province_city(dept_sta_name + '火车站')
+                res = gd_address_to_jingwei_and_province_city(dept_sta_name + '站')
                 if res is None:
                     dept_sta.jingdu, dept_sta.weidu = 0, 0
                     res = gd_address_to_jingwei_and_province_city(dept_sta_name)
@@ -88,7 +87,7 @@ def train_import(line_start=0):
 
             arri_sta, flag = Station.objects.get_or_create(name_ch=arri_sta_name)
             if flag:  # 数据库没有的新的火车站，存经纬度
-                res = gd_address_to_jingwei_and_province_city(arri_sta_name + '火车站')
+                res = gd_address_to_jingwei_and_province_city(arri_sta_name + '站')
                 if res is None:
                     arri_sta.jingdu, arri_sta.weidu = 0, 0
                     res = gd_address_to_jingwei_and_province_city(arri_sta_name)
@@ -122,12 +121,12 @@ def train_import(line_start=0):
                 train.interval = result.get('extInfo').get('allTime')
                 train.kilometer = result.get('extInfo').get('allMileage')
                 mid_list = result.get('trainScheduleBody')
-                # mid_list.sort(key=cmp)
+                mid_list.sort(key=lambda ci: float(str(ci['content'][-4]).strip('公里').strip()))
                 for c in mid_list:
                     content = c.get('content')
                     sta, flag = Station.objects.get_or_create(name_ch=content[1])
                     if flag:  # 是新建，存经纬度
-                        res = gd_address_to_jingwei_and_province_city(content[1] + '火车站')
+                        res = gd_address_to_jingwei_and_province_city(content[1] + '站')
                         if res is None:
                             sta.jingdu, sta.weidu = 0, 0
                             res = gd_address_to_jingwei_and_province_city(content[1])

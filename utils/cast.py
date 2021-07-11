@@ -55,6 +55,10 @@ def address_to_jingwei(address) -> (float, float):
 
 
 def gd_address_to_jingwei_and_province_city(address):
+    if address in ['白洋淀站']:
+        ret = __gd_address_to_jingwei_and_province_city(address[:-1] + "火车站")
+        if ret is not None:
+            return ret
     for x in [
         address + '',
         address + '站',

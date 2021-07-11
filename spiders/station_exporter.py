@@ -8,7 +8,7 @@ from train.models import Station
 def station_export():
     res = {}
     for a in Station.objects.all():
-        if a.city.province.name + '.' + a.city_name in res.keys():
+        if a.province_name + '.' + a.city_name in res.keys():
             res[a.province_name + '.' + a.city_name].append(a.name_ch)
         else:
             res[a.province_name + '.' + a.city_name] = [a.name_ch]
