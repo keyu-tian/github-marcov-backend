@@ -295,7 +295,7 @@ class TravelPlane(View):
 
 
 class TravelCity(View):
-    @JSR('status', 'planes', 'trains')
+    @JSR('status', 'planes')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'start', 'end'}:
@@ -350,7 +350,4 @@ class TravelCity(View):
             # todo:msg要改
             plane_res.append({'datetime': flight.dept_time, 'stations': [start, end], 'info': info})
 
-        train_res = []
-
-
-        return 0, plane_res, train_res
+        return 0, plane_res
