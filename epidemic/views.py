@@ -66,6 +66,67 @@ class MapProvince(View):
         return 0, data
 
 
+class MapTodayProvince(View):
+    @JSR('status', 'date', 'province', 'cities', 'info')
+    def get(self, request):
+        try:
+            province = str(request.GET.get('name'))
+        except:
+            return 1
+
+        try:
+            print(os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json'))
+            domestic_data_list = json.load(open(
+                os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json'),
+                'r', encoding='utf-8'
+            ))
+            domestic_data = {}
+            for it in domestic_data_list:
+                date = it['date']
+                domestic_data[date] = {
+                    'date': date,
+                }
+                provinces_data = {}
+                for it2 in it['provinces']:
+                    provinces_data[it2['name']] = it2
+                domestic_data[date]['provinces'] = provinces_data
+
+            province_data = json.load(open(
+                os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'provinces', '%s.json' % province_dict_ch[province]),
+                'r', encoding='utf-8'
+            ))
+        except:
+            return 7
+
+        date = domestic_data_list[-1]['date']
+        province_data_ret = {
+            'new': domestic_data[date]['provinces'][province]['new'],
+            'total': domestic_data[date]['provinces'][province]['total'],
+        }
+        cities_data = province_data[date]
+
+        try:
+            infos = []
+            for it in cities_data:
+                city = it['name']
+                msg = Policy.objects.filter(city_name=city)
+                if msg.count() != 0:
+                    msg = f'进入{city}管控政策：{msg.first().enter_policy}\n离开{city}管控政策：{msg.first().out_policy}'
+                    info = {'level': get_city_risk_level(city), 'msg': msg}
+                    infos.append(info)
+                news_list = News.objects.filter(Q(title__icontains=city) |
+                                                Q(context__icontains=city))
+                for news in news_list:
+                    info = {'level': get_city_risk_level(city), 'msg': news.title + '：' + news.context}
+                    infos.append(info)
+            infos = list_dict_duplicate_removal(infos)
+        except:
+            return 7
+
+        return 0, date, province_data_ret, cities_data, infos
+
+
+
 class MapProvince_WZ(View):
     @JSR('status', 'province')
     def post(self, request):
