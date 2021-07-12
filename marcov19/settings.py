@@ -619,6 +619,10 @@ INSTALLED_APPS = [
     'forum'
 ]
 
+CRONJOBS = [
+    ('00 11 * * *', 'user.views.send_task_email', '>>logging/email_task.log'),
+]
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     #'django.middleware.security.SecurityMiddleware',

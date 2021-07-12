@@ -5,6 +5,7 @@ import hashlib
 
 from datetime import datetime
 
+from django.template.loader import render_to_string
 from django.views import View
 from django.db.utils import IntegrityError, DataError
 
@@ -16,7 +17,9 @@ from meta_config import SPIDER_DATA_DIRNAME
 from user.models import User, VerifyCode, Follow
 from user.hypers import *
 from utils.cast import cur_time
-from utils.email_sender import send_code
+from utils.country_dict import country_dict
+from utils.dict_ch import province_dict_ch, district_dict
+from utils.email_sender import send_code, send_follow
 from utils.meta_wrapper import JSR
 
 
@@ -416,3 +419,64 @@ class FollowSetMail(View):
         user.is_mail = True if mail == 1 else False
         user.save()
         return user
+
+
+def send_task_email():
+    email_user_list = User.objects.filter(is_mail=True)
+    for u in email_user_list:
+        tasks = Follow.objects.filter(user=u)
+        if tasks:
+            # html_message = render_to_string('task/task.html', {'tasks': tasks, 'user': user})
+            send_follow(u.account, tasks)
+
+
+class FollowProvince(View):
+    @JSR('status', 'data')
+    def post(self, request):
+        try:
+            uid = int(request.session.get('uid', None))
+            user = User.objects.get(id=uid)
+        except:
+            return 2
+        res = []
+        follow_set = [a.province for a in Follow.objects.filter(user=user, level=2)]
+        for a in province_dict_ch.keys():
+            res[a] = int(a in follow_set)
+
+        return 0, res
+
+
+class FollowCountry(View):
+    @JSR('status', 'data')
+    def post(self, request):
+        try:
+            uid = int(request.session.get('uid', None))
+            user = User.objects.get(id=uid)
+        except:
+            return 2
+        res = []
+        follow_set = [a.country for a in Follow.objects.filter(user=user, level=1)]
+        for a in country_dict.values():
+            res[a] = int(a in follow_set)
+
+        return 0, res
+
+
+class FollowCity(View):
+    @JSR('status', 'data')
+    def post(self, request):
+        try:
+            uid = int(request.session.get('uid', None))
+            user = User.objects.get(id=uid)
+        except:
+            return 2
+        try:
+            province = json.loads(request.body)['province']
+        except:
+            return 1
+        res = []
+        follow_set = [a.city for a in Follow.objects.filter(user=user, level=3, province=province)]
+        for a in district_dict[province].keys():
+            res[a] = int(a in follow_set)
+
+        return 0, res

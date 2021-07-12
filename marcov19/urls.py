@@ -96,6 +96,9 @@ urlpatterns = [
     path('follow/new', FollowNew.as_view()),
     path('follow/data', FollowData.as_view()),
     path('follow/set_mail', FollowSetMail.as_view()),
+    path('follow/province', FollowProvince.as_view()),
+    path('follow/country', FollowCountry.as_view()),
+    path('follow/city', FollowCity.as_view()),
 
     re_path(r'^upload(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}, name='media'),
     url(r'^', TemplateView.as_view(template_name='index.html')),
