@@ -1,5 +1,6 @@
 import json
 import datetime
+import math
 import os
 
 from meta_config import SPIDER_DATA_DIRNAME
@@ -35,6 +36,10 @@ def predict_global_import(start_dt=None):
     bar = tqdm(
         total=days, initial=0, dynamic_ncols=True,
     )
+    # last_confirmed = {}
+    # last_cured = {}
+    # last_died = {}
+    a1, a2, a3 = 0.0, 0.0, 0.0
     while (datetime.datetime.strptime(start_dt, '%Y-%m-%d').date()
            - datetime.datetime.now().date()).days <= PREDICT_TIME:
         bar.set_description('[parsing]')
@@ -49,23 +54,44 @@ def predict_global_import(start_dt=None):
             date = datetime.datetime.strptime(data_1[1], "%Y%m%d").strftime('%Y-%m-%d')
             # print(country)
             # data_1[4] data_2[4] data_3[4]
-            x = data_1[4] if data_1[4] is not None else data_1[3]
-            y = data_2[4] if data_2[4] is not None else data_2[3]
-            z = data_3[4] if data_3[4] is not None else data_3[3]
+            # x = data_1[4] if data_1[4] is not None else data_1[3]  # y_max
+            # y = data_2[4] if data_2[4] is not None else data_2[3]  # y_max
+            # z = data_3[4] if data_3[4] is not None else data_3[3]  # y_max
             if date == yesterday:
-                a1 = (true_json[country]["confirmed"] - data_1[3]) / (data_1[3] + x + 1e-8)
-                a2 = (true_json[country]["cured"] - data_2[3]) / (data_2[3] + y + 1e-8)
-                a3 = (true_json[country]["died"] - data_3[3]) / (data_3[3] + z + 1e-8)
-                alpha[country] = [a1, a2, a3]
+                # if math.fabs(true_json[country]["confirmed"] - data_1[2]) > 1000:
+                # a1 = (true_json[country]["confirmed"] - data_1[3]) / (x - data_1[3] + 1e-8)
+                # a2 = (true_json[country]["cured"] - data_2[3]) / (y - data_2[3] + 1e-8)
+                # a3 = (true_json[country]["died"] - data_3[3]) / (z - data_3[3] + 1e-8)
+                # alpha[country] = [a1, a2, a3]
+                # last_confirmed[country] = int(alpha[country][0] * x + (1 - alpha[country][0]) * data_1[3])
+                # last_cured[country] = int(alpha[country][1] * y + (1 - alpha[country][1]) * data_2[3])
+                # last_died[country] = int(alpha[country][2] * z + (1 - alpha[country][2]) * data_3[3])
+                a1 = true_json[country]["confirmed"] / data_1[2] if data_1[2] != 0 else 0.0
+                a2 = true_json[country]["cured"] / data_2[2] if data_2[2] != 0 else 0.0
+                a3 = true_json[country]["died"] / data_3[2] if data_3[2] != 0 else 0.0
 
+            # print(last_confirmed)
             if date == start_dt:
+                # print(country)
+                # confirmed = int(alpha[country][0] * x + (1 - alpha[country][0]) * data_1[3])
+                # cured = int(alpha[country][1] * y + (1 - alpha[country][1]) * data_2[3])
+                # died = int(alpha[country][2] * z + (1 - alpha[country][2]) * data_3[3])
+                # if confirmed / (last_confirmed.get(country) + 1e-8) > 1.2:
+                #     confirmed = last_confirmed.get(country) + 1 if last_confirmed.get(country) > 0 else 0
+                # if cured / (last_cured.get(country) + 1e-8) > 1.1:
+                #     cured = last_cured.get(country) + 1 if last_cured.get(country) > 0 else 0
+                # if died / (last_died.get(country) + 1e-8) > 1.1:
+                #     died = last_died.get(country) + 1 if last_died.get(country) > 0 else 0
+                # last_confirmed[country] = confirmed
+                # last_died[country] = died
+                # last_cured[country] = cured
                 countries.append({
                     "name": country,
                     "population": 0,  # todo
                     "predict": {
-                        "confirmed": int(alpha[country][0] * x + (1 - alpha[country][0]) * data_1[3]),
-                        "cured": int(alpha[country][1] * y + (1 - alpha[country][1]) * data_2[3]),
-                        "died": int(alpha[country][2] * z + (1 - alpha[country][2]) * data_3[3]),
+                        "confirmed": int(a1 * data_1[2]),
+                        "cured": int(a2 * data_2[2]) if int(a2 * data_2[2]) < int(a1 * data_1[2]) else int(a1 * data_1[2]),
+                        "died": int(a3 * data_3[2]),
                     }
                 })
         dataout.append({
