@@ -3,7 +3,7 @@ from functools import reduce
 from django.db.models import Q
 from django.views import View
 
-from user.views import get_is_star
+from user.models import User, Follow
 from utils.meta_wrapper import JSR
 from utils.dict_ch import city_dict_ch, province_dict_ch, district_dict
 from utils.country_dict import country_dict
@@ -14,6 +14,36 @@ from news.models import *
 import json
 import os
 from meta_config import SPIDER_DATA_DIRNAME
+
+
+def get_is_star(request, level, country='', province='', city=''):
+    try:
+        uid = int(request.session.get('uid', None))
+        user = User.objects.get(id=uid)
+    except:
+        return 2
+
+    follow_set = Follow.objects.filter(user=user)
+    if level == 1:
+        if follow_set.filter(level=1, country=country).exists():
+            return 1
+        else:
+            return 0
+    elif level == 2:
+        if follow_set.filter(level=2, province=province).exists():
+            return 1
+        else:
+            return 0
+    elif level == 3:
+        if follow_set.filter(level=3, province=province, city=city).exists():
+            return 1
+        else:
+            return 0
+    else:
+        if follow_set.filter(level=1, country=country).exists() or follow_set.filter(level=2, province=country).exists():
+            return 1
+        else:
+            return 0
 
 
 def list_dict_duplicate_removal(data_list):

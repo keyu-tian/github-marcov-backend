@@ -10,7 +10,7 @@ from django.db.utils import IntegrityError, DataError
 
 from analysis.views import country_analyse_data_res
 from epidemic.models import HistoryEpidemicData
-from epidemic.views import map_oversea_dt_data_res, map_today_city_data_res
+from epidemic.views import map_today_city_data_res
 from marcov19.settings import SERVER_HOST
 from meta_config import SPIDER_DATA_DIRNAME
 from user.models import User, VerifyCode, Follow
@@ -416,33 +416,3 @@ class FollowSetMail(View):
         user.is_mail = True if mail == 1 else False
         user.save()
         return user
-
-
-def get_is_star(request, level, country='', province='', city=''):
-    try:
-        uid = int(request.session.get('uid', None))
-        user = User.objects.get(id=uid)
-    except:
-        return 2
-
-    follow_set = Follow.objects.filter(user=user)
-    if level == 1:
-        if follow_set.filter(level=1, country=country).exists():
-            return 1
-        else:
-            return 0
-    elif level == 2:
-        if follow_set.filter(level=2, province=province).exists():
-            return 1
-        else:
-            return 0
-    elif level == 3:
-        if follow_set.filter(level=3, province=province, city=city).exists():
-            return 1
-        else:
-            return 0
-    else:
-        if follow_set.filter(level=1, country=country).exists() or follow_set.filter(level=2, province=country).exists():
-            return 1
-        else:
-            return 0

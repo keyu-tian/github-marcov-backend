@@ -1,7 +1,7 @@
 from django.views import View
 
 from meta_config import SPIDER_DATA_DIRNAME
-from user.views import get_is_star
+from user.models import User
 from utils.meta_wrapper import JSR
 from utils.dict_ch import province_dict_ch
 import datetime as dt
@@ -9,6 +9,36 @@ import json
 import os
 
 epidemic_start_date = dt.date(2021, 7, 1)
+
+
+def get_is_star(request, level, country='', province='', city=''):
+    try:
+        uid = int(request.session.get('uid', None))
+        user = User.objects.get(id=uid)
+    except:
+        return 2
+
+    follow_set = Follow.objects.filter(user=user)
+    if level == 1:
+        if follow_set.filter(level=1, country=country).exists():
+            return 1
+        else:
+            return 0
+    elif level == 2:
+        if follow_set.filter(level=2, province=province).exists():
+            return 1
+        else:
+            return 0
+    elif level == 3:
+        if follow_set.filter(level=3, province=province, city=city).exists():
+            return 1
+        else:
+            return 0
+    else:
+        if follow_set.filter(level=1, country=country).exists() or follow_set.filter(level=2, province=country).exists():
+            return 1
+        else:
+            return 0
 
 
 class DomesticAnalyze(View):
@@ -114,7 +144,7 @@ class SearchAnalyse(View):
 
 
 class CountryAnalyze(View):
-    @JSR('status', 'population', 'data', 'is_star')
+    @JSR('status', 'population', 'data')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name'}:

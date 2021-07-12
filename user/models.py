@@ -41,9 +41,14 @@ class VerifyCode(models.Model):
         verbose_name_plural = verbose_name
 
 
+class EmailTask(models.Model):
+    user = models.ForeignKey(to=User, on_delete=models.CASCADE)
+
+
 class Follow(models.Model):
     user = models.ForeignKey(to=User, related_name='follow_set', on_delete=models.CASCADE)
     country = models.CharField(max_length=128, default='未知')
     province = models.CharField(max_length=128, default='未知')
     city = models.CharField(max_length=128, default='未知')
     level = models.IntegerField(choices=EPIDEMIC_LEVEL_CHS, default=1)
+    email_task = models.ForeignKey(to=EmailTask, on_delete=models.CASCADE, null=True, blank=True)
