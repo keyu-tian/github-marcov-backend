@@ -15,7 +15,7 @@ import re
 # django.setup()
 from tqdm import tqdm
 
-from country.models import City
+# from country.models import City
 from meta_config import SPIDER_DATA_DIRNAME, BULK_CREATE_BATCH_SIZE
 from train.models import Train, Station, MidStation
 from utils.cast import gd_address_to_jingwei_and_province_city
@@ -88,9 +88,9 @@ def __train_import(bar, line_start=0, src=1):
                     dept_sta.jingdu, dept_sta.weidu = res['jingdu'], res['weidu']
                     city_name = res['city']
                     province_name = res['province'] if res['province'] else res['district']
-                dept_city_name_standar = City.standardize_name(city_name)
-                if dept_city_name_standar is not None:
-                    city_name = dept_city_name_standar
+                # dept_city_name_standar = City.standardize_name(city_name)
+                # if dept_city_name_standar is not None:
+                #     city_name = dept_city_name_standar
                 dept_sta.city_name = city_name
                 dept_sta.province_name = province_name
                 dept_sta.save()
@@ -113,9 +113,9 @@ def __train_import(bar, line_start=0, src=1):
                     arri_sta.jingdu, arri_sta.weidu = res['jingdu'], res['weidu']
                     city_name = res['city']
                     province_name = res['province'] if res['province'] else res['district']
-                arri_city_name_standar = City.standardize_name(city_name)
-                if arri_city_name_standar is not None:
-                    city_name = arri_city_name_standar
+                # arri_city_name_standar = City.standardize_name(city_name)
+                # if arri_city_name_standar is not None:
+                #     city_name = arri_city_name_standar
                 arri_sta.city_name = city_name
                 arri_sta.province_name = province_name
                 arri_sta.save()
@@ -155,9 +155,9 @@ def __train_import(bar, line_start=0, src=1):
                             city_name = res['city']
                             province_name = res['province'] if res['province'] else res['district']
 
-                        mid_city_name_standar = City.standardize_name(city_name)
-                        if mid_city_name_standar is not None:
-                            city_name = mid_city_name_standar
+                        # mid_city_name_standar = City.standardize_name(city_name)
+                        # if mid_city_name_standar is not None:
+                        #     city_name = mid_city_name_standar
                         sta.province_name = province_name
                         sta.city_name = city_name
                         sta.save()
