@@ -48,7 +48,7 @@ headers = {
                   'Safari/537.36 Core/1.70.3741.400 QQBrowser/10.5.3863.400 '
 }
 
-begin = '2020-01-01'
+begin = '2020-02-01'
 
 dataout = []
 
@@ -106,7 +106,9 @@ def epidemic_global_import(start_dt=None):
                                                (data_vaccinations['location'] == 'Hong Kong') |
                                                (data_vaccinations['location'] == 'Taiwan') |
                                                (data_vaccinations['location'] == 'Macao'))]
-                if data_vacc.empty:
+                if (datetime.datetime.now().date() - datetime.datetime.strptime(date, '%Y-%m-%d').date()).days <= 2:
+                    total_vaccinated = last_total_vaccinated
+                elif data_vacc.empty:
                     new_vaccinated = "未知"
                     total_vaccinated = "未知"
                 else:
@@ -141,7 +143,9 @@ def epidemic_global_import(start_dt=None):
                 country_vacc = re_country_vaacinations_dict.get(country)
                 data_vacc = data_vaccinations[(data_vaccinations['date'] == date) &
                                               (data_vaccinations['location'] == country_vacc)]
-                if data_vacc.empty:
+                if (datetime.datetime.now().date() - datetime.datetime.strptime(date, '%Y-%m-%d').date()).days <= 2:
+                    total_vaccinated = last_total_vaccinated
+                elif data_vacc.empty:
                     new_vaccinated = "未知"
                     total_vaccinated = "未知"
                 else:
