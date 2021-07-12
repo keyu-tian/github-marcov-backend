@@ -179,6 +179,8 @@ def epidemic_global_import(start_dt=None):
     bar = tqdm(
         total=days, initial=0, dynamic_ncols=True,
     )
+
+    true_data = {}
     while start_dt <= datetime.datetime.now().strftime("%Y-%m-%d"):
         bar.set_description('[parsing]')
         bar.update(1)
@@ -187,6 +189,9 @@ def epidemic_global_import(start_dt=None):
         for i in tmp:
             if i["date"] == start_dt:
                 countries.append(i["country_info"])
+                # 做一个真实数据，为预测做准备
+                if start_dt == dt_delta(datetime.datetime.now().strftime("%Y-%m-%d"), -1):
+                    true_data[i["country_info"]["name"]] = i["country_info"]["total"]
         dataout.append({
             "date": start_dt,
             "countries": countries
@@ -214,6 +219,9 @@ def epidemic_global_import(start_dt=None):
 
     with open(os.path.join(SPIDER_DATA_DIRNAME, 'global.json'), 'w', encoding='utf-8') as f:
         json.dump(dataout, f, ensure_ascii=False, indent=2)
+
+    with open(os.path.join(SPIDER_DATA_DIRNAME, 'true_data.json'), 'w', encoding='utf-8') as f:
+        json.dump(true_data, f, ensure_ascii=False, indent=2)
 
 
 if __name__ == '__main__':
