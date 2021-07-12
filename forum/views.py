@@ -72,7 +72,7 @@ class ForumQuestion(View):
             question = Question.objects.get(id=qid)
         except:
             return 2, 0, '', '', 0, []
-        all_content = question.question_all_content
+        all_content = question.question_all_content.all()
         total = all_content.count()
         title = question.title
         published_time = question.published_time
@@ -90,7 +90,7 @@ class ForumQuestion(View):
                 'user': user,
                 'content': content.content,
                 'rid': str(content.id),
-                'reply': {'name': content.replied_content.user_name if content.replied_content else '', 'uid': str(content.replied_content.user_id) if content.replied_content else ''},
+                'reply': {'name': content.replied_content.user.name if content.replied_content else '', 'uid': str(content.replied_content.user_id) if content.replied_content else ''},
                 'published_time': content.published_time
             })
         return 0, total, title, published_time, views, content_list

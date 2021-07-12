@@ -1,6 +1,6 @@
 import json
 from django.views import View
-from knowledge.models import Knowledge
+from knowledge.models import Knowledge, EpidemicPolicy
 from utils.meta_wrapper import JSR
 
 
@@ -18,4 +18,18 @@ class KnowledgeList(View):
             'summary': a.body,
             'source': a.source,
         }for a in res_set]
+        return 0, res
+
+
+class EpidemicNewsList(View):
+    @JSR('status', 'data')
+    def post(self, request):
+        query_set = EpidemicPolicy.objects.all()
+        res = []
+        for a in query_set:
+            res.append({
+                'datetime': a.datetime,
+                'src': a.src,
+                'body': a.content,
+            })
         return 0, res
