@@ -76,18 +76,23 @@ def test_data_import():
     Question.objects.all().delete()
     Tag.objects.all().delete()
     Content.objects.all().delete()
+    users = []
     for i in range(1, 19):
-        User.objects.create(name=f'test{i}', account=f'account{i}', pwd=f'password{i}', identity=1, login_date='')
+        u = User.objects.create(name=f'test{i}', account=f'account{i}', pwd=f'password{i}', identity=1, login_date='')
+        users.append(u)
     for i in range(19, 21):
-        User.objects.create(name=f'test{i}', account=f'account{i}', pwd=f'password{i}', identity=2, login_date='')
+        u = User.objects.create(name=f'test{i}', account=f'account{i}', pwd=f'password{i}', identity=2, login_date='')
+        users.append(u)
+    questions = []
     for i in range(1, 11):
-        q = Question.objects.create(title=f'question{i}', user_id=random.randint(1, 20), published_time=datetime.now(), solved=random.randint(1, 10) > 8)
+        q = Question.objects.create(title=f'question{i}', user=users[random.randint(1, 20)], published_time=datetime.now(), solved=random.randint(1, 10) > 8)
+        questions.append(q)
         if random.randint(0, 1) == 1:
             Tag.objects.create(question=q, name='tips')
         if random.randint(0, 1) == 1:
             Tag.objects.create(question=q, name='fake')
     for i in range(1, 100):
-        c = Content.objects.create(user_id=random.randint(1, 20), content=rand_content(), floor=0, published_time=datetime.now(), question_id=random.randint(1, 10), is_top=random.randint(1, 100) > 90)
+        c = Content.objects.create(user=users[random.randint(1, 20)], content=rand_content(), floor=0, published_time=datetime.now(), question=questions[random.randint(1, 10)], is_top=random.randint(1, 100) > 90)
         c.question.replied_time = datetime.now()
         if c.user.identity == 2:
             c.question.expert_reply = True
