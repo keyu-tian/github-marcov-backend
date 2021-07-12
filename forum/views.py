@@ -24,6 +24,10 @@ class ForumList(View):
                 all_question_set = Question.objects.all()
                 for q in all_question_set:
                     all_question.append(q)
+            elif tag == 'expert':
+                all_question_set = Question.objects.filter(expert_reply__exact=True)
+                for q in all_question_set:
+                    all_question.append(q)
             else:
                 all_tagged_question = Tag.objects.filter(name__exact=tag)
                 for q in all_tagged_question:
@@ -45,7 +49,7 @@ class ForumList(View):
             question_list.append({
                 'user': user,
                 'title': question.title,
-                'preview': question.content[:300],
+                'preview': question.question_all_content.order_by('published_time').first().content[:300],
                 'views': question.views,
                 'published_time': question.published_time,
                 'replied_time': question.replied_time if question.replied_time else '',
@@ -58,7 +62,7 @@ class ForumList(View):
 
 
 class ForumQuestion(View):
-    @JSR('status', 'total', 'title', 'published_time', 'views', 'list')
+    @JSR('status', 'uid', 'solved', 'total', 'title', 'published_time', 'views', 'list', 'tag')
     def get(self, request):
         if dict(request.GET).keys() != {'qid', 'page', 'each'}:
             return 1, 0, '', '', 0, []
@@ -72,13 +76,21 @@ class ForumQuestion(View):
             question = Question.objects.get(id=qid)
         except:
             return 2, 0, '', '', 0, []
-        all_content = question.question_all_content.all()
+        all_content = question.question_all_content.all().order_by('published_time')
         total = all_content.count()
         title = question.title
         published_time = question.published_time
         views = question.views
         content_list = []
-        for content in all_content[(page - 1) * each: page * each]:
+        for index in range((page - 1) * each, min(total, page*each)):
+            content = all_content[index]
+            try:
+                replied_content = content.replied_content
+                for one_content in range(all_content.count()):
+                    if all_content[one_content].id == replied_content.id:
+                        floor = one_content + 1
+            except:
+                floor = -1
             publish_user = content.user
             user = {
                 'name': publish_user.name,
@@ -89,11 +101,17 @@ class ForumQuestion(View):
             content_list.append({
                 'user': user,
                 'content': content.content,
+                'is_top': content.is_top,
                 'rid': str(content.id),
+                'floor': floor,
                 'reply': {'name': content.replied_content.user.name if content.replied_content else '', 'uid': str(content.replied_content.user_id) if content.replied_content else ''},
                 'published_time': content.published_time
             })
-        return 0, total, title, published_time, views, content_list
+        tags = Tag.objects.filter(question=question)
+        tag = []
+        for t in tags:
+            tag.append(t.name)
+        return 0, question.user_id, question.solved, total, title, published_time, views, content_list, tag
 
 
 class ForumPublish(View):
@@ -140,7 +158,10 @@ class ForumReply(View):
         if kwargs.keys() != {'qid', 'rid', 'content'}:
             return 1, 0, ''
         try:
-            question = Question.objects.get(id=int(kwargs['qid']))
+            if kwargs['qid'] == '':
+                question = Content.objects.get(id=kwargs['rid']).question
+            else:
+                question = Question.objects.get(id=kwargs['qid'])
         except:
             return 2, 0, ''
         question.replied_time = now
@@ -148,7 +169,12 @@ class ForumReply(View):
         content = Content.objects.create(content=kwargs['content'], user=u, published_time=now, question=question)
         if kwargs['rid'] != '':
             content.replied_content_id = int(kwargs['rid'])
+        if content.user.identity == 2:
+            content.question.expert_reply = True
+            if Tag.objects.filter(question=content.question, name='expert').count() == 0:
+                Tag.objects.create(question=content.question, name='expert')
         content.save()
+        content.question.save()
         return 0, str(content.id), now
 
 
@@ -174,7 +200,7 @@ class ForumEdit(View):
             if content.user != u:
                 return 2
             content.content = kwargs['content']
-            if content.question.question_all_content.order_by('-published_time').first() == content:
+            if content.question.question_all_content.order_by('published_time').first().id == content.id:
                 content.question.content = kwargs['content']
             content.save()
             content.question.save()
@@ -215,3 +241,57 @@ class ForumDelete(View):
                 return 2
             question.delete()
         return 0
+
+
+class ForumSolve(View):
+    @JSR('status', 'solved')
+    def post(self, request):
+        if not request.session.get('is_login', False):
+            return 403, False
+        try:
+            u = User.objects.filter(id=request.session['uid'])
+        except:
+            uid = request.session['uid'].decode() if isinstance(request.session['uid'], bytes) else request.session[
+                'uid']
+            u = User.objects.filter(id=int(uid))
+        if not u.exists():
+            return -1, False
+        u = u.get()
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'qid'}:
+            return 1, False
+        try:
+            question = Question.objects.get(id=int(kwargs['qid']))
+        except:
+            return 2, False
+        if question.user != u:
+            return 3, False
+        question.solved = not question.solved
+        question.save()
+        return 0, question.solved
+
+
+class ForumTop(View):
+    @JSR('status', 'is_top')
+    def post(self, request):
+        if not request.session.get('is_login', False):
+            return 403, False
+        try:
+            u = User.objects.filter(id=request.session['uid'])
+        except:
+            uid = request.session['uid'].decode() if isinstance(request.session['uid'], bytes) else request.session[
+                'uid']
+            u = User.objects.filter(id=int(uid))
+        if not u.exists():
+            return -1, False
+        u = u.get()
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'rid'}:
+            return 1, False
+        try:
+            content = Content.objects.get(id=int(kwargs['rid']))
+        except:
+            return 2, False
+        content.is_top = not content.is_top
+        content.save()
+        return 0, content.is_top

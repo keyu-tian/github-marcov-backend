@@ -599,6 +599,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'django_crontab',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -616,6 +617,10 @@ INSTALLED_APPS = [
     'analysis',
     'knowledge',
     'forum'
+]
+
+CRONJOBS = [
+    ('00 11 * * *', 'user.views.send_task_email', '>>logging/email_task.log'),
 ]
 
 MIDDLEWARE = [

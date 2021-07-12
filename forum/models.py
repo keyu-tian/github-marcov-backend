@@ -18,6 +18,7 @@ class Content(models.Model):
     question = models.ForeignKey(to=Question, related_name='question_all_content', on_delete=models.CASCADE, verbose_name='对应的问题')
     user = models.ForeignKey(to=User, related_name='published_content', on_delete=models.CASCADE, verbose_name='发布者')
     published_time = models.CharField(verbose_name='发布时间', max_length=32)
+    is_top = models.BooleanField(verbose_name='是否被置顶', default=False)
     content = models.TextField(verbose_name='内容')
 
 

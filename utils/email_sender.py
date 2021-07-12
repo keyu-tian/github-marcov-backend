@@ -198,6 +198,93 @@ def send_code(acc, email_type, storage=True):
     return True
 
 
+def send_follow(user, data):
+    from_addr = 'marcov19@163.com'
+    password = 'LXZZOAHUTTYIBZBP'
+
+    # 收信方邮箱
+    to_addr = user.account
+
+    # 发信服务器
+    smtp_server = 'smtp.163.com'
+
+    content = r"""
+    用户%s：
+    <br>
+    您好，您在MarCov疫情网站上订阅的昨日疫情情况如下：
+    <br>
+    <br>
+
+    """
+    table_head = """<table><thead><tr>
+    <th>行政区名</th>
+    <th>行政区级别</th>
+    <th>昨日新增确诊</th>
+    <th>昨日新增治愈</th>
+    <th>昨日新增死亡</th>
+    <th>累计确诊</th>
+    <th>累计治愈</th>
+    <th>累计死亡</th>
+    </tr></thead>"""
+    body = ''
+    for a in data:
+        body = body + f"""
+        <tr>
+        <td>{a['country'] if a['level'] == 1 else a['province'] if a['level'] == 2 else a['city']}</td>
+        <td>{'国家' if a['level'] == 1 else '省' if a['level'] == 2 else '市'}</td>
+        <td>{a['new']['confirmed']}</td>
+        <td>{a['new']['cured']}</td>
+        <td>{a['new']['died']}</td>
+        <td>{a['total']['confirmed']}</td>
+        <td>{a['total']['cured']}</td>
+        <td>{a['total']['died']}</td>
+        </tr>
+        """
+
+    body = table_head + '<tbody>' + body + '</tbody>'
+    tag = """
+
+    <br>
+
+    <br>
+
+    <br>
+
+    <br>
+
+    <br>
+
+    <br>
+
+    <br>
+    %s
+    <br>
+
+    <br>
+    <i>%s --  MarCov </i>
+    <br>
+
+    <br>
+
+    <br>
+    """
+    sent = rand_sent()
+    print(f'[sent] = {sent}')
+
+    # 邮箱正文内容，第一个参数为内容，第二个参数为格式(plain 为纯文本)，第三个参数为编码
+    msg = MIMEText(content % user.name + body + tag % ("-" * 3 * len(sent), sent), 'html', 'utf-8')
+    msg['Subject'] = Header('marcov19 疫情订阅每日推送' + random.choice(HELL_WORDS))
+
+    msg['From'] = Header(from_addr)
+    msg['To'] = Header(to_addr)
+
+    server = smtplib.SMTP_SSL(host='smtp.163.com')
+    server.connect(smtp_server, 465)
+    server.login(from_addr, password)
+    server.sendmail(from_addr, to_addr, msg.as_string())
+    server.quit()
+
+
 if __name__ == '__main__':
     # req()
     send_code('1134995360@qq.com', 'register', storage=False)

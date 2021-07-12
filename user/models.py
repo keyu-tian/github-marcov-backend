@@ -47,3 +47,6 @@ class Follow(models.Model):
     province = models.CharField(max_length=128, default='未知')
     city = models.CharField(max_length=128, default='未知')
     level = models.IntegerField(choices=EPIDEMIC_LEVEL_CHS, default=1)
+
+    class Meta:
+        ordering = ('level', 'country', 'province', 'city')

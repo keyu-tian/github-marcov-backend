@@ -3,7 +3,7 @@ import os
 
 from tqdm import tqdm
 
-from country.models import Policy, City
+from country.models import Policy
 from meta_config import SPIDER_DATA_DIRNAME
 
 
@@ -21,16 +21,12 @@ def travel_policy_import(line_start=0):
         except:
             result = None
         if result:
-            city: City = City.get_via_name(result['city'])
-            if city is not None:
-                Policy.objects.get_or_create(
-                    city_name=city.name_ch, defaults=dict(
-                        province_name=result['province'],
-                        enter_policy=result['enter_policy'],
-                        out_policy=result['out_policy'],
-                        city=city,
-                        province=city.province,
-                    )
+            Policy.objects.get_or_create(
+                city_name=result['city'], defaults=dict(
+                    province_name=result['province'],
+                    enter_policy=result['enter_policy'],
+                    out_policy=result['out_policy'],
                 )
+            )
         else:
             bar.set_postfix_str(f'failed!')

@@ -3,53 +3,53 @@ import colorama
 from meta_config import BULK_CREATE_BATCH_SIZE
 from utils.cast import cur_time
 
-
-def init_districts():
-    print('\n' + colorama.Fore.WHITE + '=> `init_districts` started ...')
-
-    from utils.country_dict import country_dict
-    from utils.dict_ch import province_dict_ch
-    from utils.locatable_cities import locatable_cities
-    from country.models import Country, City, Province
-
-    Country.objects.all().delete()
-    Province.objects.all().delete()
-    City.objects.all().delete()
-
-    Country.objects.bulk_create([
-        Country(name_ch=name_ch, name_en=name_en)
-        for name_en, name_ch in country_dict.items()
-    ], batch_size=BULK_CREATE_BATCH_SIZE)
-
-    Province.objects.bulk_create([
-        Province(
-            name_ch=standard_province_name_ch,
-            country=Country.get_via_name('中国'),
-        )
-        for standard_province_name_ch in set(province_dict_ch.values())
-    ], batch_size=BULK_CREATE_BATCH_SIZE)
-
-    # todo wz：在这里一次性导入全部国外城市和他们的经纬度。（似乎高德和百度都查不到国外城市！）
-    kws = {}
-    for _, (
-            jingdu, weidu, district,
-            standard_city_name_ch,
-            not_standard_province_name_ch,
-            not_standard_country_name_ch
-    ) in locatable_cities.items():
-        if standard_city_name_ch not in kws:
-            kws[standard_city_name_ch] = dict(
-                name_ch=standard_city_name_ch,
-                jingdu=jingdu, weidu=weidu,
-                province=Province.get_via_name(not_standard_province_name_ch),
-                country=Country.get_via_name(not_standard_country_name_ch),
-            )
-    City.objects.bulk_create([
-        City(**kw)
-        for kw in kws.values()
-    ], batch_size=BULK_CREATE_BATCH_SIZE)
-
-    print('\n' + colorama.Fore.WHITE + '=> `init_districts` finished.')
+#
+# def init_districts():
+#     print('\n' + colorama.Fore.WHITE + '=> `init_districts` started ...')
+#
+#     from utils.country_dict import country_dict
+#     from utils.dict_ch import province_dict_ch
+#     from utils.locatable_cities import locatable_cities
+#     from country.models import Country, City, Province
+#
+#     Country.objects.all().delete()
+#     Province.objects.all().delete()
+#     City.objects.all().delete()
+#
+#     Country.objects.bulk_create([
+#         Country(name_ch=name_ch, name_en=name_en)
+#         for name_en, name_ch in country_dict.items()
+#     ], batch_size=BULK_CREATE_BATCH_SIZE)
+#
+#     Province.objects.bulk_create([
+#         Province(
+#             name_ch=standard_province_name_ch,
+#             country=Country.get_via_name('中国'),
+#         )
+#         for standard_province_name_ch in set(province_dict_ch.values())
+#     ], batch_size=BULK_CREATE_BATCH_SIZE)
+#
+#     # todo wz：在这里一次性导入全部国外城市和他们的经纬度。（似乎高德和百度都查不到国外城市！）
+#     kws = {}
+#     for _, (
+#             jingdu, weidu, district,
+#             standard_city_name_ch,
+#             not_standard_province_name_ch,
+#             not_standard_country_name_ch
+#     ) in locatable_cities.items():
+#         if standard_city_name_ch not in kws:
+#             kws[standard_city_name_ch] = dict(
+#                 name_ch=standard_city_name_ch,
+#                 jingdu=jingdu, weidu=weidu,
+#                 province=Province.get_via_name(not_standard_province_name_ch),
+#                 country=Country.get_via_name(not_standard_country_name_ch),
+#             )
+#     City.objects.bulk_create([
+#         City(**kw)
+#         for kw in kws.values()
+#     ], batch_size=BULK_CREATE_BATCH_SIZE)
+#
+#     print('\n' + colorama.Fore.WHITE + '=> `init_districts` finished.')
 
 
 def re_import(name, launch_spider, *args, **kwargs):
@@ -64,10 +64,10 @@ def re_import(name, launch_spider, *args, **kwargs):
 
 def init_import():
     colorama.init(autoreset=True)
-    print("!!!危，暂时注释掉了非火车的import！！！")
+    # print("!!!危，暂时注释掉了非火车的import！！！")
     print('\n' + colorama.Fore.WHITE + '=> `init_import` started ...')
 
-    init_districts()
+    # init_districts()
 
     re_import('risk', True)
     re_import('news', True, delete_old_data=True)

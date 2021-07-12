@@ -5,18 +5,21 @@ import hashlib
 
 from datetime import datetime
 
+from django.template.loader import render_to_string
 from django.views import View
 from django.db.utils import IntegrityError, DataError
 
 from analysis.views import country_analyse_data_res
 from epidemic.models import HistoryEpidemicData
-from epidemic.views import map_oversea_dt_data_res, map_today_city_data_res
+from epidemic.views import map_today_city_data_res
 from marcov19.settings import SERVER_HOST
 from meta_config import SPIDER_DATA_DIRNAME
 from user.models import User, VerifyCode, Follow
 from user.hypers import *
 from utils.cast import cur_time
-from utils.email_sender import send_code
+from utils.country_dict import country_dict
+from utils.dict_ch import province_dict_ch, district_dict
+from utils.email_sender import send_code, send_follow
 from utils.meta_wrapper import JSR
 
 
@@ -350,45 +353,49 @@ class FollowData(View):
         except:
             return 1, '', '', 1, '',
         follow_set = Follow.objects.filter(user=user)
-        data = []
-        for a in follow_set:
-            if a.level == 1:
-                population, daily_data = country_analyse_data_res(a.country)
-                if daily_data is not None:
-                    data.append({
-                        'country': a.country,
-                        'province': '',
-                        'city': '',
-                        'population': population,
-                        'level': 1,
-                        'new': daily_data[-1]['new'],
-                        'total': daily_data[-1]['total'],
-                    })
-            elif a.level == 2:
-                population, daily_data = country_analyse_data_res(a.province)
-                if daily_data is not None:
-                    data.append({
-                        'country': '',
-                        'province': a.province,
-                        'city': '',
-                        'population': population,
-                        'level': 1,
-                        'new': daily_data[-1]['new'],
-                        'total': daily_data[-1]['total'],
-                    })
-            else:
-                date, city_ret, districts = map_today_city_data_res(a.province, a.city)
-                if city_ret is not None:
-                    data.append({
-                        'country': '',
-                        'province': a.province,
-                        'city': a.city,
-                        'population': 0,
-                        'level': 1,
-                        'new': city_ret['new'],
-                        'total': city_ret['total'],
-                    })
-        return 0, data
+        return 0, get_follow_data(follow_set)
+
+
+def get_follow_data(follow_set):
+    data = []
+    for a in follow_set:
+        if a.level == 1:
+            population, daily_data = country_analyse_data_res(a.country)
+            if daily_data is not None:
+                data.append({
+                    'country': a.country,
+                    'province': '',
+                    'city': '',
+                    'population': population,
+                    'level': 1,
+                    'new': daily_data[-1]['new'],
+                    'total': daily_data[-1]['total'],
+                })
+        elif a.level == 2:
+            population, daily_data = country_analyse_data_res(a.province)
+            if daily_data is not None:
+                data.append({
+                    'country': '',
+                    'province': a.province,
+                    'city': '',
+                    'population': population,
+                    'level': 1,
+                    'new': daily_data[-1]['new'],
+                    'total': daily_data[-1]['total'],
+                })
+        else:
+            date, city_ret, districts = map_today_city_data_res(a.province, a.city)
+            if city_ret is not None:
+                data.append({
+                    'country': '',
+                    'province': a.province,
+                    'city': a.city,
+                    'population': 0,
+                    'level': 1,
+                    'new': city_ret['new'],
+                    'total': city_ret['total'],
+                })
+    return data
 
 
 class FollowSetMail(View):
@@ -418,11 +425,62 @@ class FollowSetMail(View):
         return user
 
 
-def get_is_mail(request):
-    try:
-        uid = int(request.session.get('uid', None))
-        user = User.objects.get(id=uid)
-    except:
-        return 2
+def send_task_email():
+    email_user_list = User.objects.filter(is_mail=True)
+    for u in email_user_list:
+        tasks = Follow.objects.filter(user=u)
+        if tasks:
+            # html_message = render_to_string('task/task.html', {'tasks': tasks, 'user': user})
+            send_follow(u, get_follow_data(tasks))
 
-    return user.is_mail
+
+class FollowProvince(View):
+    @JSR('status', 'data')
+    def post(self, request):
+        try:
+            uid = int(request.session.get('uid', None))
+            user = User.objects.get(id=uid)
+        except:
+            return 2
+        res = []
+        follow_set = [a.province for a in Follow.objects.filter(user=user, level=2)]
+        for a in province_dict_ch.keys():
+            res[a] = int(a in follow_set)
+
+        return 0, res
+
+
+class FollowCountry(View):
+    @JSR('status', 'data')
+    def post(self, request):
+        try:
+            uid = int(request.session.get('uid', None))
+            user = User.objects.get(id=uid)
+        except:
+            return 2
+        res = []
+        follow_set = [a.country for a in Follow.objects.filter(user=user, level=1)]
+        for a in country_dict.values():
+            res[a] = int(a in follow_set)
+
+        return 0, res
+
+
+class FollowCity(View):
+    @JSR('status', 'data')
+    def post(self, request):
+        try:
+            uid = int(request.session.get('uid', None))
+            user = User.objects.get(id=uid)
+        except:
+            return 2
+        try:
+            province = json.loads(request.body)['province']
+        except:
+            return 1
+        res = []
+        follow_set = [a.city for a in Follow.objects.filter(user=user, level=3, province=province)]
+        for a in district_dict[province].keys():
+            res[a] = int(a in follow_set)
+
+        return 0, res
