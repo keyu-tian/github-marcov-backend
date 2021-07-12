@@ -416,3 +416,13 @@ class FollowSetMail(View):
         user.is_mail = True if mail == 1 else False
         user.save()
         return user
+
+
+def get_is_mail(request):
+    try:
+        uid = int(request.session.get('uid', None))
+        user = User.objects.get(id=uid)
+    except:
+        return 2
+
+    return user.is_mail
