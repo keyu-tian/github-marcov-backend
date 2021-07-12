@@ -171,37 +171,43 @@ class MapTodayCity(View):
             city = str(request.GET.get('city'))
         except:
             return 1
-
-        try:
-            domestic_data_list = json.load(open(
-                os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json'),
-                'r', encoding='utf-8'
-            ))
-            province_data = json.load(open(
-                os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'provinces', '%s.json' % province_dict_ch[province]),
-                'r', encoding='utf-8'
-            ))
-        except:
+        date, city_ret, districts = map_today_city_data_res(province, city)
+        if date is None and city_ret is None and districts is None:
             return 7
-
-        city_ret = {}
-        date = domestic_data_list[-1]['date']
-        for city_data in province_data[date]:
-            if city_data['name'] == city:
-                city_ret = {
-                    'new': city_data['new'],
-                    'total': city_data['total'],
-                }
-                break
-        districts = []
-        districts_list = district_dict[province][city]
-        for district in districts_list:
-            districts.append({
-                'name': district,
-                'level': get_city_risk_level(district)
-            })
-
         return 0, date, city_ret, districts
+
+
+def map_today_city_data_res(province, city):
+    try:
+        domestic_data_list = json.load(open(
+            os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json'),
+            'r', encoding='utf-8'
+        ))
+        province_data = json.load(open(
+            os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'provinces', '%s.json' % province_dict_ch[province]),
+            'r', encoding='utf-8'
+        ))
+    except:
+        return None, None, None
+
+    city_ret = {}
+    date = domestic_data_list[-1]['date']
+    for city_data in province_data[date]:
+        if city_data['name'] == city:
+            city_ret = {
+                'new': city_data['new'],
+                'total': city_data['total'],
+            }
+            break
+    districts = []
+    districts_list = district_dict[province][city]
+    for district in districts_list:
+        districts.append({
+            'name': district,
+            'level': get_city_risk_level(district)
+        })
+
+    return date, city_ret, districts
 
 
 class MapProvince_WZ(View):
