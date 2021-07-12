@@ -27,6 +27,7 @@ class User(models.Model):
     avatar = models.CharField(blank=True, verbose_name="头像路径", max_length=512, default='')
     login_date = models.DateField(blank=True, verbose_name='最近登录时间', auto_now_add=True)
     wrong_count = models.IntegerField(blank=True, verbose_name='最近一天密码错误次数', default=0)
+    is_mail = models.BooleanField(default=False)    # 订阅是否发邮件
 
 
 class VerifyCode(models.Model):
@@ -38,3 +39,14 @@ class VerifyCode(models.Model):
     class Meta:
         verbose_name = '验证码'
         verbose_name_plural = verbose_name
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(to=User, related_name='follow_set', on_delete=models.CASCADE)
+    country = models.CharField(max_length=128, default='未知')
+    province = models.CharField(max_length=128, default='未知')
+    city = models.CharField(max_length=128, default='未知')
+    level = models.IntegerField(choices=EPIDEMIC_LEVEL_CHS, default=1)
+
+    class Meta:
+        ordering = ('level', 'country', 'province', 'city')

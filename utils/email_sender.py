@@ -198,6 +198,80 @@ def send_code(acc, email_type, storage=True):
     return True
 
 
+def send_follow(acc, tasks):
+    # todo：改内容
+    from_addr = 'marcov19@163.com'
+    password = 'LXZZOAHUTTYIBZBP'
+
+    # 收信方邮箱
+    to_addr = acc
+
+    # 发信服务器
+    smtp_server = 'smtp.163.com'
+
+    # 生成随机验证码
+    code_list = []
+    for i in range(10):  # 0~9
+        code_list.append(str(i))
+    key_list = []
+    for i in range(65, 91):  # A-Z
+        key_list.append(chr(i))
+    for i in range(97, 123):  # a-z
+        key_list.append(chr(i))
+
+    content = r"""
+    您好：
+    <br>
+    <br>
+
+    您的%s为：<b> %s </b> (有效期五分钟)
+
+    <br>
+
+    <br>
+
+    <br>
+
+    <br>
+
+    <br>
+
+    <br>
+
+    <br>
+    %s
+    <br>
+
+    <br>
+    <i>%s --  MarCov </i>
+    <br>
+
+    <br>
+
+    <br>
+    """
+    sent = rand_sent()
+    print(f'[sent] = {sent}')
+
+    code = random.sample(code_list, 6)  # 随机取6位数
+    code_num = ''.join(code)
+    # 数据库保存验证码！！！！！！！！！！！
+    # 邮箱正文内容，第一个参数为内容，第二个参数为格式(plain 为纯文本)，第三个参数为编码
+    msg = MIMEText(content % ('验证码', code_num, "-" * 3 * len(sent), sent), 'html', 'utf-8')
+    msg['Subject'] = Header('marcov19 注册验证码' + random.choice(HELL_WORDS))
+
+    msg['From'] = Header(from_addr)
+    msg['To'] = Header(to_addr)
+
+    server = smtplib.SMTP_SSL(host='smtp.163.com')
+    server.connect(smtp_server, 465)
+    server.login(from_addr, password)
+    server.sendmail(from_addr, to_addr, msg.as_string())
+    server.quit()
+
+    return True
+
+
 if __name__ == '__main__':
     # req()
     send_code('1134995360@qq.com', 'register', storage=False)
