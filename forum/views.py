@@ -101,6 +101,7 @@ class ForumQuestion(View):
             content_list.append({
                 'user': user,
                 'content': content.content,
+                'is_top': content.is_top,
                 'rid': str(content.id),
                 'floor': floor,
                 'reply': {'name': content.replied_content.user.name if content.replied_content else '', 'uid': str(content.replied_content.user_id) if content.replied_content else ''},
@@ -243,10 +244,10 @@ class ForumDelete(View):
 
 
 class ForumSolve(View):
-    @JSR('status')
+    @JSR('status', 'solved')
     def post(self, request):
         if not request.session.get('is_login', False):
-            return 403
+            return 403, False
         try:
             u = User.objects.filter(id=request.session['uid'])
         except:
@@ -254,18 +255,43 @@ class ForumSolve(View):
                 'uid']
             u = User.objects.filter(id=int(uid))
         if not u.exists():
-            return -1
+            return -1, False
         u = u.get()
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'qid'}:
-            return 1
+            return 1, False
         try:
             question = Question.objects.get(id=int(kwargs['qid']))
         except:
-            return 2
+            return 2, False
         if question.user != u:
-            return 3
-        question.solved = True
+            return 3, False
+        question.solved = not question.solved
         question.save()
-        return 0
+        return 0, question.solved
 
+
+class ForumTop(View):
+    @JSR('status', 'is_top')
+    def post(self, request):
+        if not request.session.get('is_login', False):
+            return 403, False
+        try:
+            u = User.objects.filter(id=request.session['uid'])
+        except:
+            uid = request.session['uid'].decode() if isinstance(request.session['uid'], bytes) else request.session[
+                'uid']
+            u = User.objects.filter(id=int(uid))
+        if not u.exists():
+            return -1, False
+        u = u.get()
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'rid'}:
+            return 1, False
+        try:
+            content = Content.objects.get(id=int(kwargs['rid']))
+        except:
+            return 2, False
+        content.is_top = not content.is_top
+        content.save()
+        return 0, content.is_top
