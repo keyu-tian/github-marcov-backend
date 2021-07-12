@@ -62,7 +62,7 @@ class ForumList(View):
 
 
 class ForumQuestion(View):
-    @JSR('status', 'total', 'title', 'published_time', 'views', 'list', 'tag')
+    @JSR('status', 'uid', 'solved', 'total', 'title', 'published_time', 'views', 'list', 'tag')
     def get(self, request):
         if dict(request.GET).keys() != {'qid', 'page', 'each'}:
             return 1, 0, '', '', 0, []
@@ -110,7 +110,7 @@ class ForumQuestion(View):
         tag = []
         for t in tags:
             tag.append(t.name)
-        return 0, total, title, published_time, views, content_list, tag
+        return 0, question.user_id, question.solved, total, title, published_time, views, content_list, tag
 
 
 class ForumPublish(View):
@@ -170,6 +170,8 @@ class ForumReply(View):
             content.replied_content_id = int(kwargs['rid'])
         if content.user.identity == 2:
             content.question.expert_reply = True
+            if Tag.objects.filter(question=content.question, name='expert').count() == 0:
+                Tag.objects.create(question=content.question, name='expert')
         content.save()
         content.question.save()
         return 0, str(content.id), now
@@ -238,3 +240,32 @@ class ForumDelete(View):
                 return 2
             question.delete()
         return 0
+
+
+class ForumSolve(View):
+    @JSR('status')
+    def post(self, request):
+        if not request.session.get('is_login', False):
+            return 403
+        try:
+            u = User.objects.filter(id=request.session['uid'])
+        except:
+            uid = request.session['uid'].decode() if isinstance(request.session['uid'], bytes) else request.session[
+                'uid']
+            u = User.objects.filter(id=int(uid))
+        if not u.exists():
+            return -1
+        u = u.get()
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'qid'}:
+            return 1
+        try:
+            question = Question.objects.get(id=int(kwargs['qid']))
+        except:
+            return 2
+        if question.user != u:
+            return 3
+        question.solved = True
+        question.save()
+        return 0
+

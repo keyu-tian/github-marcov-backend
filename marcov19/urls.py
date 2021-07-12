@@ -91,6 +91,7 @@ urlpatterns = [
     path('forum/reply', ForumReply.as_view()),
     path('forum/edit', ForumEdit.as_view()),
     path('forum/delete', ForumDelete.as_view()),
+    path('forum/solve', ForumSolve.as_view()),
 
     # ======== 九、订阅 ========
     path('follow/new', FollowNew.as_view()),
