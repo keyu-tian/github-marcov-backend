@@ -9,15 +9,30 @@ from datetime import datetime
 class ForumList(View):
     @JSR('status', 'total', 'list')
     def get(self, request):
-        if dict(request.GET).keys() != {'page', 'each'}:
+        if dict(request.GET).keys() != {'page', 'each', 'filter'}:
             return 1, 0, []
         try:
             page = int(request.GET.get('page'))
             each = int(request.GET.get('each'))
+            tag = request.GET.get('filter')
         except ValueError:
             return 1, 0, []
-        all_question = Question.objects.all()
-        total = all_question.count()
+
+        all_question = []
+        try:
+            if tag == 'all':
+                all_question_set = Question.objects.all()
+                for q in all_question_set:
+                    all_question.append(q)
+            else:
+                all_tagged_question = Tag.objects.filter(name__exact=tag)
+                for q in all_tagged_question:
+                    if q.question not in all_question:
+                        all_question.append(q.question)
+        except:
+            return 7, 0, []
+
+        total = len(all_question)
         question_list = []
         for question in all_question[(page - 1) * each: page * each]:
             publish_user = question.user
@@ -38,6 +53,7 @@ class ForumList(View):
                 'solved': question.solved,
                 'qid': str(question.id)
             })
+
         return 0, total, question_list
 
 
@@ -83,7 +99,6 @@ class ForumQuestion(View):
 class ForumPublish(View):
     @JSR('status', 'qid')
     def post(self, request):
-        print(request.session.items())
         if not request.session.get('is_login', False):
             return 403, ''
         try:
