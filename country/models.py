@@ -9,80 +9,80 @@ from utils.dict_ch import province_dict_ch
 from utils.locatable_cities import locatable_cities
 
 
-class Country(models.Model):
-    @staticmethod
-    def standardize_name(name):
-        return name.strip()
-    
-    @staticmethod
-    def get_via_name(not_standard_name):
-        name_ch = Country.standardize_name(not_standard_name)
-        if name_ch is None:
-            return None
-        q = Country.objects.filter(name_ch=name_ch)
-        if q.exists():
-            return q.get()
-        return None
-    
-    name_ch = models.CharField(primary_key=True, unique=True, db_index=True, max_length=128, blank=True)
-    name_en = models.CharField(max_length=512, blank=True)
-
-
-class Province(models.Model):
-    @staticmethod
-    def standardize_name(name):
-        p_name = re.sub('市|直辖市|省|地区', '', name.strip()).strip()
-        if p_name in province_dict_ch:
-            return province_dict_ch[p_name]
-        if p_name in province_dict_ch.values():
-            return p_name
-        return None
-    
-    @staticmethod
-    def get_via_name(not_standard_name):
-        name_ch = Province.standardize_name(not_standard_name)
-        if name_ch is None:
-            return None
-        q = Province.objects.filter(name_ch=name_ch)
-        if q.exists():
-            return q.get()
-        return None
-    
-    name_ch = models.CharField(primary_key=True, unique=True, db_index=True, max_length=128, blank=True)
-    name_en = models.CharField(max_length=512, blank=True)
-    country = models.ForeignKey(to=Country, on_delete=models.CASCADE, related_name='province_set', blank=True, null=True)
-
-
-class City(models.Model):
-    @staticmethod
-    def standardize_name(name):
-        c_name = re.sub('站|市|直辖市|县|地区', '', name.strip()).strip()
-        if len(c_name) >= 3 and c_name[-1] in {'东', '南', '西', '北'} and c_name[:-1] in locatable_cities:
-            c_name = c_name[:-1]
-        info = locatable_cities.get(c_name, None)
-        return None if info is None else info[3]
-    
-    @staticmethod
-    def get_via_name(not_standard_name):
-        name_ch = City.standardize_name(not_standard_name)
-        if name_ch is None:
-            return None
-        q = City.objects.filter(name_ch=name_ch)
-        if q.exists():
-            return q.get()
-        return None
-    
-    name_ch = models.CharField(primary_key=True, unique=True, db_index=True, max_length=128, blank=True)
-    name_en = models.CharField(max_length=512, blank=True)
-    province = models.ForeignKey(to=Province, on_delete=models.CASCADE, related_name='province_city_set', blank=True, null=True)
-    country = models.ForeignKey(to=Country, on_delete=models.CASCADE, related_name='country_city_set', blank=True, null=True)
-    jingdu = models.FloatField(blank=True, null=True)
-    weidu = models.FloatField(blank=True, null=True)
+# class Country(models.Model):
+#     @staticmethod
+#     def standardize_name(name):
+#         return name.strip()
+#
+#     @staticmethod
+#     def get_via_name(not_standard_name):
+#         name_ch = Country.standardize_name(not_standard_name)
+#         if name_ch is None:
+#             return None
+#         q = Country.objects.filter(name_ch=name_ch)
+#         if q.exists():
+#             return q.get()
+#         return None
+#
+#     name_ch = models.CharField(primary_key=True, unique=True, db_index=True, max_length=128, blank=True)
+#     name_en = models.CharField(max_length=512, blank=True)
+#
+#
+# class Province(models.Model):
+#     @staticmethod
+#     def standardize_name(name):
+#         p_name = re.sub('市|直辖市|省|地区', '', name.strip()).strip()
+#         if p_name in province_dict_ch:
+#             return province_dict_ch[p_name]
+#         if p_name in province_dict_ch.values():
+#             return p_name
+#         return None
+#
+#     @staticmethod
+#     def get_via_name(not_standard_name):
+#         name_ch = Province.standardize_name(not_standard_name)
+#         if name_ch is None:
+#             return None
+#         q = Province.objects.filter(name_ch=name_ch)
+#         if q.exists():
+#             return q.get()
+#         return None
+#
+#     name_ch = models.CharField(primary_key=True, unique=True, db_index=True, max_length=128, blank=True)
+#     name_en = models.CharField(max_length=512, blank=True)
+#     country = models.ForeignKey(to=Country, on_delete=models.CASCADE, related_name='province_set', blank=True, null=True)
+#
+#
+# class City(models.Model):
+#     @staticmethod
+#     def standardize_name(name):
+#         c_name = re.sub('站|市|直辖市|县|地区', '', name.strip()).strip()
+#         if len(c_name) >= 3 and c_name[-1] in {'东', '南', '西', '北'} and c_name[:-1] in locatable_cities:
+#             c_name = c_name[:-1]
+#         info = locatable_cities.get(c_name, None)
+#         return None if info is None else info[3]
+#
+#     @staticmethod
+#     def get_via_name(not_standard_name):
+#         name_ch = City.standardize_name(not_standard_name)
+#         if name_ch is None:
+#             return None
+#         q = City.objects.filter(name_ch=name_ch)
+#         if q.exists():
+#             return q.get()
+#         return None
+#
+#     name_ch = models.CharField(primary_key=True, unique=True, db_index=True, max_length=128, blank=True)
+#     name_en = models.CharField(max_length=512, blank=True)
+#     province = models.ForeignKey(to=Province, on_delete=models.CASCADE, related_name='province_city_set', blank=True, null=True)
+#     country = models.ForeignKey(to=Country, on_delete=models.CASCADE, related_name='country_city_set', blank=True, null=True)
+#     jingdu = models.FloatField(blank=True, null=True)
+#     weidu = models.FloatField(blank=True, null=True)
 
 
 class Policy(models.Model):
-    city = models.ForeignKey(to=City, on_delete=models.DO_NOTHING, related_name='policy_set', blank=True, null=True)
-    province = models.ForeignKey(to=Province, on_delete=models.DO_NOTHING, related_name='policy_set', blank=True, null=True)
+    # city = models.ForeignKey(to=City, on_delete=models.DO_NOTHING, related_name='policy_set', blank=True, null=True)
+    # province = models.ForeignKey(to=Province, on_delete=models.DO_NOTHING, related_name='policy_set', blank=True, null=True)
     city_name = models.CharField(max_length=128, blank=True, null=True)
     province_name = models.CharField(max_length=128, blank=True, null=True)
     enter_policy = models.TextField(blank=True, null=True)
