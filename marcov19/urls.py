@@ -90,6 +90,6 @@ urlpatterns = [
     path('forum/edit', ForumEdit.as_view()),
     path('forum/delete', ForumDelete.as_view()),
 
+    re_path(r'^upload(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}, name='media'),
     url(r'^', TemplateView.as_view(template_name='index.html')),
-    re_path(r'^upload(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}, name='media')
 ]

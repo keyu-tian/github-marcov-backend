@@ -102,7 +102,7 @@ def JSR(*keys): # 这里的 keys 是 @JSR(...) 里面填的 keys
                     session_id = request.session.session_key
                 ret_dict['sessionid'] = session_id
                 response = JsonResponse(ret_dict)
-                response.set_cookie(key="sessionid", value=session_id, httponly=False, domain="buaasoft.icu")
+                response.set_cookie(key="sessionid", value=session_id)
                 
                 return response
 
