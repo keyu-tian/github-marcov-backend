@@ -11,3 +11,6 @@ class EpidemicPolicy(models.Model):
     datetime = models.DateTimeField()
     content = models.TextField()
     src = models.TextField()
+
+    class Meta:
+        ordering = ['-datetime']

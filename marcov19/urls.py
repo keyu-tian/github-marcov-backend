@@ -68,6 +68,7 @@ urlpatterns = [
     # ======== 六、小知识 ========
     path('rumor/list', RumorList.as_view()),
     path('tips/list', KnowledgeList.as_view()),
+    path('epidemic_news/list', EpidemicNewsList.as_view()),
 
     # ======== 七、用户系统 ========
     path('account/login', Login.as_view()),
