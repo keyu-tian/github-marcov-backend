@@ -240,3 +240,32 @@ class ForumDelete(View):
                 return 2
             question.delete()
         return 0
+
+
+class ForumSolve(View):
+    @JSR('status')
+    def post(self, request):
+        if not request.session.get('is_login', False):
+            return 403
+        try:
+            u = User.objects.filter(id=request.session['uid'])
+        except:
+            uid = request.session['uid'].decode() if isinstance(request.session['uid'], bytes) else request.session[
+                'uid']
+            u = User.objects.filter(id=int(uid))
+        if not u.exists():
+            return -1
+        u = u.get()
+        kwargs: dict = json.loads(request.body)
+        if kwargs.keys() != {'qid'}:
+            return 1
+        try:
+            question = Question.objects.get(id=int(kwargs['qid']))
+        except:
+            return 2
+        if question.user != u:
+            return 3
+        question.solved = True
+        question.save()
+        return 0
+
