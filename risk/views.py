@@ -1,10 +1,13 @@
 from django.views import View
 from utils.meta_wrapper import JSR
 from risk.models import RiskArea
+from flight.models import Airport
 
 
 # 根据城市名字获取该城市风险等级
 def get_city_risk_level(name) -> int:
+    if Airport.objects.filter(city_name=name).count() > 0:
+        return 4
     if RiskArea.objects.filter(address__icontains=name, level=2).count() > 0:
         return 4
     elif RiskArea.objects.filter(address__icontains=name, level=1).count() > 0:
