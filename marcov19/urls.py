@@ -46,6 +46,7 @@ urlpatterns = [
 
     # ======== 三、数据分析 ========
     path('data/international_analyze', InternationalAnalyze.as_view()),
+    path('data/international_future_analyze', InternationalFutureAnalyze.as_view()),
     path('data/today/international_analyze', InternationalTodayAnalyze.as_view()),
     path('data/domestic_analyze', DomesticAnalyze.as_view()),
     path('data/today/domestic_analyze', DomesticTodayAnalyze.as_view()),
