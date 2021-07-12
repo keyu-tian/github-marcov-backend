@@ -56,6 +56,18 @@ class InternationalTodayAnalyze(View):
         return 0, [analysis[-2]], analysis[-1]
 
 
+class InternationalFutureAnalyze(View):
+    @JSR('status', 'data')
+    def get(self, request):
+        # json_path = os.path.join('spiders_data', 'epidemic_domestic_data', 'province.json')
+        try:
+            json_path = os.path.join(SPIDER_DATA_DIRNAME, 'predict.json')
+            analysis = json.load(open(json_path, 'r', encoding='utf-8'))
+        except:
+            return 7
+        return 0, analysis
+
+
 class SearchAnalyse(View):
     @JSR('status', 'population', 'data')
     def post(self, request):
