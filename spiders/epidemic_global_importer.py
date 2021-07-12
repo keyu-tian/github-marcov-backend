@@ -115,8 +115,11 @@ def epidemic_global_import(start_dt=None):
                             sum(data_vacc["daily_vaccinations"])) != 0 else "未知"
                     total_vaccinated = int(sum(data_vacc["total_vaccinations"]))
                     if total_vaccinated == 0:
-                        total_vaccinated = \
-                            last_total_vaccinated + new_vaccinated if new_vaccinated != "未知" else total_vaccinated
+                        if (datetime.datetime.now().date() - datetime.datetime.strptime(date, '%Y-%m-%d').date()).days <= 2:
+                            total_vaccinated = last_total_vaccinated
+                        else:
+                            total_vaccinated = \
+                                last_total_vaccinated + new_vaccinated if new_vaccinated != "未知" else total_vaccinated
                     last_total_vaccinated = total_vaccinated
                 China_info = epidemic_China_total_import(date)
                 if China_info is None:
@@ -150,8 +153,11 @@ def epidemic_global_import(start_dt=None):
                             sum(data_vacc["daily_vaccinations"])) != 0 else "未知"
                     total_vaccinated = int(sum(data_vacc["total_vaccinations"]))
                     if total_vaccinated == 0:
-                        total_vaccinated = \
-                            last_total_vaccinated + new_vaccinated if new_vaccinated != "未知" else total_vaccinated
+                        if (datetime.datetime.now().date() - datetime.datetime.strptime(date, '%Y-%m-%d').date()).days <= 2:
+                            total_vaccinated = last_total_vaccinated
+                        else:
+                            total_vaccinated = \
+                                last_total_vaccinated + new_vaccinated if new_vaccinated != "未知" else total_vaccinated
                     last_total_vaccinated = total_vaccinated
                 country_info = {
                     "name": country,
