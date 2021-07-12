@@ -353,45 +353,49 @@ class FollowData(View):
         except:
             return 1, '', '', 1, '',
         follow_set = Follow.objects.filter(user=user)
-        data = []
-        for a in follow_set:
-            if a.level == 1:
-                population, daily_data = country_analyse_data_res(a.country)
-                if daily_data is not None:
-                    data.append({
-                        'country': a.country,
-                        'province': '',
-                        'city': '',
-                        'population': population,
-                        'level': 1,
-                        'new': daily_data[-1]['new'],
-                        'total': daily_data[-1]['total'],
-                    })
-            elif a.level == 2:
-                population, daily_data = country_analyse_data_res(a.province)
-                if daily_data is not None:
-                    data.append({
-                        'country': '',
-                        'province': a.province,
-                        'city': '',
-                        'population': population,
-                        'level': 1,
-                        'new': daily_data[-1]['new'],
-                        'total': daily_data[-1]['total'],
-                    })
-            else:
-                date, city_ret, districts = map_today_city_data_res(a.province, a.city)
-                if city_ret is not None:
-                    data.append({
-                        'country': '',
-                        'province': a.province,
-                        'city': a.city,
-                        'population': 0,
-                        'level': 1,
-                        'new': city_ret['new'],
-                        'total': city_ret['total'],
-                    })
-        return 0, data
+        return 0, get_follow_data(follow_set)
+
+
+def get_follow_data(follow_set):
+    data = []
+    for a in follow_set:
+        if a.level == 1:
+            population, daily_data = country_analyse_data_res(a.country)
+            if daily_data is not None:
+                data.append({
+                    'country': a.country,
+                    'province': '',
+                    'city': '',
+                    'population': population,
+                    'level': 1,
+                    'new': daily_data[-1]['new'],
+                    'total': daily_data[-1]['total'],
+                })
+        elif a.level == 2:
+            population, daily_data = country_analyse_data_res(a.province)
+            if daily_data is not None:
+                data.append({
+                    'country': '',
+                    'province': a.province,
+                    'city': '',
+                    'population': population,
+                    'level': 1,
+                    'new': daily_data[-1]['new'],
+                    'total': daily_data[-1]['total'],
+                })
+        else:
+            date, city_ret, districts = map_today_city_data_res(a.province, a.city)
+            if city_ret is not None:
+                data.append({
+                    'country': '',
+                    'province': a.province,
+                    'city': a.city,
+                    'population': 0,
+                    'level': 1,
+                    'new': city_ret['new'],
+                    'total': city_ret['total'],
+                })
+    return data
 
 
 class FollowSetMail(View):
@@ -427,7 +431,7 @@ def send_task_email():
         tasks = Follow.objects.filter(user=u)
         if tasks:
             # html_message = render_to_string('task/task.html', {'tasks': tasks, 'user': user})
-            send_follow(u.account, tasks)
+            send_follow(u, get_follow_data(tasks))
 
 
 class FollowProvince(View):

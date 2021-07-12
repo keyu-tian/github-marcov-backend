@@ -198,33 +198,51 @@ def send_code(acc, email_type, storage=True):
     return True
 
 
-def send_follow(acc, tasks):
-    # todo：改内容
+def send_follow(user, data):
     from_addr = 'marcov19@163.com'
     password = 'LXZZOAHUTTYIBZBP'
 
     # 收信方邮箱
-    to_addr = acc
+    to_addr = user.account
 
     # 发信服务器
     smtp_server = 'smtp.163.com'
 
-    # 生成随机验证码
-    code_list = []
-    for i in range(10):  # 0~9
-        code_list.append(str(i))
-    key_list = []
-    for i in range(65, 91):  # A-Z
-        key_list.append(chr(i))
-    for i in range(97, 123):  # a-z
-        key_list.append(chr(i))
-
     content = r"""
-    您好：
+    用户%s：
+    <br>
+    您好，您在MarCov疫情网站上订阅的昨日疫情情况如下：
     <br>
     <br>
 
-    您的%s为：<b> %s </b> (有效期五分钟)
+    """
+    table_head = """<table><thead><tr>
+    <th>行政区名</th>
+    <th>行政区级别</th>
+    <th>昨日新增确诊</th>
+    <th>昨日新增治愈</th>
+    <th>昨日新增死亡</th>
+    <th>累计确诊</th>
+    <th>累计治愈</th>
+    <th>累计死亡</th>
+    </tr></thead>"""
+    body = ''
+    for a in data:
+        body = body + f"""
+        <tr>
+        <td>{a['country'] if a['level'] == 1 else a['province'] if a['level'] == 2 else a['city']}</td>
+        <td>{'国家' if a['level'] == 1 else '省' if a['level'] == 2 else '市'}</td>
+        <td>{a['new']['confirmed']}</td>
+        <td>{a['new']['cured']}</td>
+        <td>{a['new']['died']}</td>
+        <td>{a['total']['confirmed']}</td>
+        <td>{a['total']['cured']}</td>
+        <td>{a['total']['died']}</td>
+        </tr>
+        """
+
+    body = table_head + '<tbody>' + body + '</tbody>'
+    tag = """
 
     <br>
 
@@ -253,12 +271,9 @@ def send_follow(acc, tasks):
     sent = rand_sent()
     print(f'[sent] = {sent}')
 
-    code = random.sample(code_list, 6)  # 随机取6位数
-    code_num = ''.join(code)
-    # 数据库保存验证码！！！！！！！！！！！
     # 邮箱正文内容，第一个参数为内容，第二个参数为格式(plain 为纯文本)，第三个参数为编码
-    msg = MIMEText(content % ('验证码', code_num, "-" * 3 * len(sent), sent), 'html', 'utf-8')
-    msg['Subject'] = Header('marcov19 注册验证码' + random.choice(HELL_WORDS))
+    msg = MIMEText(content % user.name + body + tag % ("-" * 3 * len(sent), sent), 'html', 'utf-8')
+    msg['Subject'] = Header('marcov19 疫情订阅每日推送' + random.choice(HELL_WORDS))
 
     msg['From'] = Header(from_addr)
     msg['To'] = Header(to_addr)
@@ -268,8 +283,6 @@ def send_follow(acc, tasks):
     server.login(from_addr, password)
     server.sendmail(from_addr, to_addr, msg.as_string())
     server.quit()
-
-    return True
 
 
 if __name__ == '__main__':
