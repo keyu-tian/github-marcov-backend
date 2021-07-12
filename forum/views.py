@@ -76,7 +76,7 @@ class ForumQuestion(View):
             question = Question.objects.get(id=qid)
         except:
             return 2, 0, '', '', 0, []
-        all_content = question.question_all_content.all().order_by(['-is_top', 'published_time'])
+        all_content = question.question_all_content.all().order_by('-is_top', 'published_time')
         total = all_content.count()
         title = question.title
         published_time = question.published_time
@@ -84,10 +84,10 @@ class ForumQuestion(View):
         content_list = []
         for index in range((page - 1) * each, min(total, page*each)):
             content = all_content[index]
-            try:
-                floor = content.replied_content.floor
-            except:
+            if content.replied_content is None:
                 floor = -1
+            else:
+                floor = content.replied_content.floor
             publish_user = content.user
             user = {
                 'name': publish_user.name,
@@ -100,7 +100,8 @@ class ForumQuestion(View):
                 'content': content.content,
                 'is_top': content.is_top,
                 'rid': str(content.id),
-                'floor': floor,
+                'floor': content.floor,
+                'replied_floor': floor,
                 'reply': {'name': content.replied_content.user.name if content.replied_content else '', 'uid': str(content.replied_content.user_id) if content.replied_content else ''},
                 'published_time': content.published_time
             })
@@ -108,7 +109,7 @@ class ForumQuestion(View):
         tag = []
         for t in tags:
             tag.append(t.name)
-        return 0, question.user_id, question.solved, total, title, published_time, views, content_list, tag
+        return 0, str(question.user_id), question.solved, total, title, published_time, views, content_list, tag
 
 
 class ForumPublish(View):
@@ -129,7 +130,9 @@ class ForumPublish(View):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'title', 'content', 'tags'}:
             return 1, ''
-        question = Question.objects.create(title=kwargs['title'], content=kwargs['content'], user=u, published_time=now)
+        print('111')
+        question = Question.objects.create(title=kwargs['title'], user=u, published_time=now)
+        print('222')
         content_num = question.question_all_content.count()
         Content.objects.create(question=question, user=u, published_time=now, content=kwargs['content'], floor=content_num + 1)
         for tag in kwargs['tags']:
@@ -164,7 +167,8 @@ class ForumReply(View):
             return 2, 0, ''
         question.replied_time = now
         question.save()
-        content = Content.objects.create(content=kwargs['content'], user=u, published_time=now, question=question)
+        content_num = question.question_all_content.count()
+        content = Content.objects.create(content=kwargs['content'], user=u, published_time=now, question=question, floor=content_num+1)
         if kwargs['rid'] != '':
             content.replied_content_id = int(kwargs['rid'])
         if content.user.identity == 2:
