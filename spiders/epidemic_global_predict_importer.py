@@ -5,6 +5,7 @@ import os
 from meta_config import SPIDER_DATA_DIRNAME
 from spiders.epidemic_global_importer import dt_delta
 from utils.country_dict import country_dict
+from tqdm import tqdm
 
 PREDICT_TIME = 30  # 预测的天数
 keys = ["confirmedCount.json", "curedCount.json", "deadCount.json"]
@@ -23,9 +24,16 @@ begin = datetime.datetime.now().strftime("%Y-%m-%d")
 def predict_global_import(start_dt=None):
     if start_dt is None:
         start_dt = begin
+
+    days = (datetime.datetime.now().date() - datetime.datetime.strptime(start_dt, '%Y-%m-%d').date()).days + 1
+    bar = tqdm(
+        total=days, initial=0, dynamic_ncols=True,
+    )
     while (datetime.datetime.strptime(start_dt, '%Y-%m-%d').date()
            - datetime.datetime.now().date()).days <= PREDICT_TIME:
-
+        bar.set_description('[parsing]')
+        bar.update(1)
+        bar.set_postfix_str(start_dt)
         countries = []
         for (data_1, data_2, data_3) in zip(datas_1, datas_2, datas_3):
             country = data_1[0]
