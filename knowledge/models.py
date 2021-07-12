@@ -8,8 +8,9 @@ class Knowledge(models.Model):
 
 
 class EpidemicPolicy(models.Model):
+    title = models.TextField()
     datetime = models.DateTimeField()
-    content = models.TextField()
+    body = models.TextField()
     src = models.TextField()
 
     class Meta:

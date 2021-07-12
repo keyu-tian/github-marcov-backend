@@ -28,8 +28,9 @@ class EpidemicNewsList(View):
         res = []
         for a in query_set:
             res.append({
+                'title': a.title,
                 'datetime': a.datetime,
                 'src': a.src,
-                'body': a.content,
+                'body': a.body,
             })
         return 0, res
