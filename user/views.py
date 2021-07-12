@@ -8,8 +8,12 @@ from datetime import datetime
 from django.views import View
 from django.db.utils import IntegrityError, DataError
 
+from analysis.views import country_analyse_data_res
+from epidemic.models import HistoryEpidemicData
+from epidemic.views import map_oversea_dt_data_res, map_today_city_data_res
 from marcov19.settings import SERVER_HOST
-from user.models import User, VerifyCode
+from meta_config import SPIDER_DATA_DIRNAME
+from user.models import User, VerifyCode, Follow
 from user.hypers import *
 from utils.cast import cur_time
 from utils.email_sender import send_code
@@ -267,3 +271,158 @@ class UploadPic(View):
         with open(file_path, 'wb') as dest:
             [dest.write(chunk) for chunk in file.chunks()]
         return 0, file_url
+
+
+class FollowNew(View):
+    @JSR('status')
+    def post(self, request):
+        try:
+            uid = int(request.session.get('uid', None))
+            user = User.objects.get(id=uid)
+        except:
+            return 1, '', '', 1, '',
+        kwargs: dict = json.loads(request.body)
+        if not {'level', 'mail', 'is_new'}.issubset(kwargs.keys()):
+            return 1
+        try:
+            level = int(kwargs['level'])
+            mail = int(kwargs['mail'])
+            is_new = int(kwargs['is_new'])
+        except:
+            return 1
+
+        if level == 1:
+            if not 'country' in kwargs.keys():
+                return 1
+            total_data = HistoryEpidemicData.objects.filter(country_ch__icontains=kwargs['country'])
+            if total_data.count() == 0:
+                return 7
+            if is_new:
+                fo, flag = Follow.objects.get_or_create(user=user, level=1, country=kwargs['country'])
+                if not flag:
+                    return 2
+            else:
+                fo = Follow.objects.filter(user=user, level=1, country=kwargs['country'])
+                if not fo.exists():
+                    return 3
+                fo.delete()
+        elif level == 2:
+            if not 'province' in kwargs.keys():
+                return 1
+            total_data = HistoryEpidemicData.objects.filter(province_ch__icontains=kwargs['province'])
+            if total_data.count() == 0:
+                return 7
+            if is_new:
+                fo, flag = Follow.objects.get_or_create(user=user, level=2, province=kwargs['province'])
+                if not flag:
+                    return 2
+            else:
+                fo = Follow.objects.filter(user=user, level=2, province=kwargs['province'])
+                if not fo.exists():
+                    return 3
+                fo.delete()
+        elif level == 3:
+            if not {'province', 'city'}.issubset(kwargs.keys()):
+                return 1
+            if is_new:
+                fo, flag = Follow.objects.get_or_create(user=user, level=3, province=kwargs['province'],
+                                                        city=kwargs['city'])
+                if not flag:
+                    return 2
+            else:
+                fo = Follow.objects.filter(user=user, level=3, province=kwargs['province'], city=kwargs['city'])
+                if not fo.exists():
+                    return 3
+                fo.delete()
+        else:
+            return 1
+        user.is_mail = bool(mail)
+        user.save()
+        return 0
+
+
+class FollowData(View):
+    @JSR('status', 'data')
+    def post(self, request):
+        try:
+            uid = int(request.session.get('uid', None))
+            user = User.objects.get(id=uid)
+        except:
+            return 1, '', '', 1, '',
+        follow_set = Follow.objects.filter(user=user)
+        data = []
+        for a in follow_set:
+            if a.level == 1:
+                population, daily_data = country_analyse_data_res(a.country)
+                if daily_data is not None:
+                    data.append({
+                        'country': a.country,
+                        'province': '',
+                        'city': '',
+                        'population': population,
+                        'level': 1,
+                        'new': daily_data[-1]['new'],
+                        'total': daily_data[-1]['total'],
+                    })
+            elif a.level == 2:
+                population, daily_data = country_analyse_data_res(a.province)
+                if daily_data is not None:
+                    data.append({
+                        'country': '',
+                        'province': a.province,
+                        'city': '',
+                        'population': population,
+                        'level': 1,
+                        'new': daily_data[-1]['new'],
+                        'total': daily_data[-1]['total'],
+                    })
+            else:
+                date, city_ret, districts = map_today_city_data_res(a.province, a.city)
+                if city_ret is not None:
+                    data.append({
+                        'country': '',
+                        'province': a.province,
+                        'city': a.city,
+                        'population': 0,
+                        'level': 1,
+                        'new': city_ret['new'],
+                        'total': city_ret['total'],
+                    })
+        return 0, data
+
+
+class FollowSetMail(View):
+    @JSR('status')
+    def post(self, request):
+        try:
+            uid = int(request.session.get('uid', None))
+            user = User.objects.get(id=uid)
+        except:
+            return 1, '', '', 1, '',
+        kwargs: dict = json.loads(request.body)
+        if not {'mail'}.issubset(kwargs.keys()):
+            return 1
+        try:
+            mail = int(kwargs['mail'])
+        except:
+            return 1
+        if mail != 1 and mail != 0:
+            return 1
+
+        if user.is_mail is True and mail == 1:
+            return 2
+        elif user.is_mail is False and mail == 0:
+            return 3
+        user.is_mail = True if mail == 1 else False
+        user.save()
+        return user
+
+
+def get_is_mail(request):
+    try:
+        uid = int(request.session.get('uid', None))
+        user = User.objects.get(id=uid)
+    except:
+        return 2
+
+    return user.is_mail

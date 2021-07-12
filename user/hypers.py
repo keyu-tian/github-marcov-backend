@@ -13,6 +13,12 @@ VERCODE_CHS = (
     (1, '注册邮件'),
     (2, '找回密码')
 )
+
+EPIDEMIC_LEVEL_CHS = (
+    (1, 'country_ch'),
+    (2, 'province_ch'),
+    (3, 'city_ch'),
+)
 # MESSAGE_type = (
 #     (0, '其他'),
 #     (1, '学者认证成功'),
