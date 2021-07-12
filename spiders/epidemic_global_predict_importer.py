@@ -9,9 +9,9 @@ from utils.country_dict import country_dict
 PREDICT_TIME = 30  # 预测的天数
 keys = ["confirmedCount.json", "curedCount.json", "deadCount.json"]
 
-f1 = open(os.path.join("temp", "confirmedCount.json"), "r", encoding='utf-8')
-f2 = open(os.path.join("temp", "curedCount.json"), "r", encoding='utf-8')
-f3 = open(os.path.join("temp", "deadCount.json"), "r", encoding='utf-8')
+f1 = open(os.path.join(SPIDER_DATA_DIRNAME, "confirmedCount.json"), "r", encoding='utf-8')
+f2 = open(os.path.join(SPIDER_DATA_DIRNAME, "curedCount.json"), "r", encoding='utf-8')
+f3 = open(os.path.join(SPIDER_DATA_DIRNAME, "deadCount.json"), "r", encoding='utf-8')
 datas_1 = json.load(f1)["data"]
 datas_2 = json.load(f2)["data"]
 datas_3 = json.load(f3)["data"]
