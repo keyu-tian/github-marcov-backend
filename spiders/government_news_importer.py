@@ -13,6 +13,8 @@ from datetime import datetime
 # import django
 #
 # django.setup()
+
+print("废了！！！！！！！！！！！！！！！！")
 from tqdm import tqdm
 
 from knowledge.models import EpidemicPolicy
@@ -40,8 +42,9 @@ def government_news_import(line_start=0):
             if last_month == 1 and this_month == 12:
                 old_year = '2020-'
             objs.append(EpidemicPolicy(
+                title=result['title'],
                 datetime=datetime.strptime(old_year + result['date'], "%Y-%m-%d %H:%M"),
-                content=result['content'],
+                body=result['content'],
                 src=result['src'],
             ))
             last_month = this_month
