@@ -76,7 +76,7 @@ class ForumQuestion(View):
             question = Question.objects.get(id=qid)
         except:
             return 2, 0, '', '', 0, []
-        all_content = question.question_all_content.all().order_by('published_time')
+        all_content = question.question_all_content.all().order_by(['-is_top', 'published_time'])
         total = all_content.count()
         title = question.title
         published_time = question.published_time
@@ -85,10 +85,7 @@ class ForumQuestion(View):
         for index in range((page - 1) * each, min(total, page*each)):
             content = all_content[index]
             try:
-                replied_content = content.replied_content
-                for one_content in range(all_content.count()):
-                    if all_content[one_content].id == replied_content.id:
-                        floor = one_content + 1
+                floor = content.replied_content.floor
             except:
                 floor = -1
             publish_user = content.user
@@ -133,7 +130,8 @@ class ForumPublish(View):
         if kwargs.keys() != {'title', 'content', 'tags'}:
             return 1, ''
         question = Question.objects.create(title=kwargs['title'], content=kwargs['content'], user=u, published_time=now)
-        Content.objects.create(question=question, user=u, published_time=now, content=kwargs['content'])
+        content_num = question.question_all_content.count()
+        Content.objects.create(question=question, user=u, published_time=now, content=kwargs['content'], floor=content_num + 1)
         for tag in kwargs['tags']:
             Tag.objects.create(name=tag, question=question)
         return 0, str(question.id)
@@ -200,10 +198,7 @@ class ForumEdit(View):
             if content.user != u:
                 return 2
             content.content = kwargs['content']
-            if content.question.question_all_content.order_by('published_time').first().id == content.id:
-                content.question.content = kwargs['content']
             content.save()
-            content.question.save()
         else:
             question = Question.objects.get(id=kwargs['qid'])
             if question.user != u:
@@ -232,9 +227,14 @@ class ForumDelete(View):
             return 1
         if kwargs['qid'] == '':
             content = Content.objects.get(id=kwargs['rid'])
+            question = content.question
             if content.user != u:
                 return 2
             content.delete()
+            contents = question.question_all_content.all().order_by('published_time')
+            for index in range(contents.count()):
+                contents[index].floor = index + 1
+                contents[index].save()
         else:
             question = Question.objects.get(id=kwargs['qid'])
             if question.user != u:
