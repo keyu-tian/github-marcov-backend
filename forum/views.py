@@ -62,7 +62,7 @@ class ForumList(View):
 
 
 class ForumQuestion(View):
-    @JSR('status', 'total', 'title', 'published_time', 'views', 'list', 'tag')
+    @JSR('status', 'uid', 'total', 'title', 'published_time', 'views', 'list', 'tag')
     def get(self, request):
         if dict(request.GET).keys() != {'qid', 'page', 'each'}:
             return 1, 0, '', '', 0, []
@@ -110,7 +110,7 @@ class ForumQuestion(View):
         tag = []
         for t in tags:
             tag.append(t.name)
-        return 0, total, title, published_time, views, content_list, tag
+        return 0, question.user_id, total, title, published_time, views, content_list, tag
 
 
 class ForumPublish(View):
@@ -170,6 +170,8 @@ class ForumReply(View):
             content.replied_content_id = int(kwargs['rid'])
         if content.user.identity == 2:
             content.question.expert_reply = True
+            if Tag.objects.filter(question=content.question, name='expert').count() == 0:
+                Tag.objects.create(question=content.question, name='expert')
         content.save()
         content.question.save()
         return 0, str(content.id), now
