@@ -1,6 +1,6 @@
 import os
 import re
-from marcov19.settings import MEDIA_ROOT
+from marcov19.settings import MEDIA_ROOT, SERVER_HOST, BASE_DIR
 
 
 
@@ -71,7 +71,8 @@ _CHECK_TEL = lambda tel: all([
 
 CHECK_ACC = lambda acc: _CHECK_EMAIL(acc)
 
-CHECK_AVATAR = lambda avatar: os.path.exists('/root/backend/marcov19_backend'+avatar[22:])
+CHECK_AVATAR = lambda avatar: os.path.exists(BASE_DIR + re.findall(f'(?<=http://{SERVER_HOST}).*$', avatar)[0])
+# 不清楚为何os.path.join不起作用
 
 CHECK_PWD = lambda pwd: all([
     PWD_MIN_LEN <= len(pwd) <= PWD_MAX_LEN,
