@@ -106,35 +106,41 @@ class CountryAnalyze(View):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name'}:
             return 1, []
-
-        try:
-            global_json_path = os.path.join(SPIDER_DATA_DIRNAME, 'global.json')
-            province_json_path = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
-        except:
+        population, daily_data = country_analyse_data_res(kwargs)
+        if population is None and daily_data is None:
             return 7
-
-        population = 0
-        daily_data = []
-        if kwargs['name'] in province_dict_ch.keys():
-            province_analysis = json.load(open(province_json_path, 'r', encoding='utf-8'))
-            for d in province_analysis:
-                for c in d['provinces']:
-                    if c['name'] == kwargs['name']:
-                        daily_data.append({
-                            'date': d['date'],
-                            'new': c['new'],
-                            'total': c['total']
-                        })
-        else:
-            global_analysis = json.load(open(global_json_path, 'r', encoding='utf-8'))
-            for d in global_analysis[:-1]:
-                for c in d['countries']:
-                    if c['name'] == kwargs['name']:
-                        daily_data.append({
-                            'date': d['date'],
-                            'new': c['new'],
-                            'total': c['total']
-                        })
-
         return 0, population, daily_data
+
+
+def country_analyse_data_res(kwargs):
+    try:
+        global_json_path = os.path.join(SPIDER_DATA_DIRNAME, 'global.json')
+        province_json_path = os.path.join(SPIDER_DATA_DIRNAME, 'epidemic_domestic_data', 'province.json')
+    except:
+        return None, None
+
+    population = 0
+    daily_data = []
+    if kwargs['name'] in province_dict_ch.keys():
+        province_analysis = json.load(open(province_json_path, 'r', encoding='utf-8'))
+        for d in province_analysis:
+            for c in d['provinces']:
+                if c['name'] == kwargs['name']:
+                    daily_data.append({
+                        'date': d['date'],
+                        'new': c['new'],
+                        'total': c['total']
+                    })
+    else:
+        global_analysis = json.load(open(global_json_path, 'r', encoding='utf-8'))
+        for d in global_analysis[:-1]:
+            for c in d['countries']:
+                if c['name'] == kwargs['name']:
+                    daily_data.append({
+                        'date': d['date'],
+                        'new': c['new'],
+                        'total': c['total']
+                    })
+
+    return population, daily_data
 
