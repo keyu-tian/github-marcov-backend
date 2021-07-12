@@ -62,7 +62,7 @@ class ForumList(View):
 
 
 class ForumQuestion(View):
-    @JSR('status', 'uid', 'total', 'title', 'published_time', 'views', 'list', 'tag')
+    @JSR('status', 'uid', 'solved', 'total', 'title', 'published_time', 'views', 'list', 'tag')
     def get(self, request):
         if dict(request.GET).keys() != {'qid', 'page', 'each'}:
             return 1, 0, '', '', 0, []
@@ -110,7 +110,7 @@ class ForumQuestion(View):
         tag = []
         for t in tags:
             tag.append(t.name)
-        return 0, question.user_id, total, title, published_time, views, content_list, tag
+        return 0, question.user_id, question.solved, total, title, published_time, views, content_list, tag
 
 
 class ForumPublish(View):
