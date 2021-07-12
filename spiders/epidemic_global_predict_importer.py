@@ -18,13 +18,19 @@ datas_2 = json.load(f2)["data"]
 datas_3 = json.load(f3)["data"]
 
 dataout = []
-begin = datetime.datetime.now().strftime("%Y-%m-%d")
+begin = dt_delta(datetime.datetime.now().strftime("%Y-%m-%d"), -1)
 
 
 def predict_global_import(start_dt=None):
     if start_dt is None:
         start_dt = begin
-
+    yesterday = begin
+    true_json = {}
+    try:
+        true_json = json.load(
+            open(os.path.join(SPIDER_DATA_DIRNAME, "true_data.json"), "r", encoding='utf-8'))
+    except FileNotFoundError:
+        print("No true data!!")
     days = (datetime.datetime.now().date() - datetime.datetime.strptime(start_dt, '%Y-%m-%d').date()).days + 1
     bar = tqdm(
         total=days, initial=0, dynamic_ncols=True,
@@ -35,21 +41,31 @@ def predict_global_import(start_dt=None):
         bar.update(1)
         bar.set_postfix_str(start_dt)
         countries = []
+        alpha = {}
         for (data_1, data_2, data_3) in zip(datas_1, datas_2, datas_3):
             country = data_1[0]
-            if country not in country_dict.values():
-                # print(country)
-                # start_dt = dt_delta(start_dt, 1)
+            if country not in country_dict.values() or country not in true_json.keys():
                 continue
             date = datetime.datetime.strptime(data_1[1], "%Y%m%d").strftime('%Y-%m-%d')
+            # print(country)
+            # data_1[4] data_2[4] data_3[4]
+            x = data_1[4] if data_1[4] is not None else data_1[3]
+            y = data_2[4] if data_2[4] is not None else data_2[3]
+            z = data_3[4] if data_3[4] is not None else data_3[3]
+            if date == yesterday:
+                a1 = (true_json[country]["confirmed"] - data_1[3]) / (data_1[3] + x + 1e-8)
+                a2 = (true_json[country]["cured"] - data_2[3]) / (data_2[3] + y + 1e-8)
+                a3 = (true_json[country]["died"] - data_3[3]) / (data_3[3] + z + 1e-8)
+                alpha[country] = [a1, a2, a3]
+
             if date == start_dt:
                 countries.append({
                     "name": country,
                     "population": 0,  # todo
                     "predict": {
-                        "died": int(data_3[2]),
-                        "cured": int(data_2[2]),
-                        "confirmed": int(data_1[2]),
+                        "confirmed": int(alpha[country][0] * x + (1 - alpha[country][0]) * data_1[3]),
+                        "cured": int(alpha[country][1] * y + (1 - alpha[country][1]) * data_2[3]),
+                        "died": int(alpha[country][2] * z + (1 - alpha[country][2]) * data_3[3]),
                     }
                 })
         dataout.append({
