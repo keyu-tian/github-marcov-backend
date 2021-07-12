@@ -1,7 +1,7 @@
 from django.views import View
 
 from meta_config import SPIDER_DATA_DIRNAME
-from user.models import User
+from user.models import User, Follow
 from utils.meta_wrapper import JSR
 from utils.dict_ch import province_dict_ch
 import datetime as dt
