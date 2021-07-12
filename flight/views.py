@@ -9,7 +9,7 @@ import math
 from bs4 import BeautifulSoup
 from django.views import View
 
-from flight.models import Flight
+from flight.models import Flight, Airport
 from risk.views import get_city_risk_level
 from utils.cast import address_to_jingwei
 from utils.meta_wrapper import JSR
@@ -131,7 +131,10 @@ class TravelCity(View):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'start', 'end'}:
             return 1, []
-        flights = Flight.objects.filter(dept_airport__airport_name=kwargs['start'], arri_airport__airport_name=kwargs['end'])
+        if Airport.objects.filter(airport_name=kwargs['start']).count() == 0:
+            flights = Flight.objects.filter(dept_airport__city_name=kwargs['start'], arri_airport__city_name=kwargs['end'])
+        else:
+            flights = Flight.objects.filter(dept_airport__airport_name=kwargs['start'], arri_airport__airport_name=kwargs['end'])
         plane_res = []
         for flight in flights:
             is_cancel = flight.condition == "取消"
