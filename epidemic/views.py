@@ -2,6 +2,8 @@ from functools import reduce
 
 from django.db.models import Q
 from django.views import View
+
+from user.views import get_is_star
 from utils.meta_wrapper import JSR
 from utils.dict_ch import city_dict_ch, province_dict_ch, district_dict
 from utils.country_dict import country_dict
@@ -20,7 +22,7 @@ def list_dict_duplicate_removal(data_list):
 
 
 class MapProvince(View):
-    @JSR('status', 'data')
+    @JSR('status', 'data', 'is_star')
     def get(self, request):
         try:
             province = str(request.GET.get('name'))
@@ -62,11 +64,11 @@ class MapProvince(View):
             }
             data.append(daily_data)
 
-        return 0, data
+        return 0, data, get_is_star(request, level=2, province=province)
 
 
 class MapTodayProvince(View):
-    @JSR('status', 'date', 'province', 'cities', 'info')
+    @JSR('status', 'date', 'province', 'cities', 'info', 'is_star')
     def get(self, request):
         try:
             province = str(request.GET.get('name'))
@@ -124,11 +126,11 @@ class MapTodayProvince(View):
         except:
             return 7
 
-        return 0, date, province_data_ret, cities_data, infos
+        return 0, date, province_data_ret, cities_data, infos, get_is_star(request, level=2, province=province)
 
 
 class MapCity(View):
-    @JSR('status', 'data')
+    @JSR('status', 'data', 'is_star')
     def get(self, request):
         try:
             province = str(request.GET.get('province'))
@@ -143,7 +145,7 @@ class MapCity(View):
             ))
         except:
             return 7
-        return 0, map_city_data_res(city, province_data)
+        return 0, map_city_data_res(city, province_data), get_is_star(request, level=3, province=province, city=city)
 
 
 def map_city_data_res(city, province_data):
@@ -164,7 +166,7 @@ def map_city_data_res(city, province_data):
 
 
 class MapTodayCity(View):
-    @JSR('status', 'date', 'city', 'districts')
+    @JSR('status', 'date', 'city', 'districts', 'is_star')
     def get(self, request):
         try:
             province = str(request.GET.get('province'))
@@ -174,7 +176,7 @@ class MapTodayCity(View):
         date, city_ret, districts = map_today_city_data_res(province, city)
         if date is None and city_ret is None and districts is None:
             return 7
-        return 0, date, city_ret, districts
+        return 0, date, city_ret, districts, get_is_star(request, level=3, province=province, city=city)
 
 
 def map_today_city_data_res(province, city):
@@ -270,14 +272,14 @@ class MapProvince_WZ(View):
 
 
 class MapProvinceDt(View):
-    @JSR('status', 'data')
+    @JSR('status', 'data', 'is_star')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name'}:
             return 1, []
         kwargs['name'] = country_dict[kwargs['name']]
         total_data = HistoryEpidemicData.objects.filter(province_ch=kwargs['name'])
-        return 0, map_province_dt_data_res(total_data)
+        return 0, map_province_dt_data_res(total_data), get_is_star(request, level=2, province=kwargs['name'])
 
 
 def map_province_dt_data_res(total_data):
@@ -303,7 +305,7 @@ def map_province_dt_data_res(total_data):
 
 
 class MapOversea(View):
-    @JSR('status', 'country')
+    @JSR('status', 'country', 'is_star')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name', 'date'}:
@@ -313,7 +315,7 @@ class MapOversea(View):
         data = HistoryEpidemicData.objects.filter(date=kwargs['date'], country_ch=kwargs['name'])
         if data.count() == 0:
             return 6, country
-        return 0, map_oversea_data_res(data)
+        return 0, map_oversea_data_res(data), get_is_star(request, level=1, country=kwargs['name'])
 
 
 def map_oversea_data_res(data):
@@ -360,7 +362,7 @@ def map_oversea_data_res(data):
 
 
 class MapOverseaDt(View):
-    @JSR('status', 'data')
+    @JSR('status', 'data', 'is_star')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name'}:
@@ -370,7 +372,7 @@ class MapOverseaDt(View):
         if total_data.count() == 0:
             return 6, {}
         res = map_oversea_dt_data_res(total_data)
-        return 0, res
+        return 0, res, get_is_star(request, level=1, country=kwargs['name'])
 
 
 def map_oversea_dt_data_res(total_data):

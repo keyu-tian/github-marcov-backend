@@ -1,6 +1,7 @@
 from django.views import View
 
 from meta_config import SPIDER_DATA_DIRNAME
+from user.views import get_is_star
 from utils.meta_wrapper import JSR
 from utils.dict_ch import province_dict_ch
 import datetime as dt
@@ -113,7 +114,7 @@ class SearchAnalyse(View):
 
 
 class CountryAnalyze(View):
-    @JSR('status', 'population', 'data')
+    @JSR('status', 'population', 'data', 'is_star')
     def post(self, request):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'name'}:
@@ -121,7 +122,7 @@ class CountryAnalyze(View):
         population, daily_data = country_analyse_data_res(kwargs)
         if population is None and daily_data is None:
             return 7
-        return 0, population, daily_data
+        return 0, population, daily_data, get_is_star(request, level=4, country=kwargs['name'])
 
 
 def country_analyse_data_res(kwargs):

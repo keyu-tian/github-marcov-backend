@@ -418,7 +418,7 @@ class FollowSetMail(View):
         return user
 
 
-def get_is_star(request, level, country, province, city):
+def get_is_star(request, level, country='', province='', city=''):
     try:
         uid = int(request.session.get('uid', None))
         user = User.objects.get(id=uid)
@@ -436,8 +436,13 @@ def get_is_star(request, level, country, province, city):
             return 1
         else:
             return 0
-    else:
+    elif level == 3:
         if follow_set.filter(level=3, province=province, city=city).exists():
+            return 1
+        else:
+            return 0
+    else:
+        if follow_set.filter(level=1, country=country).exists() or follow_set.filter(level=2, province=country).exists():
             return 1
         else:
             return 0
