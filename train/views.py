@@ -17,9 +17,7 @@ DEFAULT_DATE_STR = DEFAULT_DATE.strftime('%Y-%m-%d')
 
 def get_train_info_res(train: Train):
     res = {'stations': []}
-    total_risk_level = 0
-    count = train.schedule_station.count() + 2
-    total_risk_level += float(get_city_risk_level(train.dept_station.city_name)) / count
+    total_risk_level = 2
     for a in MidStation.objects.filter(train=train):
         risk_level = get_city_risk_level(a.station.city_name)
         res['stations'].append({
@@ -28,8 +26,7 @@ def get_train_info_res(train: Train):
             'risk_level': risk_level,
             'pos': [a.station.jingdu, a.station.weidu],
         })
-        total_risk_level += float(risk_level) / count
-    total_risk_level += float(get_city_risk_level(train.dept_station.city_name)) / count
+        total_risk_level = max(total_risk_level, risk_level)
     if math.ceil(total_risk_level) >= 4:
         msg = '当前线路存在较大疫情风险，请谨慎考虑出行。'
     elif math.ceil(total_risk_level) >= 3:
@@ -51,10 +48,9 @@ def get_train_dept_and_arri_info_res(train: Train):
     st_t = datetime.datetime.strptime(datetime.date.today().strftime('%Y-%m-%d ') + train.dept_time, '%Y-%m-%d %H:%M')
     ed_t = st_t + datetime.timedelta(hours=hours, minutes=minutes)
     total_risk_level = 0
-    count = train.schedule_station.count() + 2
     for a in MidStation.objects.filter(train=train):
         risk_level = get_city_risk_level(a.station.city_name)
-        total_risk_level += float(risk_level) / count
+        total_risk_level = max(risk_level, total_risk_level)
     res = {
         'start': {
             'station_name': train.dept_station.name_ch,
