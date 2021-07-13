@@ -6,6 +6,7 @@ import hashlib
 from datetime import datetime
 
 import colorama
+import time
 from django.template.loader import render_to_string
 from django.views import View
 from django.db.utils import IntegrityError, DataError
@@ -510,15 +511,18 @@ class AIQA(View):
         
         first_time = query == ''
         if first_time:
+            time.sleep(0.5)
             return 0, [greet_based_on_time(), add_tail(rand_greet(), q=True)], '', 1
         
         query = del_stop_words(query)
         
         for k in tricky_keys:
             if k in query:
+                time.sleep(0.5)
                 return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_tricky_sent(), q=False)], '', -2
         for k in juan_keys:
             if k in query:
+                time.sleep(0.5)
                 return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_juan_sent(), q=False)], '', -1
             
         countries = [c for c in country_dict.values() if c in query]
@@ -552,7 +556,7 @@ class AIQA(View):
                 ]))
             else:
                 emotion = 1
-            
+            time.sleep(0.3)
             return 0, responses, '', emotion
 
         try:
