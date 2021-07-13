@@ -104,16 +104,16 @@ def test_data_import():
     questions = []
     question_num = Question.objects.all().count()
     for i in range(1+question_num, 11+question_num):
-        q = Question.objects.create(title=f'question{i}', user=users[random.randint(0, len(expert_name)-1)], published_time=datetime.now(), solved=random.randint(1, 10) > 8)
-        Content.objects.create(user=q.user, published_time=datetime.now(), content=rand_content(), floor=1, question=q, is_top=random.randint(1, 100) > 90)
+        q = Question.objects.create(title=f'question{i}', user=users[random.randint(0, len(expert_name)-1)], published_time=datetime.now().strftime('%Y-%m-%d'), solved=random.randint(1, 10) > 8)
+        Content.objects.create(user=q.user, published_time=datetime.now().strftime('%Y-%m-%d'), content=rand_content(), floor=1, question=q, is_top=random.randint(1, 100) > 90)
         questions.append(q)
         if random.randint(0, 1) == 1:
             Tag.objects.create(question=q, name='tips')
         if random.randint(0, 1) == 1:
             Tag.objects.create(question=q, name='fake')
     for i in range(1, 100):
-        c = Content.objects.create(user=users[random.randint(0, len(expert_name)-1)], content=rand_content(), floor=0, published_time=datetime.now(), question=questions[random.randint(0, 9)], is_top=random.randint(1, 100) > 90)
-        c.question.replied_time = datetime.now()
+        c = Content.objects.create(user=users[random.randint(0, len(expert_name)-1)], content=rand_content(), floor=0, published_time=datetime.now().strftime('%Y-%m-%d'), question=questions[random.randint(0, 9)], is_top=random.randint(1, 100) > 90)
+        c.question.replied_time = datetime.now().strftime('%Y-%m-%d')
         if c.user.identity == 2:
             c.question.expert_reply = True
         c.question.save()
