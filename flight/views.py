@@ -58,11 +58,12 @@ def get_flight_info_by_code(code, date=datetime.now().strftime('%Y-%m-%d')):
 
 def get_flight_dept_and_arri_info_res(flight):
     # 传入flight对象，按交互文档travel/search格式返回dict
+    risk = max(get_city_risk_level(flight.dept_airport.city_name), get_city_risk_level(flight.arri_airport.city_name))
     start = {
         'station_name': flight.dept_airport.airport_name,
         'city_name': flight.dept_airport.city_name,
         'country_name': flight.dept_airport.country_name,
-        'risk': get_city_risk_level(flight.dept_airport.city_name),
+        'risk': risk,
         'datetime': flight.dept_time
     }
     end = {
