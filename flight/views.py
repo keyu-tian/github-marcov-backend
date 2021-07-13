@@ -139,7 +139,7 @@ class TravelCity(View):
         elif Airport.objects.filter(airport_name=kwargs['start']).count() != 0:
             flights = Flight.objects.filter(dept_airport__airport_name=kwargs['start'], arri_airport__airport_name=kwargs['end'])
         else:
-            return 2, []
+            return 9, []
         plane_res = []
         for flight in flights:
             is_cancel = flight.condition == "取消"
