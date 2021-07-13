@@ -72,9 +72,9 @@ def init_import():
     # re_import('dxy_news', False, delete_old_data=False)  # 不launch是因为 dxy_news 没有 spider，只有 importer
     # re_import('yaoyan', True, line_start=0)
     re_import('travel_policy', True, line_start=0)
-    re_import('train', False, line_start=0)  # 不launch是因为 train 的 spider 太慢（超过6h）
-    from spiders.station_exporter import station_export
-    station_export()  # 输出一个文件，给前端
+    # re_import('train', False, line_start=0)  # 不launch是因为 train 的 spider 太慢（超过6h）
+    # from spiders.station_exporter import station_export
+    # station_export()  # 输出一个文件，给前端
     # daily_import()
     # re_import('epidemic_global', False)  # 不launch是因为 epidemic_global 没有 spider，只有 importer
     # re_import('epidemic_global_predict', False)
