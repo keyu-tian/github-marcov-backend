@@ -5,11 +5,15 @@ import hashlib
 
 from datetime import datetime
 
+import colorama
 from django.template.loader import render_to_string
 from django.views import View
 from django.db.utils import IntegrityError, DataError
 
 from analysis.views import country_analyse_data_res
+from chatbot.chat_api import chat_query
+from chatbot.chat_util import greet_based_on_time, rand_greet, add_tail, del_stop_words, rand_beg_word, rand_sep_punc, join_rand_punc, rand_end_face, rand_end_punc, CHAT_DEBUG, tricky_keys, juan_keys, \
+    rand_tricky_sent, rand_juan_sent, rand_no_idea_sent, rand_end_query
 from epidemic.models import HistoryEpidemicData
 from epidemic.views import map_today_city_data_res
 from marcov19.settings import SERVER_HOST
@@ -490,3 +494,75 @@ class FollowCity(View):
             res[a] = int(a in follow_set)
 
         return 0, res
+
+
+from utils.country_dict import country_dict
+from analysis.views import get_country_info
+
+class AIQA(View):
+    @JSR('status', 'list', 'session_key', 'emotion')
+    def post(self, request):
+        d = json.loads(request.body)
+        query, session_key = d['q'], d['session_key']
+        
+        first_time = query == ''
+        if first_time:
+            return 0, [greet_based_on_time(), add_tail(rand_greet(), q=True)], '', 0
+        
+        query = del_stop_words(query)
+        
+        for k in tricky_keys:
+            if k in query:
+                return 0, [add_tail(rand_tricky_sent(), q=False)], '', -2
+        for k in juan_keys:
+            if k in query:
+                return 0, [add_tail(rand_juan_sent(), q=False)], '', -1
+            
+        countries = [c for c in country_dict.values() if c in query]
+        if len(countries) > 0:
+            first_res = join_rand_punc([
+                rand_beg_word(),
+                random.choice([
+                    '情况是这样的',
+                    '情况是这样子',
+                    '我来回答您',
+                    '让我看一下',
+                    '让我看一下',
+                    'emm.. 我看看',
+                    'emm.. 哦，是这样子的',
+                    '这题我会',
+                    '我我我来回答您',
+                ]),
+            ]) + rand_end_punc()
+            responses = [first_res]
+            for c in countries:
+                responses.append(c + '的情况是' + rand_sep_punc() + get_country_info(c) + rand_end_punc() + rand_end_face())
+            if len(countries) >= 3:
+                emotion = -1
+                responses.append(random.choice([
+                    '都给您查完了，客官还满意吗？',
+                    '（呼，一口气给亲查了这么多',
+                    '亲您问的可真多（小声bb），都给您查完了，您给小嘤点个赞呗~' if CHAT_DEBUG else '都给您查完了，您给小嘤点个赞呗~',
+                    '我怎么都查到了，我真是神通广大呀？' if CHAT_DEBUG else '以上',
+                    '查数据库工具人属于是' if CHAT_DEBUG else '呼呼，查完啦，您请慢慢看哈~',
+                    '查数据库工具人属于是' if CHAT_DEBUG else '呼呼，查完啦，您请慢慢看哈~',
+                ]))
+            else:
+                emotion = 1
+            
+            return 0, responses, '', emotion
+
+        new_session_key, ai_response = chat_query(session_key)
+        if new_session_key == '':
+            print(colorama.Fore.WHITE + f'====> [ai bug] <====: {ai_response}')
+            return 0, [add_tail(rand_no_idea_sent(), q=True)], '', 0
+
+        emotion = 0
+        for x in {'开心', '欢乐', '耶', '好哦', '哈', '嘿', '笑'}:
+            if x in ai_response:
+                emotion = 1
+        for x in {'伤心', '生气', '哼', '呜', '哭'}:
+            if x in ai_response:
+                emotion = -1
+        return 0, [ai_response + random.choice([rand_end_face(), rand_end_punc()])], new_session_key, emotion
+

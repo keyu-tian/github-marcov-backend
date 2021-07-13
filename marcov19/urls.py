@@ -102,6 +102,10 @@ urlpatterns = [
     path('follow/province', FollowProvince.as_view()),
     path('follow/country', FollowCountry.as_view()),
     path('follow/city', FollowCity.as_view()),
+    
+    # ======== 十、AI ========
+    path('qa', AIQA.as_view()),
+    
 
     re_path(r'^upload(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}, name='media'),
     url(r'^', TemplateView.as_view(template_name='index.html')),
