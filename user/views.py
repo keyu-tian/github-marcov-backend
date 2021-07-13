@@ -289,13 +289,13 @@ class FollowNew(View):
             return 1
         try:
             level = int(kwargs['level'])
-            mail = int(kwargs['mail'])
-            is_new = int(kwargs['is_new'])
+            mail = bool(kwargs['mail'])
+            is_new = bool(kwargs['is_new'])
         except:
-            return 1
+            return -1
 
         if level == 1:
-            if not 'country' in kwargs.keys():
+            if not {'country'}.issubset(kwargs.keys()):
                 return 1
             total_data = HistoryEpidemicData.objects.filter(country_ch__icontains=kwargs['country'])
             if total_data.count() == 0:
@@ -310,7 +310,7 @@ class FollowNew(View):
                     return 3
                 fo.delete()
         elif level == 2:
-            if not 'province' in kwargs.keys():
+            if not {'province'}.issubset(kwargs.keys()):
                 return 1
             total_data = HistoryEpidemicData.objects.filter(province_ch__icontains=kwargs['province'])
             if total_data.count() == 0:
