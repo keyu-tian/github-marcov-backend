@@ -52,7 +52,7 @@ def main():
         bar.set_description(f'[line{i}]')
         city_list = res.get(list(res.keys())[i])
         for j in range(len(city_list)):
-            get_url = url + city_list[j][0]
+            get_url = url + city_list[j]
             response = requests.get(get_url, headers={'Content-Type': 'application/json'}, timeout=10)
             js = json.loads(response.text)
             if js['success']:
@@ -61,14 +61,13 @@ def main():
                     if js['data']['city'] in a:
                         js['data']['city'] = a
                         break
-                with open(os.path.join(SPIDER_DATA_DIRNAME, 'travel_policy_spider_all', 'policy_by_city.json'), 'a+', encoding='utf-8') as fp:
+                with open(os.path.join(SPIDER_DATA_DIRNAME, 'travel_policy_spider_all', 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
                     fp.write(json.dumps({
                         'province': js['data']['province'],
                         'city': js['data']['city'],
                         'enter_policy': js['data']['enterPolicy'],
                         'out_policy': js['data']['outPolicy'],
                     }) + '\n')
-                    fp.close()
     bar.close()
 
 
