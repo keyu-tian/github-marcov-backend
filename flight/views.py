@@ -131,6 +131,8 @@ class TravelCity(View):
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'start', 'end'}:
             return 1, []
+        kwargs['start'] = kwargs['start'].split('市')[0]
+        kwargs['end'] = kwargs['end'].split('市')[0]
         if Airport.objects.filter(city_name=kwargs['start']).count() != 0:
             flights = Flight.objects.filter(dept_airport__city_name=kwargs['start'], arri_airport__city_name=kwargs['end'])
         elif Airport.objects.filter(airport_name=kwargs['start']).count() != 0:
