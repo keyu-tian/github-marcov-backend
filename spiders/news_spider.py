@@ -13,6 +13,7 @@ def is_Chinese(ch):
 
 
 def main():
+    results = []
     for i in range(40):
         url = 'https://i.news.qq.com/trpc.qqnews_web.kv_srv.kv_srv_http_proxy/list?sub_srv_id=antip&srv_id=pc&offset='+ str(i) + '&limit=65&strategy=1&ext={%22pool%22:[%22high%22,%22top%22],%22is_filter%22:10,%22check_type%22:true}'
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
@@ -20,7 +21,6 @@ def main():
         resp = urllib.request.urlopen(req)
         content = resp.read()
         news_list = json.loads(str(content, 'utf-8'))['data']['list']
-        results = []
 
         '''
         分类: 社会（国际社会、港澳台时政） 时政（国际时政） 健康（心理、学术健康） 教育（幼儿园教育）
@@ -55,9 +55,9 @@ def main():
             results.append(result)
         bar.close()
 
-        with open(f'{SPIDER_DATA_DIRNAME}/news_data.json', 'a', encoding='utf-8') as f:
-            f.write(json.dumps(results, ensure_ascii=False))
-        return results
+    with open(f'{SPIDER_DATA_DIRNAME}/news_data.json', 'w', encoding='utf-8') as f:
+        f.write(json.dumps(results, ensure_ascii=False))
+    return results
 
 
 if __name__ == '__main__':
