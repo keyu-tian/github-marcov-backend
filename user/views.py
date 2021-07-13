@@ -14,7 +14,7 @@ from django.db.utils import IntegrityError, DataError
 from analysis.views import country_analyse_data_res
 from chatbot.chat_api import chat_query
 from chatbot.chat_util import greet_based_on_time, rand_greet, add_tail, del_stop_words, rand_beg_word, rand_sep_punc, join_rand_punc, rand_end_face, rand_end_punc, CHAT_DEBUG, tricky_keys, juan_keys, \
-    rand_tricky_sent, rand_juan_sent, rand_no_idea_sent, rand_end_query
+    rand_tricky_sent, rand_juan_sent, rand_no_idea_sent, rand_end_query, endswith_ch_punc
 from epidemic.models import HistoryEpidemicData
 from epidemic.views import map_today_city_data_res
 from marcov19.settings import SERVER_HOST
@@ -580,5 +580,6 @@ class AIQA(View):
         for x in {'伤心', '生气', '哼', '呜', '哭', '桑心', '文明用语'}:
             if x in ai_response:
                 emotion = -1
-        return 0, [rand_beg_word() + rand_sep_punc() + ai_response + random.choice([rand_end_face(), rand_end_punc()])], new_session_key, emotion
+        ai_response = add_tail(ai_response, q=False)
+        return 0, [rand_beg_word() + rand_sep_punc() + ai_response + rand_end_face()], new_session_key, emotion
 
