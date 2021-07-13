@@ -19,9 +19,10 @@ def get_input_options():
     #     js = json.load(fp)
     js = json.loads(requests.get('http://wx.wind.com.cn/alert/traffic/getProvince').content)
     for i in range(len(js['data'])):
-        if js['data'][i]['province'] not in res.keys():
-            res[js['data'][i]['province']] = []
-        res[js['data'][i]['province']].append([js['data'][i]['city']])
+        if js['data'][i]['value'] not in res.keys():
+            res[js['data'][i]['value']] = []
+        for j in range(len(js['data'][i]['children'])):
+            res[js['data'][i]['value']].append(js['data'][i]['children'][j]['value'])
     return res
 
 
