@@ -20,7 +20,7 @@ def get_access_token():
     return access_token
 
 
-def chat_query(user_inp, session_id=""):
+def chat_query(user_inp, session_id):
     post_data = {
         'log_id': 15712,
         'request': {

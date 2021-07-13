@@ -507,7 +507,7 @@ class AIQA(View):
         
         first_time = query == ''
         if first_time:
-            return 0, [greet_based_on_time(), add_tail(rand_greet(), q=True)], '', 0
+            return 0, [greet_based_on_time(), add_tail(rand_greet(), q=True)], '', 1
         
         query = del_stop_words(query)
         
@@ -552,7 +552,7 @@ class AIQA(View):
             
             return 0, responses, '', emotion
 
-        new_session_key, ai_response = chat_query(session_key)
+        new_session_key, ai_response = chat_query(query, session_key)
         if new_session_key == '':
             print(colorama.Fore.WHITE + f'====> [ai bug] <====: {ai_response}')
             return 0, [add_tail(rand_no_idea_sent(), q=True)], '', 0
