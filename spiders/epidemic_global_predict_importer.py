@@ -90,7 +90,7 @@ def predict_global_import(start_dt=None):
                     "population": 0,  # todo
                     "predict": {
                         "confirmed": int(a1 * data_1[2]),
-                        "cured": int(a2 * data_2[2]) if int(a2 * data_2[2]) < int(a1 * data_1[2]) else int(a1 * data_1[2]),
+                        "cured": min(int(a2 * data_2[2]), int(a1 * data_1[2]) - int(a3 * data_3[2])),
                         "died": int(a3 * data_3[2]),
                     }
                 })
