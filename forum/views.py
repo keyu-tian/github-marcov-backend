@@ -290,6 +290,8 @@ class ForumTop(View):
         if not u.exists():
             return -1, False
         u = u.get()
+
+
         kwargs: dict = json.loads(request.body)
         if kwargs.keys() != {'rid'}:
             return 1, False
@@ -297,6 +299,8 @@ class ForumTop(View):
             content = Content.objects.get(id=int(kwargs['rid']))
         except:
             return 2, False
+        if u.identity == 1 and content.user != u:
+            return 403, False
         content.is_top = not content.is_top
         content.save()
         return 0, content.is_top
