@@ -504,16 +504,6 @@ from analysis.views import get_country_info
 class AIQA(View):
     # todo: 加政策、新闻、国内疫情
     # todo: 给一个官方的介绍在最开始（林肯定喜欢）
-    # todo: [
-    #     '我能问你什么',
-    #     '你能回答什么',
-    #     '你知道什么',
-    #     '你都知道什么',
-    #     '你都知道些什么',
-    #     '什么都能问',
-    #     '想问什么问什么',
-    #     '我怎样问',
-    # ]
     @JSR('status', 'list', 'session_key', 'emotion')
     def post(self, request):
         d = json.loads(request.body)
@@ -524,8 +514,21 @@ class AIQA(View):
             time.sleep(0.5)
             return 0, [greet_based_on_time(), add_tail(rand_greet(), q=True)], '', 1
         
-        query = del_stop_words(query)
         
+        # for s in [
+        #     '我能问你什么',
+        #     '你能回答什么',
+        #     '你知道什么',
+        #     '你都知道什么',
+        #     '你都知道些什么',
+        #     '什么都能问',
+        #     '想问什么问什么',
+        #     '我怎样问',
+        #     '帮助',
+        #     'help',
+        # ]:
+        #     if s in query:
+            
         for k in tricky_keys:
             if k in query:
                 time.sleep(0.5)
@@ -537,7 +540,6 @@ class AIQA(View):
                     return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_juan_sent(), q=False) + rand_end_face()], '', -1
                 else:
                     return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_juan_sent(), q=False), rand_end_face()], '', -1
-                    
         for k in dev_keys:
             if k in query:
                 time.sleep(0.5)
@@ -545,6 +547,8 @@ class AIQA(View):
                     return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_dev_sent(), q=False) + rand_end_face()], '', -1
                 else:
                     return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_dev_sent(), q=False), rand_end_face()], '', -1
+
+        query = del_stop_words(query)
         
         countries = [c for c in country_dict.values() if c in query]
         if len(countries) > 0:
