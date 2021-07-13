@@ -50,6 +50,11 @@ def get_train_dept_and_arri_info_res(train: Train):
         hours, minutes = 0, 0
     st_t = datetime.datetime.strptime(datetime.date.today().strftime('%Y-%m-%d ') + train.dept_time, '%Y-%m-%d %H:%M')
     ed_t = st_t + datetime.timedelta(hours=hours, minutes=minutes)
+    total_risk_level = 0
+    count = train.schedule_station.count()
+    for a in MidStation.objects.filter(train=train):
+        risk_level = get_city_risk_level(a.station.city_name)
+        total_risk_level += float(risk_level) / count
     res = {
         'start': {
             'station_name': train.dept_station.name_ch,
