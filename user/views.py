@@ -283,7 +283,7 @@ class FollowNew(View):
             uid = int(request.session.get('uid', None))
             user = User.objects.get(id=uid)
         except:
-            return 1, '', '', 1, '',
+            return 2,
         kwargs: dict = json.loads(request.body)
         if not {'level', 'mail', 'is_new'}.issubset(kwargs.keys()):
             return 1
@@ -292,7 +292,7 @@ class FollowNew(View):
             mail = bool(kwargs['mail'])
             is_new = bool(kwargs['is_new'])
         except:
-            return -1
+            return 1
 
         if level == 1:
             if not {'country'}.issubset(kwargs.keys()):
@@ -351,7 +351,7 @@ class FollowData(View):
             uid = int(request.session.get('uid', None))
             user = User.objects.get(id=uid)
         except:
-            return 1, '', '', 1, '',
+            return 2, {}
         follow_set = Follow.objects.filter(user=user)
         return 0, get_follow_data(follow_set)
 
@@ -405,7 +405,7 @@ class FollowSetMail(View):
             uid = int(request.session.get('uid', None))
             user = User.objects.get(id=uid)
         except:
-            return 1, '', '', 1, '',
+            return 2,
         kwargs: dict = json.loads(request.body)
         if not {'mail'}.issubset(kwargs.keys()):
             return 1
