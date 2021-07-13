@@ -10,12 +10,14 @@ import xml.dom.minidom
 import requests
 
 from meta_config import SPIDER_DATA_DIRNAME
+from utils.dict_ch import district_dict
 
 
 def get_input_options():
     res = {}
-    with open(os.path.join('spiders', 'travel_policy_cities.json'), 'r', encoding='utf-8') as fp:
-        js = json.load(fp)
+    # with open(os.path.join('spiders', 'travel_policy_cities.json'), 'r', encoding='utf-8') as fp:
+    #     js = json.load(fp)
+    js = json.loads(requests.get('http://wx.wind.com.cn/alert/traffic/getProvince').content)
     for i in range(len(js['data'])):
         if js['data'][i]['province'] not in res.keys():
             res[js['data'][i]['province']] = []
@@ -53,6 +55,11 @@ def main():
             response = requests.get(get_url, headers={'Content-Type': 'application/json'}, timeout=10)
             js = json.loads(response.text)
             if js['success']:
+                cities = district_dict[js['data']['province']].keys()
+                for a in cities:
+                    if js['data']['city'] in a:
+                        js['data']['city'] = a
+                        break
                 with open(output_json_fname, 'a', encoding='utf-8') as fp:
                     fp.write(json.dumps({
                         'province': js['data']['province'],
