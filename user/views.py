@@ -564,7 +564,7 @@ class AIQA(View):
             ]) + rand_end_punc()
             responses = [first_res]
             for c in countries:
-                responses.append(c + '的情况是' + rand_sep_punc() + get_country_info(c) + rand_end_punc() + rand_end_face())
+                responses.append(c + '的情况是' + rand_sep_punc() + get_country_info(c) + rand_end_punc())
             if len(countries) >= 3:
                 emotion = -1
                 responses.append(rand_beg_word() + rand_sep_punc() + random.choice([
