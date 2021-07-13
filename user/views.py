@@ -442,7 +442,7 @@ class FollowProvince(View):
             user = User.objects.get(id=uid)
         except:
             return 8
-        res = []
+        res = {}
         follow_set = [a.province for a in Follow.objects.filter(user=user, level=2)]
         for a in province_dict_ch.keys():
             res[a] = int(a in follow_set)
@@ -458,7 +458,7 @@ class FollowCountry(View):
             user = User.objects.get(id=uid)
         except:
             return 8
-        res = []
+        res = {}
         follow_set = [a.country for a in Follow.objects.filter(user=user, level=1)]
         for a in country_dict.values():
             res[a] = int(a in follow_set)
@@ -478,7 +478,7 @@ class FollowCity(View):
             province = json.loads(request.body)['province']
         except:
             return 1
-        res = []
+        res = {}
         follow_set = [a.city for a in Follow.objects.filter(user=user, level=3, province=province)]
         for a in district_dict[province].keys():
             res[a] = int(a in follow_set)
