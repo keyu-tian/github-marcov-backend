@@ -297,9 +297,9 @@ class FollowNew(View):
         if level == 1:
             if not {'country'}.issubset(kwargs.keys()):
                 return 1
-            total_data = HistoryEpidemicData.objects.filter(country_ch__icontains=kwargs['country'])
-            if total_data.count() == 0:
-                return 7
+            # total_data = HistoryEpidemicData.objects.filter(country_ch__icontains=kwargs['country'])
+            # if total_data.count() == 0:
+            #     return 7
             if is_new:
                 fo, flag = Follow.objects.get_or_create(user=user, level=1, country=kwargs['country'])
                 if not flag:
@@ -312,9 +312,9 @@ class FollowNew(View):
         elif level == 2:
             if not {'province'}.issubset(kwargs.keys()):
                 return 1
-            total_data = HistoryEpidemicData.objects.filter(province_ch__icontains=kwargs['province'])
-            if total_data.count() == 0:
-                return 7
+            # total_data = HistoryEpidemicData.objects.filter(province_ch__icontains=kwargs['province'])
+            # if total_data.count() == 0:
+            #     return 7
             if is_new:
                 fo, flag = Follow.objects.get_or_create(user=user, level=2, province=kwargs['province'])
                 if not flag:
