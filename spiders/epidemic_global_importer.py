@@ -183,6 +183,7 @@ def epidemic_global_import(start_dt=None):
     )
 
     true_data = {}
+    today_data = {}
     while start_dt <= datetime.datetime.now().strftime("%Y-%m-%d"):
         bar.set_description('[parsing]')
         bar.update(1)
@@ -194,6 +195,10 @@ def epidemic_global_import(start_dt=None):
                 # 做一个真实数据，为预测做准备
                 if start_dt == dt_delta(datetime.datetime.now().strftime("%Y-%m-%d"), -1):
                     true_data[i["country_info"]["name"]] = i["country_info"]["total"]
+                    true_data[i["country_info"]["name"]]["new_confirmed"] = i["country_info"]["new"]["confirmed"]
+                    true_data[i["country_info"]["name"]]["new_cured"] = i["country_info"]["new"]["cured"]
+                    true_data[i["country_info"]["name"]]["new_died"] = i["country_info"]["new"]["died"]
+
         dataout.append({
             "date": start_dt,
             "countries": countries
