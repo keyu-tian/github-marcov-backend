@@ -200,7 +200,7 @@ def get_country_info(country):
         with open(os.path.join(SPIDER_DATA_DIRNAME, "true_data.json"), "r", encoding="utf-8") as f:
             data = json.load(f)
             date = datetime.date.today() + datetime.timedelta(-1)
-            msg = "截至%s年%s月%s日，%s现有确诊%s人、治愈%s人、死亡%s人，较前一日新增确诊%s人、新增治愈%s人，新增死亡%s人" \
+            msg = "截至%s年%s月%s日，%s现有确诊%s人、治愈%s人、死亡%s人，较前一日新增确诊%s人、新增治愈%s人、新增死亡%s人" \
                   % (str(date.year), str(date.month), str(date.day),
                      country,
                      data[country]["confirmed"],
