@@ -36,6 +36,7 @@ urlpatterns = [
     path('time', TimeInfo.as_view()),
 
     # ======== 二、地图分析 ========
+    path('map/risk', MapRisk.as_view()),
     path('map/province', MapProvince.as_view()),
     path('map/today/province', MapTodayProvince.as_view()),
     path('map/city', MapCity.as_view()),
