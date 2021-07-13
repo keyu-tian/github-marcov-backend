@@ -499,7 +499,10 @@ class FollowCity(View):
 from utils.country_dict import country_dict
 from analysis.views import get_country_info
 
+
 class AIQA(View):
+    # todo: 加政策、新闻、国内疫情
+    # todo: 给一个官方的介绍在最开始（林肯定喜欢）
     @JSR('status', 'list', 'session_key', 'emotion')
     def post(self, request):
         d = json.loads(request.body)
@@ -556,7 +559,7 @@ class AIQA(View):
             new_session_key, ai_response = chat_query(query, session_key)
             if new_session_key == '':
                 print(colorama.Fore.WHITE + f'====> [ai bug] <====: {ai_response}')
-                return 0, [add_tail(rand_no_idea_sent(), q=True)], '', 0
+                return 0, [add_tail(rand_no_idea_sent(), q=True)], '', random.choices([0, 1, -1], weights=[0.2, 0.2, 0.1], k=1)[0]
         except IndexError:
             res = rand_beg_word() + rand_sep_punc() + random.choice([
                 '您说的太快辣',
@@ -566,7 +569,7 @@ class AIQA(View):
             ]) + rand_end_face()
             return 0, [res], '', -1
 
-        emotion = 0
+        emotion = random.choices([0, 1, -1], weights=[0.3, 0.3, 0.1], k=1)[0]
         for x in {'开心', '欢乐', '耶', '好哦', '哈', '嘿', '笑'}:
             if x in ai_response:
                 emotion = 1

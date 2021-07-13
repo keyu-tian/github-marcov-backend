@@ -41,9 +41,10 @@ def greet_based_on_time():
 
 
 def del_stop_words(s: str):
+    rs = str(s)
     s = ' '.join(map(str.strip, s.split())).strip('，').strip('。')
     s = ''.join(ch for ch in s if ch not in {
-        '啊', '哦', '呢', '嗯', '恩', '咦', '呗', '唉', '哎', '呵', '呀', '哇', '呃', '咚', '之', '哉', '吧', '哈', '哒',
+        '啊', '哦', '呢', '嗯', '恩', '咦', '呗', '唉', '哎', '呵', '呀', '哇', '呃', '咚', '之', '哉', '吧', '哒',
         '；', ';', '“', '”', '"', '\'',
         '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+', '=', '\\', '/', '|', '`', '~',
     })
@@ -71,6 +72,9 @@ def del_stop_words(s: str):
             ch = random.choice(['你', '你', '您'])
         res.append(ch)
     s = ''.join(res)
+    
+    if len(s) == 0:
+        s = rs
     
     return s
 
