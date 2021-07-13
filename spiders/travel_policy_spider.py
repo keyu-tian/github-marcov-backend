@@ -61,13 +61,14 @@ def main():
                     if js['data']['city'] in a:
                         js['data']['city'] = a
                         break
-                with open(os.path.join(SPIDER_DATA_DIRNAME, 'travel_policy_spider_all', 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
+                with open(os.path.join(SPIDER_DATA_DIRNAME, 'travel_policy_spider_all', 'policy_by_city.json'), 'a+', encoding='utf-8') as fp:
                     fp.write(json.dumps({
                         'province': js['data']['province'],
                         'city': js['data']['city'],
                         'enter_policy': js['data']['enterPolicy'],
                         'out_policy': js['data']['outPolicy'],
                     }) + '\n')
+                    fp.close()
     bar.close()
 
 
