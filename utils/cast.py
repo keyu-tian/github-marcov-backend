@@ -61,7 +61,6 @@ def gd_address_to_jingwei_and_province_city(address):
         ret = __gd_address_to_jingwei_and_province_city(address[:-1] + "火车站")
         if ret is not None:
             return ret
-    # todo: 在这个list里填百度查的准的
     if address not in baidu_station:
         for x in [
             address + '',
@@ -74,6 +73,8 @@ def gd_address_to_jingwei_and_province_city(address):
             ret = __gd_address_to_jingwei_and_province_city(x)
             if ret is not None:
                 return ret
+    if address == '金普站':
+        address = '辽宁省金普站'
     jingdu, weidu = address_to_jingwei(address)
     if jingdu == 0 and weidu == 0:
         return None
