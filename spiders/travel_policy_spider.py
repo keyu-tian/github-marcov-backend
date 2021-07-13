@@ -41,7 +41,7 @@ def main():
     "province":"辽宁",
     "city":"朝阳","param1":    {"success":false,"code":2,"msg":"没有查询的城市","data":null}
     '''
-    output_json_fname = os.path.join(path, 'policy_by_city.json')
+    output_json_fname = os.path.join(SPIDER_DATA_DIRNAME, 'travel_policy_spider_all', 'policy_by_city.json')
     if os.path.exists(output_json_fname):
         os.remove(output_json_fname)
     
