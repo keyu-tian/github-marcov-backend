@@ -209,7 +209,7 @@ class ChangeInfo(View):
         try:
             u.save()
         except:
-            return -1
+            return 101,  # 字段unique未满足
         return 0
 
 
@@ -297,32 +297,32 @@ class FollowNew(View):
         if level == 1:
             if not {'country'}.issubset(kwargs.keys()):
                 return 1
-            total_data = HistoryEpidemicData.objects.filter(country_ch__icontains=kwargs['country'])
-            if total_data.count() == 0:
-                return 7
+            # total_data = HistoryEpidemicData.objects.filter(country_ch__icontains=kwargs['country'])
+            # if total_data.count() == 0:
+            #     return 7
             if is_new:
                 fo, flag = Follow.objects.get_or_create(user=user, level=1, country=kwargs['country'])
                 if not flag:
-                    return 2
+                    return 12
             else:
                 fo = Follow.objects.filter(user=user, level=1, country=kwargs['country'])
                 if not fo.exists():
-                    return 3
+                    return 13
                 fo.delete()
         elif level == 2:
             if not {'province'}.issubset(kwargs.keys()):
                 return 1
-            total_data = HistoryEpidemicData.objects.filter(province_ch__icontains=kwargs['province'])
-            if total_data.count() == 0:
-                return 7
+            # total_data = HistoryEpidemicData.objects.filter(province_ch__icontains=kwargs['province'])
+            # if total_data.count() == 0:
+            #     return 7
             if is_new:
                 fo, flag = Follow.objects.get_or_create(user=user, level=2, province=kwargs['province'])
                 if not flag:
-                    return 2
+                    return 12
             else:
                 fo = Follow.objects.filter(user=user, level=2, province=kwargs['province'])
                 if not fo.exists():
-                    return 3
+                    return 13
                 fo.delete()
         elif level == 3:
             if not {'province', 'city'}.issubset(kwargs.keys()):
@@ -331,11 +331,11 @@ class FollowNew(View):
                 fo, flag = Follow.objects.get_or_create(user=user, level=3, province=kwargs['province'],
                                                         city=kwargs['city'])
                 if not flag:
-                    return 2
+                    return 12
             else:
                 fo = Follow.objects.filter(user=user, level=3, province=kwargs['province'], city=kwargs['city'])
                 if not fo.exists():
-                    return 3
+                    return 13
                 fo.delete()
         else:
             return 1
@@ -417,9 +417,9 @@ class FollowSetMail(View):
             return 1
 
         if user.is_mail is True and mail == 1:
-            return 2
+            return 12
         elif user.is_mail is False and mail == 0:
-            return 3
+            return 13
         user.is_mail = True if mail == 1 else False
         user.save()
         return user
@@ -442,7 +442,7 @@ class FollowProvince(View):
             user = User.objects.get(id=uid)
         except:
             return 8
-        res = []
+        res = {}
         follow_set = [a.province for a in Follow.objects.filter(user=user, level=2)]
         for a in province_dict_ch.keys():
             res[a] = int(a in follow_set)
@@ -458,7 +458,7 @@ class FollowCountry(View):
             user = User.objects.get(id=uid)
         except:
             return 8
-        res = []
+        res = {}
         follow_set = [a.country for a in Follow.objects.filter(user=user, level=1)]
         for a in country_dict.values():
             res[a] = int(a in follow_set)
@@ -478,7 +478,7 @@ class FollowCity(View):
             province = json.loads(request.body)['province']
         except:
             return 1
-        res = []
+        res = {}
         follow_set = [a.city for a in Follow.objects.filter(user=user, level=3, province=province)]
         for a in district_dict[province].keys():
             res[a] = int(a in follow_set)
