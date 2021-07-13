@@ -96,20 +96,23 @@ def test_data_import():
     #     u = User.objects.create(name=f'test{i}', account=f'account{i}', pwd=f'password{i}', identity=2, login_date='')
     #     users.append(u)
     for i in range(len(expert_name)):
-        u = User.objects.create(name=f'{expert_name[i]}', account=f'{expert_name[i]}123', pwd=f'{expert_name[i]}123', identity=2, login_date='')
+        try:
+            u = User.objects.get(name=f'{expert_name[i]}', account=f'{expert_name[i]}123', pwd=f'{expert_name[i]}123', identity=2)
+        except:
+            u = User.objects.create(name=f'{expert_name[i]}', account=f'{expert_name[i]}123', pwd=f'{expert_name[i]}123', identity=2)
         users.append(u)
     questions = []
     question_num = Question.objects.all().count()
     for i in range(1+question_num, 11+question_num):
-        q = Question.objects.create(title=f'question{i}', user=users[random.randint(0, 19)], published_time=datetime.now(), solved=random.randint(1, 10) > 8)
-        Content.objects.create(user=q.user, published_time=datetime.now(), content=rand_content(), floor=1, questions=q, is_top=random.randint(1, 100) > 90)
+        q = Question.objects.create(title=f'question{i}', user=users[random.randint(0, len(expert_name)-1)], published_time=datetime.now(), solved=random.randint(1, 10) > 8)
+        Content.objects.create(user=q.user, published_time=datetime.now(), content=rand_content(), floor=1, question=q, is_top=random.randint(1, 100) > 90)
         questions.append(q)
         if random.randint(0, 1) == 1:
             Tag.objects.create(question=q, name='tips')
         if random.randint(0, 1) == 1:
             Tag.objects.create(question=q, name='fake')
     for i in range(1, 100):
-        c = Content.objects.create(user=users[random.randint(0, 19)], content=rand_content(), floor=0, published_time=datetime.now(), question=questions[random.randint(0, 9)], is_top=random.randint(1, 100) > 90)
+        c = Content.objects.create(user=users[random.randint(0, len(expert_name)-1)], content=rand_content(), floor=0, published_time=datetime.now(), question=questions[random.randint(0, 9)], is_top=random.randint(1, 100) > 90)
         c.question.replied_time = datetime.now()
         if c.user.identity == 2:
             c.question.expert_reply = True
