@@ -303,11 +303,11 @@ class FollowNew(View):
             if is_new:
                 fo, flag = Follow.objects.get_or_create(user=user, level=1, country=kwargs['country'])
                 if not flag:
-                    return 2
+                    return 12
             else:
                 fo = Follow.objects.filter(user=user, level=1, country=kwargs['country'])
                 if not fo.exists():
-                    return 3
+                    return 13
                 fo.delete()
         elif level == 2:
             if not {'province'}.issubset(kwargs.keys()):
@@ -318,11 +318,11 @@ class FollowNew(View):
             if is_new:
                 fo, flag = Follow.objects.get_or_create(user=user, level=2, province=kwargs['province'])
                 if not flag:
-                    return 2
+                    return 12
             else:
                 fo = Follow.objects.filter(user=user, level=2, province=kwargs['province'])
                 if not fo.exists():
-                    return 3
+                    return 13
                 fo.delete()
         elif level == 3:
             if not {'province', 'city'}.issubset(kwargs.keys()):
@@ -331,11 +331,11 @@ class FollowNew(View):
                 fo, flag = Follow.objects.get_or_create(user=user, level=3, province=kwargs['province'],
                                                         city=kwargs['city'])
                 if not flag:
-                    return 2
+                    return 12
             else:
                 fo = Follow.objects.filter(user=user, level=3, province=kwargs['province'], city=kwargs['city'])
                 if not fo.exists():
-                    return 3
+                    return 13
                 fo.delete()
         else:
             return 1
@@ -417,9 +417,9 @@ class FollowSetMail(View):
             return 1
 
         if user.is_mail is True and mail == 1:
-            return 2
+            return 12
         elif user.is_mail is False and mail == 0:
-            return 3
+            return 13
         user.is_mail = True if mail == 1 else False
         user.save()
         return user
