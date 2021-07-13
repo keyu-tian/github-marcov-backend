@@ -34,8 +34,10 @@ def get_train_info_res(train: Train):
         msg = '当前线路存在较大疫情风险，请谨慎考虑出行。'
     elif math.ceil(total_risk_level) >= 3:
         msg = '当前线路存在疫情风险，请做好防护，谨慎出行。'
+    elif math.ceil(total_risk_level) >= 1:
+        msg = '当前线路疫情风险较低，请注意做好防护。'
     else:
-        msg = '当前线路无疫情风险，请放心出行。'
+        msg = '当前线路无疫情风险，请做好防护，放心出行。'
     res['info'] = {
         'level': math.ceil(total_risk_level) if math.ceil(total_risk_level) <= 5 else 5,
         'msg': msg,
