@@ -209,7 +209,7 @@ class ChangeInfo(View):
         try:
             u.save()
         except:
-            return -1
+            return 101,  # 字段unique未满足
         return 0
 
 
