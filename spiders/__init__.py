@@ -67,20 +67,20 @@ def init_import():
     # print("!!!危，暂时注释掉了非火车的import！！！")
     print('\n' + colorama.Fore.WHITE + '=> `init_import` started ...')
 
-    re_import('risk', True)
-    re_import('news', True, delete_old_data=True)
-    re_import('dxy_news', False, delete_old_data=False)  # 不launch是因为 dxy_news 没有 spider，只有 importer
-    re_import('yaoyan', True, line_start=0)
+    # re_import('risk', True)
+    # re_import('news', True, delete_old_data=True)
+    # re_import('dxy_news', False, delete_old_data=False)  # 不launch是因为 dxy_news 没有 spider，只有 importer
+    # re_import('yaoyan', True, line_start=0)
     re_import('travel_policy', True, line_start=0)
-    re_import('train', False, line_start=0)  # 不launch是因为 train 的 spider 太慢（超过6h）
-    from spiders.station_exporter import station_export
-    station_export()  # 输出一个文件，给前端
-    daily_import()
-    re_import('epidemic_global', False)  # 不launch是因为 epidemic_global 没有 spider，只有 importer
-    re_import('epidemic_global_predict', False)
-    re_import('flight_once', False)  # 不launch是因为 flight_once 的 spider 太慢（超过2h），而且需要 chromedrive.exe
-    re_import('small_knowledge', False, line_start=0)   # 小知识没有spider，只有importer
-    re_import('government_news', False)     # win爬
+    # re_import('train', False, line_start=0)  # 不launch是因为 train 的 spider 太慢（超过6h）
+    # from spiders.station_exporter import station_export
+    # station_export()  # 输出一个文件，给前端
+    # daily_import()
+    # re_import('epidemic_global', False)  # 不launch是因为 epidemic_global 没有 spider，只有 importer
+    # re_import('epidemic_global_predict', False)
+    # re_import('flight_once', False)  # 不launch是因为 flight_once 的 spider 太慢（超过2h），而且需要 chromedrive.exe
+    # re_import('small_knowledge', False, line_start=0)   # 小知识没有spider，只有importer
+    # re_import('government_news', False)     # win爬SPIDER_DATA_DIRNAME, 'travel_policy_spider_all'
 
     print('\n' + colorama.Fore.WHITE + '=> `init_import` finished.')
 

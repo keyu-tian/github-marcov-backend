@@ -16,6 +16,17 @@ import os
 from meta_config import SPIDER_DATA_DIRNAME
 
 
+class MapRisk(View):
+    @JSR('status', 'level')
+    def get(self, request):
+        try:
+            name = str(request.GET.get('name'))
+        except:
+            return 1
+
+        return 0, -get_city_risk_level(name)
+
+
 def get_is_star(request, level, country='', province='', city=''):
     try:
         uid = int(request.session.get('uid', None))

@@ -19,9 +19,10 @@ def get_input_options():
     #     js = json.load(fp)
     js = json.loads(requests.get('http://wx.wind.com.cn/alert/traffic/getProvince').content)
     for i in range(len(js['data'])):
-        if js['data'][i]['province'] not in res.keys():
-            res[js['data'][i]['province']] = []
-        res[js['data'][i]['province']].append([js['data'][i]['city']])
+        if js['data'][i]['value'] not in res.keys():
+            res[js['data'][i]['value']] = []
+        for j in range(len(js['data'][i]['children'])):
+            res[js['data'][i]['value']].append(js['data'][i]['children'][j]['value'])
     return res
 
 
@@ -40,7 +41,7 @@ def main():
     "province":"辽宁",
     "city":"朝阳","param1":    {"success":false,"code":2,"msg":"没有查询的城市","data":null}
     '''
-    output_json_fname = os.path.join(path, 'policy_by_city.json')
+    output_json_fname = os.path.join(SPIDER_DATA_DIRNAME, 'travel_policy_spider_all', 'policy_by_city.json')
     if os.path.exists(output_json_fname):
         os.remove(output_json_fname)
     
@@ -51,7 +52,7 @@ def main():
         bar.set_description(f'[line{i}]')
         city_list = res.get(list(res.keys())[i])
         for j in range(len(city_list)):
-            get_url = url + city_list[j][0]
+            get_url = url + city_list[j]
             response = requests.get(get_url, headers={'Content-Type': 'application/json'}, timeout=10)
             js = json.loads(response.text)
             if js['success']:
@@ -60,7 +61,7 @@ def main():
                     if js['data']['city'] in a:
                         js['data']['city'] = a
                         break
-                with open(output_json_fname, 'a', encoding='utf-8') as fp:
+                with open(os.path.join(SPIDER_DATA_DIRNAME, 'travel_policy_spider_all', 'policy_by_city.json'), 'a', encoding='utf-8') as fp:
                     fp.write(json.dumps({
                         'province': js['data']['province'],
                         'city': js['data']['city'],
