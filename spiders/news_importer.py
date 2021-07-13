@@ -24,7 +24,6 @@ def news_import(delete_old_data):
             'img': item['img'],
             'url': item['url'],
             'media': item['media_name'],
-            'context': item['context'],
             'category_cn': item['category_cn'],
             'sub_category_cn': item['sub_category_cn'],
         }
@@ -32,6 +31,7 @@ def news_import(delete_old_data):
             kw['publish_time'] = datetime.strptime(item['publish_time'][:10], '%Y-%m-%d').date()
         except:
             pass
-        objs.append(News(**kw))
+        News.objects.get_or_create(context=item['context'], defaults=kw)
+        # objs.append(News(**kw))
     bar.close()
-    News.objects.bulk_create(objs, batch_size=BULK_CREATE_BATCH_SIZE)
+    # News.objects.bulk_create(objs, batch_size=BULK_CREATE_BATCH_SIZE)
