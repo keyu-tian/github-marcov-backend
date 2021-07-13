@@ -552,10 +552,19 @@ class AIQA(View):
             
             return 0, responses, '', emotion
 
-        new_session_key, ai_response = chat_query(query, session_key)
-        if new_session_key == '':
-            print(colorama.Fore.WHITE + f'====> [ai bug] <====: {ai_response}')
-            return 0, [add_tail(rand_no_idea_sent(), q=True)], '', 0
+        try:
+            new_session_key, ai_response = chat_query(query, session_key)
+            if new_session_key == '':
+                print(colorama.Fore.WHITE + f'====> [ai bug] <====: {ai_response}')
+                return 0, [add_tail(rand_no_idea_sent(), q=True)], '', 0
+        except IndexError:
+            res = rand_beg_word() + rand_sep_punc() + random.choice([
+                '您说的太快辣',
+                '您说的太快辣，我都跟不上您了',
+                '您说话慢点',
+                '您说话慢点，别咬着舌头',
+            ]) + rand_end_face()
+            return 0, [res], '', -1
 
         emotion = 0
         for x in {'开心', '欢乐', '耶', '好哦', '哈', '嘿', '笑'}:
