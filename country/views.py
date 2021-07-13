@@ -24,7 +24,7 @@ class TravelPolicy(View):
             return 0, po.enter_policy, po.out_policy
 
         po_set: QuerySet = Policy.objects.filter(province_name=key)
-        if po_set.count() > 1:
+        if po_set.count() >= 1:
             po_set = po_set.filter(city_name=province_capital_city[key])
         elif po_set.count() == 0:
             return 7, '', ''
