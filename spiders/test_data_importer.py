@@ -88,6 +88,7 @@ def test_data_import():
     question_num = Question.objects.all().count()
     for i in range(1+question_num, 11+question_num):
         q = Question.objects.create(title=f'question{i}', user=users[random.randint(0, 19)], published_time=datetime.now(), solved=random.randint(1, 10) > 8)
+        Content.objects.create(user=q.user, published_time=datetime.now(), content=rand_content(), floor=1, questions=q, is_top=random.randint(1, 100) > 90)
         questions.append(q)
         if random.randint(0, 1) == 1:
             Tag.objects.create(question=q, name='tips')
@@ -102,5 +103,5 @@ def test_data_import():
         all_contents = c.question.question_all_content.all()
         c.floor = all_contents.count()
         if random.randint(0, 1):
-            c.replied_content_id = all_contents[random.randint(0, all_contents.count()-1)]
+            c.replied_content_id = all_contents[random.randint(0, all_contents.count()-2)]
         c.save()
