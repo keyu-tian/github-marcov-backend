@@ -60,7 +60,7 @@ def get_train_dept_and_arri_info_res(train: Train):
             'station_name': train.dept_station.name_ch,
             'city_name': train.dept_station.city_name,
             'country_name': "中国",
-            'risk': get_city_risk_level(train.dept_station.city_name),
+            'risk': math.ceil(total_risk_level) if math.ceil(total_risk_level) <= 5 else 5,
             'datetime': st_t.strftime('%Y-%m-%d %H:%M'),
         },
         'end': {
