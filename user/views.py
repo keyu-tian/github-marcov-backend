@@ -523,11 +523,18 @@ class AIQA(View):
         for k in juan_keys:
             if k in query:
                 time.sleep(0.5)
-                return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_juan_sent(), q=False) + rand_end_face()], '', -1
+                if random.randrange(2):
+                    return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_juan_sent(), q=False), rand_end_face()], '', -1
+                else:
+                    return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_juan_sent(), q=False) + rand_end_face()], '', -1
+                    
         for k in dev_keys:
             if k in query:
                 time.sleep(0.5)
-                return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_dev_sent(), q=False) + rand_end_face()], '', -1
+                if random.randrange(2):
+                    return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_dev_sent(), q=False), rand_end_face()], '', -1
+                else:
+                    return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_dev_sent(), q=False) + rand_end_face()], '', -1
         
         countries = [c for c in country_dict.values() if c in query]
         if len(countries) > 0:
@@ -585,5 +592,8 @@ class AIQA(View):
             if x in ai_response:
                 emotion = -1
         ai_response = add_tail(ai_response, q=False)
-        return 0, [rand_beg_word() + rand_sep_punc() + ai_response + rand_end_face()], new_session_key, emotion
+        if random.randrange(2):
+            return 0, [rand_beg_word() + rand_sep_punc() + ai_response + rand_end_face()], new_session_key, emotion
+        else:
+            return 0, [rand_beg_word() + rand_sep_punc() + ai_response, rand_end_face()], new_session_key, emotion
 
