@@ -513,10 +513,10 @@ class AIQA(View):
         
         for k in tricky_keys:
             if k in query:
-                return 0, [add_tail(rand_tricky_sent(), q=False)], '', -2
+                return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_tricky_sent(), q=False)], '', -2
         for k in juan_keys:
             if k in query:
-                return 0, [add_tail(rand_juan_sent(), q=False)], '', -1
+                return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_juan_sent(), q=False)], '', -1
             
         countries = [c for c in country_dict.values() if c in query]
         if len(countries) > 0:
@@ -539,7 +539,7 @@ class AIQA(View):
                 responses.append(c + '的情况是' + rand_sep_punc() + get_country_info(c) + rand_end_punc() + rand_end_face())
             if len(countries) >= 3:
                 emotion = -1
-                responses.append(random.choice([
+                responses.append(rand_beg_word() + rand_sep_punc() + random.choice([
                     '都给您查完了，客官还满意吗？',
                     '（呼，一口气给亲查了这么多',
                     '亲您问的可真多（小声bb），都给您查完了，您给小嘤点个赞呗~' if CHAT_DEBUG else '都给您查完了，您给小嘤点个赞呗~',
@@ -564,5 +564,5 @@ class AIQA(View):
         for x in {'伤心', '生气', '哼', '呜', '哭'}:
             if x in ai_response:
                 emotion = -1
-        return 0, [ai_response + random.choice([rand_end_face(), rand_end_punc()])], new_session_key, emotion
+        return 0, [rand_beg_word() + rand_sep_punc() + ai_response + random.choice([rand_end_face(), rand_end_punc()])], new_session_key, emotion
 
