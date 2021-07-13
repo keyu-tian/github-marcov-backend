@@ -10,8 +10,8 @@ endswith_ch_punc = lambda s: s[-1] in {'?', '？', '¿', '!', '！', '。', '.',
 
 
 def greet_based_on_time():
-    h = datetime.datetime.now().hour
-    if 0 <= h <= 6:
+    h = datetime.datetime.now().hour + datetime.datetime.now().minute / 60
+    if 0 <= h <= 5.5:
         return random.choice([
             '夜猫子，晚上好！',
             '还在肝呢？晚上好！',
@@ -19,7 +19,7 @@ def greet_based_on_time():
             '哥，DDL赶完了吗就逛网站！',
             '哥，别肝了！',
         ])
-    if h <= 11:
+    if h <= 11.5:
         return random.choice(['早上好', '早安']) + random.choice(['~ ', '，']) + random.choice([
             '早起的鸟儿有虫吃！',
             '一日之计在于晨！',
