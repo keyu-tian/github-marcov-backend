@@ -203,10 +203,10 @@ def get_country_info(country):
             msg = "截至%s年%s月%s日，%s现有确诊%s人、治愈%s人、死亡%s人，较前一日新增确诊%s人、新增治愈%s人，新增死亡%s人" \
                   % (str(date.year), str(date.month), str(date.day),
                      country,
-                     data[country]["total"]["confirmed"],
-                     data[country]["total"]["cured"],
-                     data[country]["total"]["died"],
-                     data[country]["new"]["confirmed"],
-                     data[country]["new"]["cured"],
-                     data[country]["new"]["died"],)
+                     data[country]["confirmed"],
+                     data[country]["cured"],
+                     data[country]["died"],
+                     data[country]["new_confirmed"],
+                     data[country]["new_cured"],
+                     data[country]["new_died"],)
             return msg
