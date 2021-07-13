@@ -50,6 +50,10 @@ class Register(View):
         vc = vc.get()
         kwargs.pop('ver')
 
+        u_name_set = [a.name for a in User.objects.all()]
+        if kwargs['name'] in u_name_set:
+            return 101,
+
         if datetime.now() < vc.expire_time:
             try:
                 u = User.objects.create(**kwargs)
