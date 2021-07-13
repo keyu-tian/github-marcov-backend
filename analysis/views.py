@@ -202,7 +202,7 @@ def get_country_info(country):
             date = datetime.date.today() + datetime.timedelta(-1)
             msg = "截至%s年%s月%s日，%s现有确诊%s人、治愈%s人、死亡%s人，较前一日新增确诊%s人、新增治愈%s人，新增死亡%s人" \
                   % (str(date.year), str(date.month), str(date.day),
-                     data[country]["name"],
+                     country,
                      data[country]["total"]["confirmed"],
                      data[country]["total"]["cured"],
                      data[country]["total"]["died"],
