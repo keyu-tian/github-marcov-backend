@@ -38,6 +38,7 @@ class ForumList(View):
 
         total = len(all_question)
         question_list = []
+        all_question.sort(key=lambda x: x.published_time, reverse=True)
         for question in all_question[(page - 1) * each: page * each]:
             publish_user = question.user
             user = {
