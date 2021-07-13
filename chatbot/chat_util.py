@@ -154,6 +154,22 @@ _rich_juan_sent = OrderedDict({
     '卷卷有爷名': 1,
     '三椽函宇宙，一卷肇乾坤': 1,
 })
+# 大部分陈述
+_rich_dev_sent = OrderedDict({
+    '您搁着 de de-bug 呢？': 1,
+    '您搁着写 bug 呢？': 1,
+    '你 用 户 故 事 格 式 写 错 了': 1,
+    '你测试用例格式写错了': 1,
+    'git push --force，我可会了': 1,
+    'git push --force，嘻嘻嘻~': 1,
+    'git push --force，嘿嘿嘿~': 1,
+    '代码审查过了吗': 1,
+    '你站会不会迟到了吧': 1,
+    '刚签到了，你去上厕所了？': 1,
+    '你 情 绪 图 没 填': 1,
+    '你 情 绪 图 没 填 啊': 1,
+    '摸🐟子不🐟鱼': 1,
+})
 # 大部分疑问
 _rich_greet = OrderedDict({
     '请问有什么问题吗': 1,
@@ -194,6 +210,7 @@ random.seed(time() * 10)
 
 __clean_up = lambda od: OrderedDict({k: v for k, v in od.items() if v >= 0.99})
 _simple_beg_word = __clean_up(_rich_beg_word)
+_simple_dev_sent = __clean_up(_rich_dev_sent)
 _simple_end_face = __clean_up(_rich_end_face)
 _simple_end_punc = __clean_up(_rich_end_punc)
 _simple_end_query = __clean_up(_rich_end_query)
@@ -206,6 +223,8 @@ _simple_tricky_sent = __clean_up(_rich_tricky_sent)
 
 rand_rich_beg_word = lambda: random.choices(list(_rich_beg_word.keys()), weights=list(_rich_beg_word.values()), k=1)[0]
 rand_simple_beg_word = lambda: random.choices(list(_simple_beg_word.keys()), weights=list(_simple_beg_word.values()), k=1)[0]
+rand_rich_dev_sent = lambda: random.choices(list(_rich_dev_sent.keys()), weights=list(_rich_dev_sent.values()), k=1)[0]
+rand_simple_dev_sent = lambda: random.choices(list(_simple_dev_sent.keys()), weights=list(_simple_dev_sent.values()), k=1)[0]
 rand_rich_end_face = lambda: random.choices(list(_rich_end_face.keys()), weights=list(_rich_end_face.values()), k=1)[0]
 rand_simple_end_face = lambda: random.choices(list(_simple_end_face.keys()), weights=list(_simple_end_face.values()), k=1)[0]
 rand_rich_end_punc = lambda: random.choices(list(_rich_end_punc.keys()), weights=list(_rich_end_punc.values()), k=1)[0]
@@ -226,6 +245,7 @@ rand_rich_tricky_sent = lambda: random.choices(list(_rich_tricky_sent.keys()), w
 rand_simple_tricky_sent = lambda: random.choices(list(_simple_tricky_sent.keys()), weights=list(_simple_tricky_sent.values()), k=1)[0]
 
 rand_beg_word = rand_rich_beg_word if CHAT_DEBUG else rand_simple_beg_word
+rand_dev_sent = rand_rich_dev_sent if CHAT_DEBUG else rand_simple_dev_sent
 rand_end_face = rand_rich_end_face if CHAT_DEBUG else rand_simple_end_face
 rand_end_punc = rand_rich_end_punc if CHAT_DEBUG else rand_simple_end_punc
 rand_end_query = rand_rich_end_query if CHAT_DEBUG else rand_simple_end_query
@@ -285,5 +305,22 @@ juan_keys = {
     '还卷',
     '在卷',
     '躺平',
+    '互评',
+    '权重',
+}
+
+dev_keys = {
+    'git',
+    'bug',
+    'Bug',
+    'BUG',
+    '用户故事',
+    '测试用例',
+    '站会',
+    '签到',
+    '情绪图',
+    '燃尽图',
+    '燃烬图',
+    '那个女人',
 }
 

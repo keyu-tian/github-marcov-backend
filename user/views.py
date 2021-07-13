@@ -14,7 +14,7 @@ from django.db.utils import IntegrityError, DataError
 from analysis.views import country_analyse_data_res
 from chatbot.chat_api import chat_query
 from chatbot.chat_util import greet_based_on_time, rand_greet, add_tail, del_stop_words, rand_beg_word, rand_sep_punc, join_rand_punc, rand_end_face, rand_end_punc, CHAT_DEBUG, tricky_keys, juan_keys, \
-    rand_tricky_sent, rand_juan_sent, rand_no_idea_sent, rand_end_query, endswith_ch_punc
+    rand_tricky_sent, rand_juan_sent, rand_no_idea_sent, rand_end_query, endswith_ch_punc, dev_keys, rand_dev_sent
 from epidemic.models import HistoryEpidemicData
 from epidemic.views import map_today_city_data_res
 from marcov19.settings import SERVER_HOST
@@ -523,8 +523,12 @@ class AIQA(View):
         for k in juan_keys:
             if k in query:
                 time.sleep(0.5)
-                return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_juan_sent(), q=False)], '', -1
-            
+                return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_juan_sent(), q=False) + rand_end_face()], '', -1
+        for k in dev_keys:
+            if k in query:
+                time.sleep(0.5)
+                return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_dev_sent(), q=False) + rand_end_face()], '', -1
+        
         countries = [c for c in country_dict.values() if c in query]
         if len(countries) > 0:
             first_res = join_rand_punc([
