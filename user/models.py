@@ -20,7 +20,7 @@ class User(models.Model):
     def get_all_admin():
         return User.objects.filter(Q(identity=3) | Q(identity=4))
 
-    name = models.CharField(verbose_name='姓名', max_length=32, unique=True)
+    name = models.CharField(verbose_name='姓名', max_length=32)
     account = models.CharField(verbose_name='邮箱', max_length=64, unique=True)
     pwd = models.CharField(verbose_name='密码', max_length=64)
     identity = models.IntegerField(verbose_name='身份', choices=IDENTITY_CHS, default=1)
