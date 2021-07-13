@@ -283,7 +283,7 @@ class FollowNew(View):
             uid = int(request.session.get('uid', None))
             user = User.objects.get(id=uid)
         except:
-            return 2,
+            return 8,
         kwargs: dict = json.loads(request.body)
         if not {'level', 'mail', 'is_new'}.issubset(kwargs.keys()):
             return 1
@@ -351,7 +351,7 @@ class FollowData(View):
             uid = int(request.session.get('uid', None))
             user = User.objects.get(id=uid)
         except:
-            return 2, {}
+            return 8, []
         follow_set = Follow.objects.filter(user=user)
         return 0, get_follow_data(follow_set)
 
@@ -405,7 +405,7 @@ class FollowSetMail(View):
             uid = int(request.session.get('uid', None))
             user = User.objects.get(id=uid)
         except:
-            return 2,
+            return 8,
         kwargs: dict = json.loads(request.body)
         if not {'mail'}.issubset(kwargs.keys()):
             return 1
@@ -441,7 +441,7 @@ class FollowProvince(View):
             uid = int(request.session.get('uid', None))
             user = User.objects.get(id=uid)
         except:
-            return 2
+            return 8
         res = []
         follow_set = [a.province for a in Follow.objects.filter(user=user, level=2)]
         for a in province_dict_ch.keys():
@@ -457,7 +457,7 @@ class FollowCountry(View):
             uid = int(request.session.get('uid', None))
             user = User.objects.get(id=uid)
         except:
-            return 2
+            return 8
         res = []
         follow_set = [a.country for a in Follow.objects.filter(user=user, level=1)]
         for a in country_dict.values():
@@ -473,7 +473,7 @@ class FollowCity(View):
             uid = int(request.session.get('uid', None))
             user = User.objects.get(id=uid)
         except:
-            return 2
+            return 8
         try:
             province = json.loads(request.body)['province']
         except:
