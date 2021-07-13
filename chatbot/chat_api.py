@@ -57,6 +57,7 @@ def chat_query(user_inp, session_id):
     for x in {
         '我会再学习更多疫情知识',
         '不知道应该怎么答复',
+        '不知道说什么了',
         '然后呢',
         '接着说',
         '请继续',

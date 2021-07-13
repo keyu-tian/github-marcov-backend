@@ -570,7 +570,7 @@ class AIQA(View):
         for x in {'开心', '欢乐', '耶', '好哦', '哈', '嘿', '笑'}:
             if x in ai_response:
                 emotion = 1
-        for x in {'伤心', '生气', '哼', '呜', '哭'}:
+        for x in {'伤心', '生气', '哼', '呜', '哭', '桑心', '文明用语'}:
             if x in ai_response:
                 emotion = -1
         return 0, [rand_beg_word() + rand_sep_punc() + ai_response + random.choice([rand_end_face(), rand_end_punc()])], new_session_key, emotion
