@@ -504,6 +504,13 @@ from analysis.views import get_country_info
 class AIQA(View):
     # todo: 加政策、新闻、国内疫情
     # todo: 给一个官方的介绍在最开始（林肯定喜欢）
+    # todo: [
+    #     '你知道什么',
+    #     '我能问你什么',
+    #     '你知道什么',
+    #     '我怎么问',
+    #     '我怎样问',
+    # ]
     @JSR('status', 'list', 'session_key', 'emotion')
     def post(self, request):
         d = json.loads(request.body)
@@ -523,18 +530,18 @@ class AIQA(View):
         for k in juan_keys:
             if k in query:
                 time.sleep(0.5)
-                if random.randrange(2):
-                    return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_juan_sent(), q=False), rand_end_face()], '', -1
-                else:
+                if random.randrange(4):
                     return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_juan_sent(), q=False) + rand_end_face()], '', -1
+                else:
+                    return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_juan_sent(), q=False), rand_end_face()], '', -1
                     
         for k in dev_keys:
             if k in query:
                 time.sleep(0.5)
-                if random.randrange(2):
-                    return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_dev_sent(), q=False), rand_end_face()], '', -1
-                else:
+                if random.randrange(4):
                     return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_dev_sent(), q=False) + rand_end_face()], '', -1
+                else:
+                    return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_dev_sent(), q=False), rand_end_face()], '', -1
         
         countries = [c for c in country_dict.values() if c in query]
         if len(countries) > 0:
@@ -592,7 +599,7 @@ class AIQA(View):
             if x in ai_response:
                 emotion = -1
         ai_response = add_tail(ai_response, q=False)
-        if random.randrange(2):
+        if random.randrange(4):
             return 0, [rand_beg_word() + rand_sep_punc() + ai_response + rand_end_face()], new_session_key, emotion
         else:
             return 0, [rand_beg_word() + rand_sep_punc() + ai_response, rand_end_face()], new_session_key, emotion
