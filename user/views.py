@@ -205,7 +205,9 @@ class ChangeInfo(View):
         if kwargs['avatar'] is not None and not CHECK_AVATAR(kwargs['avatar']):
             return 102,
         u.avatar = kwargs['avatar']
-
+        u_name_set = [a.name for a in User.objects.all()]
+        if kwargs['name'] in u_name_set:
+            return 101,
         try:
             u.save()
         except:
