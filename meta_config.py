@@ -1,7 +1,7 @@
 import re
 
-DEBUG = True
-CHAT_DEBUG = True
+DEBUG = False
+CHAT_DEBUG = False
 
 SPIDER_DATA_DIRNAME = 'spiders_data'
 BULK_CREATE_BATCH_SIZE = 4096
