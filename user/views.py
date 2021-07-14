@@ -15,13 +15,13 @@ from django.db.utils import IntegrityError, DataError
 from analysis.views import country_analyse_data_res
 from chatbot.chat_api import chat_query
 from chatbot.chat_util import greet_based_on_time, rand_greet, add_tail, del_stop_words, rand_beg_word, rand_sep_punc, join_rand_punc, rand_end_face, rand_end_punc, CHAT_DEBUG, tricky_keys, juan_keys, \
-    rand_tricky_sent, rand_juan_sent, rand_no_idea_sent, rand_end_query, endswith_ch_punc, dev_keys, rand_dev_sent
+    rand_tricky_sent, rand_juan_sent, rand_no_idea_sent, rand_end_query, endswith_ch_punc, dev_keys, rand_dev_sent, rand_end_word
 from epidemic.models import HistoryEpidemicData
 from epidemic.views import map_today_city_data_res
 from knowledge.models import EpidemicPolicy
 from marcov19.settings import SERVER_HOST
 from meta_config import SPIDER_DATA_DIRNAME
-from user.models import User, VerifyCode, Follow
+from user.models import User, VerifyCode, Follow, AILastState
 from user.hypers import *
 from utils.cast import cur_time
 from utils.country_dict import country_dict
@@ -500,7 +500,68 @@ class FollowCity(View):
 
 
 from utils.country_dict import country_dict
-from analysis.views import get_country_info
+from analysis.views import get_province_info, get_country_info
+
+
+def gener_res(ls, info_func, name_func=str, missing_tips=''):
+    if len(ls) > 0:
+        responses = [join_rand_punc([
+            rand_beg_word(),
+            random.choice([
+                '情况是这样的',
+                '情况是这样子',
+                '我来回答您',
+                '让我看一下',
+                '让我看一下',
+                'emm.. 我看看',
+                'emm.. 哦，是这样子的',
+                '这题我会',
+                '我我我来回答您',
+            ]),
+        ]) + rand_end_punc()]
+        for c in ls:
+            responses.append(name_func(c) + '的情况是' + rand_sep_punc() + info_func(c) + rand_end_punc())
+        if len(ls) >= 3:
+            emotion = -1
+            responses.append(rand_beg_word() + rand_sep_punc() + random.choice([
+                '都给您查完了，客官还满意吗？',
+                '（呼，一口气给亲查了这么多',
+                '亲您问的可真多（小声bb），都给您查完了，您给小嘤点个赞呗~' if CHAT_DEBUG else '都给您查完了，您给小嘤点个赞呗~',
+                '我怎么都查到了，我真是神通广大呀？' if CHAT_DEBUG else '以上',
+                '查数据库工具人属于是' if CHAT_DEBUG else '呼呼，查完啦，您请慢慢看哈~',
+                '查数据库工具人属于是' if CHAT_DEBUG else '呼呼，查完啦，您请慢慢看哈~',
+            ]))
+        else:
+            emotion = 1
+        return 0, responses, '', emotion
+    else:
+        if random.randrange(4):
+            return 0, [rand_beg_word() + rand_sep_punc() + missing_tips + rand_end_face()], '', 0
+        else:
+            return 0, [rand_beg_word() + rand_sep_punc() + missing_tips, rand_end_face()], '', 0
+
+
+def query_policy(ls):
+    p_data = defaultdict(list)
+    for k in list(province_dict_ch.keys() + country_dict.values()):
+        qs = EpidemicPolicy.objects.filter(title__icontains=k)
+        if qs.count():
+            p_data[k].extend([tu[0] for tu in qs.values_list('src')])
+    
+    matched_k = [k for k in p_data.keys() if k in ls]
+    
+    def info_func(k):
+        return f'具体的相关政策请见：{" ; ".join(p_data[k][:3])} 等详情页' + rand_end_word()
+    
+    return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关政策，要不您查查{"、".join(p_data.keys())}的政策 试试？')
+
+
+def query_cond(ls):
+    
+    def info_func(k):
+        return get_province_info(k) if k in province_dict_ch.keys() else get_country_info(k)
+    
+    return gener_res(ls, info_func, str, '')
 
 
 class AIQA(View):
@@ -513,9 +574,9 @@ class AIQA(View):
         
         first_time = query == ''
         if first_time:
-            time.sleep(0.5)
-            return 0, [greet_based_on_time(), add_tail(rand_greet(), q=True)], '', 1
-        
+            first_session_key, _ = chat_query('您好', '')
+            return 0, [greet_based_on_time(), add_tail(rand_greet(), q=True)], first_session_key, 1
+        assert session_key != ''
         
         # for s in [
         #     '我能问你什么',
@@ -549,62 +610,57 @@ class AIQA(View):
                     return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_dev_sent(), q=False) + rand_end_face()], '', -1
                 else:
                     return 0, [rand_beg_word() + rand_sep_punc() + add_tail(rand_dev_sent(), q=False), rand_end_face()], '', -1
-
         query = del_stop_words(query)
-        
-        if '政策' in query:
-            prov_data = defaultdict(list)
-            for p in province_dict_ch.keys():
-                prov_data[p].extend(EpidemicPolicy.objects.filter(title__icontains=p).values_list('title', 'src'))
+
+        qs = AILastState.objects.filter(sid=session_key)
+        if qs.exists():
+            last_state = qs.get()
+        else:
+            last_state = {'policy': False, 'cond': False, 'ls': []}
+        AILastState.objects.update_or_create(sid=session_key, defaults={
+            'last_state': {'policy': False, 'cond': False, 'ls': []}
+        })
+
+        cur_state = {
+            'policy': any(x in query for x in ['政策', '政务', '方针', '策略']),
+            'cond': any(x in query for x in ['现况', '情况', '状况', '现状']),
+            'ls': [p for p in province_dict_ch.keys() if p in query] + [c for c in country_dict.values() if c in query]
+        }
+        if len(cur_state['ls']):
+            if cur_state['policy']:
+                return query_policy(cur_state['ls'])
+            elif cur_state['cond']:
+                return query_cond(cur_state['ls'])
+            elif last_state['policy']:
+                return query_policy(cur_state['ls'])
+            elif last_state['cond']:
+                return query_cond(cur_state['ls'])
+            else:
+                AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': cur_state})
+                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是什么？是疫情政策，还是疫情情况呢？')
             
-            ps = [p for p in prov_data.keys() if p in query]
-            if len(ps) > 0:
-                pass
+        elif len(last_state['ls']):
+            if cur_state['policy']:
+                return query_policy(last_state['ls'])
+            elif cur_state['cond']:
+                return query_policy(last_state['ls'])
             else:
-                if random.randrange(4):
-                    return 0, [rand_beg_word() + rand_sep_punc() + f'好像找不到相关的政策信息？建议问{"、".join(prov_data.keys())}这几个地方的政策哟！' + rand_end_face()], '', 0
-                else:
-                    return 0, [rand_beg_word() + rand_sep_punc() + f'好像找不到相关的政策信息？建议问{"、".join(prov_data.keys())}这几个地方的政策哟！', rand_end_face()], '', 0
-        
-        if any(x in query for x in ['疫情', '情况', '状况', '现状']):
-            countries = [c for c in country_dict.values() if c in query]
-            if len(countries) > 0:
-                first_res = join_rand_punc([
-                    rand_beg_word(),
-                    random.choice([
-                        '情况是这样的',
-                        '情况是这样子',
-                        '我来回答您',
-                        '让我看一下',
-                        '让我看一下',
-                        'emm.. 我看看',
-                        'emm.. 哦，是这样子的',
-                        '这题我会',
-                        '我我我来回答您',
-                    ]),
-                ]) + rand_end_punc()
-                responses = [first_res]
-                for c in countries:
-                    responses.append(c + '的情况是' + rand_sep_punc() + get_country_info(c) + rand_end_punc())
-                if len(countries) >= 3:
-                    emotion = -1
-                    responses.append(rand_beg_word() + rand_sep_punc() + random.choice([
-                        '都给您查完了，客官还满意吗？',
-                        '（呼，一口气给亲查了这么多',
-                        '亲您问的可真多（小声bb），都给您查完了，您给小嘤点个赞呗~' if CHAT_DEBUG else '都给您查完了，您给小嘤点个赞呗~',
-                        '我怎么都查到了，我真是神通广大呀？' if CHAT_DEBUG else '以上',
-                        '查数据库工具人属于是' if CHAT_DEBUG else '呼呼，查完啦，您请慢慢看哈~',
-                        '查数据库工具人属于是' if CHAT_DEBUG else '呼呼，查完啦，您请慢慢看哈~',
-                    ]))
-                else:
-                    emotion = 1
-                time.sleep(0.3)
-                return 0, responses, '', emotion
-            else:
-                if random.randrange(4):
-                    return 0, [rand_beg_word() + rand_sep_punc() + '您好像忘了告诉我具体地点了哦？附上地点再问一次吧！' + rand_end_face()], '', 0
-                else:
-                    return 0, [rand_beg_word() + rand_sep_punc() + '您好像忘了告诉我具体地点了哦？附上地点再问一次吧！', rand_end_face()], '', 0
+                AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': last_state})
+                return gener_res([], str, str, f'抱歉，但您这次仍然是没有告诉我您想问的是什么？是疫情政策，还是疫情情况呢？')
+
+        else:
+            if cur_state['policy']:
+                AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': cur_state})
+                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是哪个省份或者国家？')
+            elif cur_state['cond']:
+                AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': cur_state})
+                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是哪个省份或者国家？')
+            elif last_state['policy']:
+                AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': last_state})
+                return gener_res([], str, str, f'抱歉，但您这次仍然没有告诉我您想问的是哪个省份或者国家？')
+            elif last_state['cond']:
+                AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': last_state})
+                return gener_res([], str, str, f'抱歉，但您这次仍然没有告诉我您想问的是哪个省份或者国家？')
 
         try:
             new_session_key, ai_response = chat_query(query, session_key)
