@@ -1,4 +1,4 @@
-CHAT_DEBUG = False
+CHAT_DEBUG = True
 
 import re
 import random
