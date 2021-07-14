@@ -645,7 +645,7 @@ class AIQA(View):
         cur_state = {
             'policy': any(x in query for x in ['政策', '政务', '方针', '策略']),
             'news': any(x in query for x in ['新闻', '新讯息']),
-            'cond': any(x in query for x in ['现况', '情况', '状况', '现状']),
+            'cond': any(x in query for x in ['数据', '数量', '统计', '分析']),
             'ls': [p for p in province_dict_ch.keys() if p in query] + [c for c in country_dict.values() if c in query]
         }
         if len(cur_state['ls']):
@@ -663,7 +663,7 @@ class AIQA(View):
                 return query_cond(cur_state['ls'])
             else:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': cur_state})
-                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是什么？是疫情政策、疫情新闻，还是疫情情况呢？')
+                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是什么？是疫情政策、疫情新闻，还是疫情数据呢？')
             
         elif len(last_state['ls']):
             if cur_state['policy']:
@@ -674,7 +674,7 @@ class AIQA(View):
                 return query_cond(last_state['ls'])
             else:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': last_state})
-                return gener_res([], str, str, f'抱歉，但您这次仍然是没有告诉我您想问的是什么？是疫情政策、疫情新闻，还是疫情情况呢？')
+                return gener_res([], str, str, f'抱歉，但您这次仍然是没有告诉我您想问的是什么？是疫情政策、疫情新闻，还是疫情数据呢？')
 
         else:
             if cur_state['policy']:
