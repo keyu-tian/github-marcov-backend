@@ -66,6 +66,7 @@ def del_stop_words(s: str):
     if '我是谁' in s:
         s = s.replace('我是谁', random.choice(['我是谁', '我是谁你知道吗', '你打听打听我的名字', '你知道我的名字吗', '我是你']))
 
+    s = s.replace('我国', '中国').replace('国内', '中国内')
     res = []
     for ch in s:
         if ch == '我':
