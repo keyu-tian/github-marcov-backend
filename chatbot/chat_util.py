@@ -18,7 +18,7 @@ def greet_based_on_time():
             '哥，DDL赶完了吗就逛网站！',
             '哥，别肝了！',
         ])
-    if h <= 11.5:
+    if h <= 11:
         return random.choice(['早上好', '早安']) + random.choice(['~ ', '，']) + random.choice([
             '早起的鸟儿有虫吃！',
             '一日之计在于晨！',
