@@ -59,18 +59,19 @@ def get_flight_info_by_code(code, date=datetime.now().strftime('%Y-%m-%d')):
 def get_flight_dept_and_arri_info_res(flight):
     # 传入flight对象，按交互文档travel/search格式返回dict
     risk = max(get_city_risk_level(flight.dept_airport.city_name), get_city_risk_level(flight.arri_airport.city_name))
+    is_cancel = flight.condition == "取消"
     start = {
         'station_name': flight.dept_airport.airport_name,
         'city_name': flight.dept_airport.city_name,
         'country_name': flight.dept_airport.country_name,
-        'risk': risk,
+        'risk': risk if not is_cancel else -1,
         'datetime': flight.dept_time
     }
     end = {
         'station_name': flight.arri_airport.airport_name,
         'city_name': flight.arri_airport.city_name,
         'country_name': flight.arri_airport.country_name,
-        'risk': get_city_risk_level(flight.arri_airport.city_name),
+        'risk': risk if not is_cancel else -1,
         'datetime': flight.arri_time
     }
     result = {
@@ -112,7 +113,7 @@ class TravelPlane(View):
             'pos': [arri_airport.jingdu, arri_airport.weidu]
         }
         stations = [start_station, end_station]
-        risk_level = math.ceil((start_station['risk_level'] + end_station['risk_level'])/2)
+        risk_level = max(start_station['risk_level'], end_station['risk_level'])
         # if math.ceil(risk_level) >= 4:
         #     msg = '当前线路存在较大疫情风险，请谨慎考虑出行。'
         # elif math.ceil(risk_level) >= 1:

@@ -7,7 +7,7 @@ from spiders.epidemic_global_importer import dt_delta
 from user.models import User, Follow
 from utils.country_dict import country_dict
 from utils.meta_wrapper import JSR
-from utils.dict_ch import province_dict_ch
+from utils.dict_ch import province_dict_ch, vaccine
 import datetime as dt
 import json
 import os
@@ -177,7 +177,12 @@ def country_analyse_data_res(kwargs):
                     daily_data.append({
                         'date': d['date'],
                         'new': c['new'],
-                        'total': c['total']
+                        'total': {
+                            'confirmed': c['total']['confirmed'],
+                            'died': c['total']['died'],
+                            'cured': c['total']['cured'],
+                            'vaccinated': vaccine[kwargs['name']],
+                        }
                     })
     else:
         global_analysis = json.load(open(global_json_path, 'r', encoding='utf-8'))
