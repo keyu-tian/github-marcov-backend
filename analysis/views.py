@@ -177,13 +177,16 @@ def country_analyse_data_res(kwargs):
                     daily_data.append({
                         'date': d['date'],
                         'new': c['new'],
-                        'total': {
-                            'confirmed': c['total']['confirmed'],
-                            'died': c['total']['died'],
-                            'cured': c['total']['cured'],
-                            'vaccinated': vaccine[kwargs['name']],
-                        }
+                        'total': c['total']
                     })
+                """
+                {
+                    'confirmed': c['total']['confirmed'],
+                    'died': c['total']['died'],
+                    'cured': c['total']['cured'],
+                    'vaccinated': vaccine[kwargs['name']],
+                }
+                """
     else:
         global_analysis = json.load(open(global_json_path, 'r', encoding='utf-8'))
         for d in global_analysis[:-1]:
