@@ -649,7 +649,7 @@ class AIQA(View):
         cur_state = {
             'policy': any(x in query for x in ['政策', '政务', '方针', '策略']),
             'news': any(x in query for x in ['新闻', '新讯息']),
-            'cond': any(x in query for x in ['数据', '数量', '统计', '分析']),
+            'cond': any(x in query for x in ['现状', '总览', '总计', '总结', '数据', '数量', '统计', '分析']),
             'ls': [p for p in province_dict_ch.keys() if p in query] + [c for c in country_dict.values() if c in query]
         }
         if len(cur_state['ls']):
