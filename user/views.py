@@ -546,7 +546,7 @@ def query_policy(ls):
     for k in list(province_dict_ch.keys()) + list(country_dict.values()):
         qs = EpidemicPolicy.objects.filter(title__icontains=k)
         if qs.count():
-            p_data[k].extend([f'{tu[0][:10]}... ({tu[1]})' for tu in qs.values_list('title', 'src')])
+            p_data[k].extend([f'{tu[0][:15]}... ({tu[1]})' for tu in qs.values_list('title', 'src')])
     
     matched_k = [k for k in p_data.keys() if k in ls]
     
