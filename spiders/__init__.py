@@ -68,7 +68,7 @@ def init_import():
     print('\n' + colorama.Fore.WHITE + '=> `init_import` started ...')
 
     # re_import('risk', True)
-    re_import('news', True, delete_old_data=True)
+    re_import('news', True, delete_old_data=False)
     # re_import('dxy_news', False, delete_old_data=False)  # 不launch是因为 dxy_news 没有 spider，只有 importer
     # re_import('yaoyan', True, line_start=0)
     # re_import('travel_policy', True, line_start=0)
