@@ -614,7 +614,7 @@ class AIQA(View):
 
         qs = AILastState.objects.filter(sid=session_key)
         if qs.exists():
-            last_state = qs.get()
+            last_state = qs.get().last_state
         else:
             last_state = {'policy': False, 'cond': False, 'ls': []}
         AILastState.objects.update_or_create(sid=session_key, defaults={
