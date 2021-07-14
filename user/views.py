@@ -543,7 +543,7 @@ def gener_res(ls, info_func, name_func=str, missing_tips=''):
 
 def query_policy(ls):
     p_data = defaultdict(list)
-    for k in list(province_dict_ch.keys() + country_dict.values()):
+    for k in list(province_dict_ch.keys()) + list(country_dict.values()):
         qs = EpidemicPolicy.objects.filter(title__icontains=k)
         if qs.count():
             p_data[k].extend([tu[0] for tu in qs.values_list('src')])
