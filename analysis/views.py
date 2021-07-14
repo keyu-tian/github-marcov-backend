@@ -177,16 +177,13 @@ def country_analyse_data_res(kwargs):
                     daily_data.append({
                         'date': d['date'],
                         'new': c['new'],
-                        'total': c['total']
+                        'total': {
+                            'confirmed': c['total']['confirmed'],
+                            'died': c['total']['died'],
+                            'cured': c['total']['cured'],
+                            'vaccinated': vaccine[kwargs['name']],
+                        }
                     })
-                """
-                {
-                    'confirmed': c['total']['confirmed'],
-                    'died': c['total']['died'],
-                    'cured': c['total']['cured'],
-                    'vaccinated': vaccine[kwargs['name']],
-                }
-                """
     else:
         global_analysis = json.load(open(global_json_path, 'r', encoding='utf-8'))
         for d in global_analysis[:-1]:
@@ -224,7 +221,8 @@ def get_province_info(province):
     if province not in province_dict_ch.keys():
         return "没有该省信息"
     else:
-        with open(os.path.join(SPIDER_DATA_DIRNAME, "epidemic_domestic_data", "province.json"), "r", encoding="utf-8") as f:
+        with open(os.path.join(SPIDER_DATA_DIRNAME, "epidemic_domestic_data", "province.json"), "r",
+                  encoding="utf-8") as f:
             data = json.load(f)
             provinces_data = data[-1]
             date = provinces_data['date'].split('-')
