@@ -224,7 +224,8 @@ def get_province_info(province):
     if province not in province_dict_ch.keys():
         return "没有该省信息"
     else:
-        with open(os.path.join(SPIDER_DATA_DIRNAME, "epidemic_domestic_data", "province.json"), "r", encoding="utf-8") as f:
+        with open(os.path.join(SPIDER_DATA_DIRNAME, "epidemic_domestic_data", "province.json"), "r",
+                  encoding="utf-8") as f:
             data = json.load(f)
             provinces_data = data[-1]
             date = provinces_data['date'].split('-')
