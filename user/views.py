@@ -528,8 +528,8 @@ def gener_res(ls, info_func, name_func=str, missing_tips=''):
                 '（呼，一口气给亲查了这么多',
                 '亲您问的可真多（小声bb），都给您查完了，您给小嘤点个赞呗~' if CHAT_DEBUG else '都给您查完了，您给小嘤点个赞呗~',
                 '我怎么都查到了，我真是神通广大呀？' if CHAT_DEBUG else '以上',
-                '查数据库工具人属于是' if CHAT_DEBUG else '呼呼，查完啦，您请慢慢看哈~',
-                '查数据库工具人属于是' if CHAT_DEBUG else '呼呼，查完啦，您请慢慢看哈~',
+                '小嘤是查数据库工具人属于是' if CHAT_DEBUG else '呼呼，查完啦，您请慢慢看哈~',
+                '小嘤是查数据库工具人属于是' if CHAT_DEBUG else '呼呼，查完啦，您请慢慢看哈~',
             ]))
         else:
             emotion = 1
