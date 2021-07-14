@@ -99,7 +99,7 @@ def test_data_import():
         try:
             u = User.objects.get(name=f'{expert_name[i]}', account=f'{expert_name[i]}123', pwd=f'{expert_name[i]}123', identity=2)
         except:
-            u = User.objects.create(name=f'{expert_name[i]}', account=f'{expert_name[i]}123', pwd=f'{expert_name[i]}123', identity=2)
+            u = User.objects.create(name=f'{expert_name[i]}', account=f'{expert_name[i]}123', pwd=f'{expert_name[i]}123', identity=2, avatar=f'http://106.53.125.203/upload/avatar/{expert_name[i]}.jpg')
         users.append(u)
     questions = []
     question_num = Question.objects.all().count()
