@@ -511,6 +511,8 @@ def gener_res(ls, info_func, name_func=str, missing_tips=''):
             random.choice([
                 '是这样的',
                 '是这样子',
+                '我查到了',
+                '我找到了',
                 '我来回答您',
                 '让我看一下',
                 '让我看一下',
