@@ -1,7 +1,11 @@
+import datetime
+
 from django.views import View
 
 from meta_config import SPIDER_DATA_DIRNAME
+from spiders.epidemic_global_importer import dt_delta
 from user.models import User, Follow
+from utils.country_dict import country_dict
 from utils.meta_wrapper import JSR
 from utils.dict_ch import province_dict_ch
 import datetime as dt
@@ -35,7 +39,8 @@ def get_is_star(request, level, country='', province='', city=''):
         else:
             return 0
     else:
-        if follow_set.filter(level=1, country=country).exists() or follow_set.filter(level=2, province=country).exists():
+        if follow_set.filter(level=1, country=country).exists() or follow_set.filter(level=2,
+                                                                                     province=country).exists():
             return 1
         else:
             return 0
@@ -187,3 +192,43 @@ def country_analyse_data_res(kwargs):
 
     return population, daily_data
 
+
+def get_country_info(country):
+    if country not in country_dict.values():
+        return "没有该国家信息"
+    else:
+        with open(os.path.join(SPIDER_DATA_DIRNAME, "true_data.json"), "r", encoding="utf-8") as f:
+            data = json.load(f)
+            date = datetime.date.today() + datetime.timedelta(-1)
+            msg = "截至%s年%s月%s日，%s现有确诊%s人、治愈%s人、死亡%s人，较前一日新增确诊%s人、新增治愈%s人、新增死亡%s人" \
+                  % (str(date.year), str(date.month), str(date.day),
+                     country,
+                     data[country]["confirmed"],
+                     data[country]["cured"],
+                     data[country]["died"],
+                     data[country]["new_confirmed"],
+                     data[country]["new_cured"],
+                     data[country]["new_died"],)
+            return msg
+
+
+def get_province_info(province):
+    if province not in province_dict_ch.keys():
+        return "没有该省信息"
+    else:
+        with open(os.path.join(SPIDER_DATA_DIRNAME, "epidemic_domestic_data", "province.json"), "r", encoding="utf-8") as f:
+            data = json.load(f)
+            provinces_data = data[-1]
+            date = provinces_data['date'].split('-')
+            for province_data in provinces_data['provinces']:
+                if province_data['name'] == province:
+                    msg = "截至%s年%s月%s日，%s现有确诊%s人、治愈%s人、死亡%s人，较前一日新增确诊%s人、新增治愈%s人、新增死亡%s人" \
+                          % (date[0], date[1], date[2],
+                             province,
+                             province_data['total']["confirmed"],
+                             province_data['total']["cured"],
+                             province_data['total']["died"],
+                             province_data['new']["confirmed"],
+                             province_data['new']["cured"],
+                             province_data['new']["died"])
+                    return msg

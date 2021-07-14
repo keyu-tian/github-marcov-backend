@@ -50,3 +50,9 @@ class Follow(models.Model):
 
     class Meta:
         ordering = ('level', 'country', 'province', 'city')
+
+
+class AILastState(models.Model):
+    sid = models.CharField(max_length=128, unique=True, primary_key=True, db_index=True)
+    last_state = models.JSONField(null=False)
+    
