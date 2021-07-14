@@ -509,8 +509,8 @@ def gener_res(ls, info_func, name_func=str, missing_tips=''):
         responses = [join_rand_punc([
             rand_beg_word(),
             random.choice([
-                '情况是这样的',
-                '情况是这样子',
+                '是这样的',
+                '是这样子',
                 '我来回答您',
                 '让我看一下',
                 '让我看一下',
@@ -521,7 +521,7 @@ def gener_res(ls, info_func, name_func=str, missing_tips=''):
             ]),
         ]) + rand_end_punc()]
         for c in ls:
-            responses.append(name_func(c) + '的情况是' + rand_sep_punc() + info_func(c) + rand_end_punc())
+            responses.append(name_func(c) + '的相关结果是' + rand_sep_punc() + info_func(c) + rand_end_punc())
         if len(ls) >= 3:
             emotion = -1
             responses.append(rand_beg_word() + rand_sep_punc() + random.choice([
@@ -556,7 +556,7 @@ def query_policy(ls):
 
     ks = list(p_data.keys())
     random.shuffle(ks)
-    return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关政策，要不您查查{"、".join(ks[:5])}的政策 试试？')
+    return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关政策，要不您查查{"、".join(ks[:10])}... 的政策 试试？')
 
 
 def query_news(ls):
@@ -572,8 +572,9 @@ def query_news(ls):
         return f'具体的相关新闻请见：{" ; ".join(p_data[k][:2])} 等详情页' + rand_end_word() + rand_end_face()
     
     ks = list(p_data.keys())
+    ks = list(set(ks) - {'中国'})
     random.shuffle(ks)
-    return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关新闻，要不您查查{"、".join(ks[:5])}的新闻 试试？')
+    return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关新闻，要不您查查{"、".join(ks[:10])}... 的新闻 试试？')
 
 
 def query_cond(ls):
