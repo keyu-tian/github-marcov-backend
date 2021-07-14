@@ -546,12 +546,12 @@ def query_policy(ls):
     for k in list(province_dict_ch.keys()) + list(country_dict.values()):
         qs = EpidemicPolicy.objects.filter(title__icontains=k)
         if qs.count():
-            p_data[k].extend([tu[0] for tu in qs.values_list('src')])
+            p_data[k].extend([f'{tu[0][:10]}... ({tu[1]})' for tu in qs.values_list('title', 'src')])
     
     matched_k = [k for k in p_data.keys() if k in ls]
     
     def info_func(k):
-        return f'具体的相关政策请见：{" ; ".join(p_data[k][:3])} 等详情页' + rand_end_word() + rand_end_face()
+        return f'具体的相关政策请见：{" ; ".join(p_data[k][0])} 等详情页' + rand_end_word() + rand_end_face()
     
     return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关政策，要不您查查{"、".join(p_data.keys())}的政策 试试？')
 
