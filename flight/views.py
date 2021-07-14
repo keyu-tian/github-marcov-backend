@@ -113,7 +113,7 @@ class TravelPlane(View):
             'pos': [arri_airport.jingdu, arri_airport.weidu]
         }
         stations = [start_station, end_station]
-        risk_level = math.ceil((start_station['risk_level'] + end_station['risk_level'])/2)
+        risk_level = max(start_station['risk_level'], end_station['risk_level'])
         # if math.ceil(risk_level) >= 4:
         #     msg = '当前线路存在较大疫情风险，请谨慎考虑出行。'
         # elif math.ceil(risk_level) >= 1:
