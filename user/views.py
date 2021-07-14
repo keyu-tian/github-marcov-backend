@@ -525,10 +525,10 @@ def gener_res(ls, info_func, name_func=str, missing_tips=''):
         if len(ls) >= 3:
             emotion = -1
             responses.append(rand_beg_word() + rand_sep_punc() + random.choice([
-                '都给您查完了，客官还满意吗？',
+                f'都给您查完了，客官还满意吗{rand_end_query()}',
                 '（呼，一口气给亲查了这么多',
                 '亲您问的可真多（小声bb），都给您查完了，您给小嘤点个赞呗~' if CHAT_DEBUG else '都给您查完了，您给小嘤点个赞呗~',
-                '我怎么都查到了，我真是神通广大呀？' if CHAT_DEBUG else '以上',
+                f'我怎么都查到了，我真是神通广大呀{rand_end_query()}' if CHAT_DEBUG else '以上',
                 '小嘤是查数据库工具人属于是' if CHAT_DEBUG else '呼呼，查完啦，您请慢慢看哈~',
                 '小嘤是查数据库工具人属于是' if CHAT_DEBUG else '呼呼，查完啦，您请慢慢看哈~',
             ]))
@@ -556,7 +556,7 @@ def query_policy(ls):
 
     ks = list(p_data.keys())
     random.shuffle(ks)
-    return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关政策，要不您查查{"、".join(ks[:10])}... 的政策 试试？')
+    return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关政策，要不您查查{"、".join(ks[:10])}... 的政策 试试' + rand_end_word())
 
 
 def query_news(ls):
@@ -574,7 +574,7 @@ def query_news(ls):
     ks = list(p_data.keys())
     ks = list(set(ks) - {'中国'})
     random.shuffle(ks)
-    return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关新闻，要不您查查{"、".join(ks[:10])}... 的新闻 试试？')
+    return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关新闻，要不您查查{"、".join(ks[:10])}... 的新闻 试试' + rand_end_word())
 
 
 def query_cond(ls):
@@ -645,7 +645,7 @@ class AIQA(View):
         cur_state = {
             'policy': any(x in query for x in ['政策', '政务', '方针', '策略']),
             'news': any(x in query for x in ['新闻', '新讯息']),
-            'cond': any(x in query for x in ['现况', '情况', '状况', '现状']),
+            'cond': any(x in query for x in ['数据', '数量', '统计', '分析']),
             'ls': [p for p in province_dict_ch.keys() if p in query] + [c for c in country_dict.values() if c in query]
         }
         if len(cur_state['ls']):
@@ -663,7 +663,7 @@ class AIQA(View):
                 return query_cond(cur_state['ls'])
             else:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': cur_state})
-                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是什么？是疫情政策、疫情新闻，还是疫情情况呢？')
+                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是什么？是疫情政策、疫情新闻，还是疫情数据呢' + rand_end_query())
             
         elif len(last_state['ls']):
             if cur_state['policy']:
@@ -674,27 +674,27 @@ class AIQA(View):
                 return query_cond(last_state['ls'])
             else:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': last_state})
-                return gener_res([], str, str, f'抱歉，但您这次仍然是没有告诉我您想问的是什么？是疫情政策、疫情新闻，还是疫情情况呢？')
+                return gener_res([], str, str, f'抱歉，但您这次仍然是没有告诉我您想问的是什么？是疫情政策、疫情新闻，还是疫情数据呢' + rand_end_query())
 
         else:
             if cur_state['policy']:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': cur_state})
-                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是哪个省份或者国家？')
+                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是哪个省份或者国家' + rand_end_query())
             elif cur_state['news']:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': cur_state})
-                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是哪个省份或者国家？')
+                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是哪个省份或者国家' + rand_end_query())
             elif cur_state['cond']:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': cur_state})
-                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是哪个省份或者国家？')
+                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是哪个省份或者国家' + rand_end_query())
             elif last_state['policy']:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': last_state})
-                return gener_res([], str, str, f'抱歉，但您这次仍然没有告诉我您想问的是哪个省份或者国家？')
+                return gener_res([], str, str, f'抱歉，但您这次仍然没有告诉我您想问的是哪个省份或者国家' + rand_end_query())
             elif last_state['news']:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': last_state})
-                return gener_res([], str, str, f'抱歉，但您这次仍然没有告诉我您想问的是哪个省份或者国家？')
+                return gener_res([], str, str, f'抱歉，但您这次仍然没有告诉我您想问的是哪个省份或者国家' + rand_end_query())
             elif last_state['cond']:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': last_state})
-                return gener_res([], str, str, f'抱歉，但您这次仍然没有告诉我您想问的是哪个省份或者国家？')
+                return gener_res([], str, str, f'抱歉，但您这次仍然没有告诉我您想问的是哪个省份或者国家' + rand_end_query())
 
         try:
             new_session_key, ai_response = chat_query(query, session_key)
