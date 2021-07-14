@@ -21,6 +21,7 @@ from epidemic.views import map_today_city_data_res
 from knowledge.models import EpidemicPolicy
 from marcov19.settings import SERVER_HOST
 from meta_config import SPIDER_DATA_DIRNAME
+from news.models import News
 from user.models import User, VerifyCode, Follow, AILastState
 from user.hypers import *
 from utils.cast import cur_time
@@ -552,8 +553,27 @@ def query_policy(ls):
     
     def info_func(k):
         return f'具体的相关政策请见：{" ; ".join(p_data[k][:2])} 等详情页' + rand_end_word() + rand_end_face()
+
+    ks = list(p_data.keys())
+    random.shuffle(ks)
+    return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关政策，要不您查查{"、".join(ks[:5])}的政策 试试？')
+
+
+def query_news(ls):
+    p_data = defaultdict(list)
+    for k in list(province_dict_ch.keys()) + list(country_dict.values()):
+        qs = News.objects.filter(title__icontains=k)
+        if qs.count():
+            p_data[k].extend([f'{tu[0][:15]}... ({tu[1]})' for tu in qs.values_list('title', 'url')])
     
-    return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关政策，要不您查查{"、".join(p_data.keys())}的政策 试试？')
+    matched_k = [k for k in p_data.keys() if k in ls]
+    
+    def info_func(k):
+        return f'具体的相关新闻请见：{" ; ".join(p_data[k][:2])} 等详情页' + rand_end_word() + rand_end_face()
+    
+    ks = list(p_data.keys())
+    random.shuffle(ks)
+    return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关新闻，要不您查查{"、".join(ks[:5])}的新闻 试试？')
 
 
 def query_cond(ls):
@@ -616,46 +636,59 @@ class AIQA(View):
         if qs.exists():
             last_state = qs.get().last_state
         else:
-            last_state = {'policy': False, 'cond': False, 'ls': []}
+            last_state = {'policy': False, 'news': False, 'cond': False, 'ls': []}
         AILastState.objects.update_or_create(sid=session_key, defaults={
-            'last_state': {'policy': False, 'cond': False, 'ls': []}
+            'last_state': {'policy': False, 'news': False, 'cond': False, 'ls': []}
         })
 
         cur_state = {
             'policy': any(x in query for x in ['政策', '政务', '方针', '策略']),
+            'news': any(x in query for x in ['新闻', '新讯息']),
             'cond': any(x in query for x in ['现况', '情况', '状况', '现状']),
             'ls': [p for p in province_dict_ch.keys() if p in query] + [c for c in country_dict.values() if c in query]
         }
         if len(cur_state['ls']):
             if cur_state['policy']:
                 return query_policy(cur_state['ls'])
+            elif cur_state['news']:
+                return query_news(cur_state['ls'])
             elif cur_state['cond']:
                 return query_cond(cur_state['ls'])
             elif last_state['policy']:
                 return query_policy(cur_state['ls'])
+            elif last_state['news']:
+                return query_news(cur_state['ls'])
             elif last_state['cond']:
                 return query_cond(cur_state['ls'])
             else:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': cur_state})
-                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是什么？是疫情政策，还是疫情情况呢？')
+                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是什么？是疫情政策、疫情新闻，还是疫情情况呢？')
             
         elif len(last_state['ls']):
             if cur_state['policy']:
                 return query_policy(last_state['ls'])
+            elif cur_state['news']:
+                return query_news(last_state['ls'])
             elif cur_state['cond']:
                 return query_cond(last_state['ls'])
             else:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': last_state})
-                return gener_res([], str, str, f'抱歉，但您这次仍然是没有告诉我您想问的是什么？是疫情政策，还是疫情情况呢？')
+                return gener_res([], str, str, f'抱歉，但您这次仍然是没有告诉我您想问的是什么？是疫情政策、疫情新闻，还是疫情情况呢？')
 
         else:
             if cur_state['policy']:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': cur_state})
                 return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是哪个省份或者国家？')
+            elif cur_state['news']:
+                AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': cur_state})
+                return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是哪个省份或者国家？')
             elif cur_state['cond']:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': cur_state})
                 return gener_res([], str, str, f'抱歉，但您没有告诉我您想问的是哪个省份或者国家？')
             elif last_state['policy']:
+                AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': last_state})
+                return gener_res([], str, str, f'抱歉，但您这次仍然没有告诉我您想问的是哪个省份或者国家？')
+            elif last_state['news']:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': last_state})
                 return gener_res([], str, str, f'抱歉，但您这次仍然没有告诉我您想问的是哪个省份或者国家？')
             elif last_state['cond']:
