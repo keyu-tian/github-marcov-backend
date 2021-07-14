@@ -212,21 +212,23 @@ def get_country_info(country):
             return msg
 
 
-# todo: lrq
-def get_province_info(country):
-    if country not in country_dict.values():
-        return "没有该国家信息"
+def get_province_info(province):
+    if province not in province_dict_ch.keys():
+        return "没有该省信息"
     else:
-        with open(os.path.join(SPIDER_DATA_DIRNAME, "true_data.json"), "r", encoding="utf-8") as f:
+        with open(os.path.join(SPIDER_DATA_DIRNAME, "epidemic_domestic_data", "province.json"), "r", encoding="utf-8") as f:
             data = json.load(f)
-            date = datetime.date.today() + datetime.timedelta(-1)
-            msg = "截至%s年%s月%s日，%s现有确诊%s人、治愈%s人、死亡%s人，较前一日新增确诊%s人、新增治愈%s人、新增死亡%s人" \
-                  % (str(date.year), str(date.month), str(date.day),
-                     country,
-                     data[country]["confirmed"],
-                     data[country]["cured"],
-                     data[country]["died"],
-                     data[country]["new_confirmed"],
-                     data[country]["new_cured"],
-                     data[country]["new_died"],)
-            return msg
+            provinces_data = data[-1]
+            date = provinces_data['date'].split('-')
+            for province_data in provinces_data['provinces']:
+                if province_data['name'] == province:
+                    msg = "截至%s年%s月%s日，%s现有确诊%s人、治愈%s人、死亡%s人，较前一日新增确诊%s人、新增治愈%s人、新增死亡%s人" \
+                          % (date[0], date[1], date[2],
+                             province,
+                             province_data['total']["confirmed"],
+                             province_data['total']["cured"],
+                             province_data['total']["died"],
+                             province_data['new']["confirmed"],
+                             province_data['new']["cured"],
+                             province_data['new']["died"])
+                    return msg
