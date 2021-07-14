@@ -7,6 +7,8 @@ from django.db.models import Q
 
 # 根据城市名字获取该城市风险等级
 def get_city_risk_level(name) -> int:
+    if name == '':
+        return 2
     if Airport.objects.filter(~Q(country_name='中国'), city_name=name).count() > 0:
         return 4
     if RiskArea.objects.filter(address__icontains=name, level=2).count() > 0:
