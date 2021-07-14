@@ -552,6 +552,7 @@ def query_policy(ls):
     matched_k = [k for k in p_data.keys() if k in ls]
     
     def info_func(k):
+        random.shuffle(p_data[k])
         return f'具体的相关政策请见：{" ; ".join(p_data[k][:2])} 等详情页' + rand_end_word() + rand_end_face()
 
     ks = list(p_data.keys())
@@ -569,7 +570,8 @@ def query_news(ls):
     matched_k = [k for k in p_data.keys() if k in ls]
     
     def info_func(k):
-        return f'具体的相关新闻请见：{" ; ".join(p_data[k][:2])} 等详情页' + rand_end_word() + rand_end_face()
+        random.shuffle(p_data[k])
+        return f'具体的相关新闻请见：{" ; ".join(p_data[k][:3])} 等详情页' + rand_end_word() + rand_end_face()
     
     ks = list(p_data.keys())
     ks = list(set(ks) - {'中国'})
