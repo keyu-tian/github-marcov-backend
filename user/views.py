@@ -551,7 +551,7 @@ def query_policy(ls):
     matched_k = [k for k in p_data.keys() if k in ls]
     
     def info_func(k):
-        return f'具体的相关政策请见：{" ; ".join(p_data[k][:3])} 等详情页' + rand_end_word()
+        return f'具体的相关政策请见：{" ; ".join(p_data[k][:3])} 等详情页' + rand_end_word() + rand_end_face()
     
     return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关政策，要不您查查{"、".join(p_data.keys())}的政策 试试？')
 
@@ -643,7 +643,7 @@ class AIQA(View):
             if cur_state['policy']:
                 return query_policy(last_state['ls'])
             elif cur_state['cond']:
-                return query_policy(last_state['ls'])
+                return query_cond(last_state['ls'])
             else:
                 AILastState.objects.update_or_create(sid=session_key, defaults={'last_state': last_state})
                 return gener_res([], str, str, f'抱歉，但您这次仍然是没有告诉我您想问的是什么？是疫情政策，还是疫情情况呢？')
