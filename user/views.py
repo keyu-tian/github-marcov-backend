@@ -551,7 +551,7 @@ def query_policy(ls):
     matched_k = [k for k in p_data.keys() if k in ls]
     
     def info_func(k):
-        return f'具体的相关政策请见：{" ; ".join(p_data[k][0])} 等详情页' + rand_end_word() + rand_end_face()
+        return f'具体的相关政策请见：{" ; ".join(p_data[k][:2])} 等详情页' + rand_end_word() + rand_end_face()
     
     return gener_res(matched_k, info_func, str, f'抱歉哈，没有给{rand_beg_word()}查到相关政策，要不您查查{"、".join(p_data.keys())}的政策 试试？')
 
