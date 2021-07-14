@@ -14,13 +14,13 @@ from django.db.utils import IntegrityError, DataError
 
 from analysis.views import country_analyse_data_res
 from chatbot.chat_api import chat_query
-from chatbot.chat_util import greet_based_on_time, rand_greet, add_tail, del_stop_words, rand_beg_word, rand_sep_punc, join_rand_punc, rand_end_face, rand_end_punc, CHAT_DEBUG, tricky_keys, juan_keys, \
+from chatbot.chat_util import greet_based_on_time, rand_greet, add_tail, del_stop_words, rand_beg_word, rand_sep_punc, join_rand_punc, rand_end_face, rand_end_punc, tricky_keys, juan_keys, \
     rand_tricky_sent, rand_juan_sent, rand_no_idea_sent, rand_end_query, endswith_ch_punc, dev_keys, rand_dev_sent, rand_end_word
 from epidemic.models import HistoryEpidemicData
 from epidemic.views import map_today_city_data_res
 from knowledge.models import EpidemicPolicy
 from marcov19.settings import SERVER_HOST
-from meta_config import SPIDER_DATA_DIRNAME
+from meta_config import SPIDER_DATA_DIRNAME, CHAT_DEBUG
 from news.models import News
 from user.models import User, VerifyCode, Follow, AILastState
 from user.hypers import *

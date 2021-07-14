@@ -1,5 +1,4 @@
-CHAT_DEBUG = False
-
+from meta_config import CHAT_DEBUG
 import re
 import random
 import datetime
